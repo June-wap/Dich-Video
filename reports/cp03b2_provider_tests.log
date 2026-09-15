@@ -1,0 +1,46 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Tool Dich Cho Khach
+plugins: anyio-4.15.1
+collecting ... collected 27 items
+
+backend/tests/test_provider_service.py::test_bootstrap_one_primary_adapter_and_never_loads PASSED [  3%]
+backend/tests/test_provider_service.py::test_capabilities_preserve_verified_language_scope PASSED [  7%]
+backend/tests/test_provider_service.py::test_unknown_primary_does_not_fallback PASSED [ 11%]
+backend/tests/test_provider_service.py::test_lookup_and_duplicate_registration PASSED [ 14%]
+backend/tests/test_provider_service.py::test_no_primary_selected_is_normalized PASSED [ 18%]
+backend/tests/test_provider_service.py::test_unavailable_provider_never_loads_or_falls_back PASSED [ 22%]
+backend/tests/test_provider_service.py::test_missing_package_marks_unavailable PASSED [ 25%]
+backend/tests/test_provider_service.py::test_repeated_ensure_reuses_one_load_and_same_instance PASSED [ 29%]
+backend/tests/test_provider_service.py::test_loading_state_is_visible_and_concurrent_ensure_calls_load_once PASSED [ 33%]
+backend/tests/test_provider_service.py::test_failure_is_sticky_until_explicit_retry PASSED [ 37%]
+backend/tests/test_provider_service.py::test_concurrent_load_failure_is_shared_without_automatic_retries PASSED [ 40%]
+backend/tests/test_provider_service.py::test_load_without_actual_loaded_state_is_an_error PASSED [ 44%]
+backend/tests/test_provider_service.py::test_unload_transitions_and_can_load_again PASSED [ 48%]
+backend/tests/test_provider_service.py::test_shutdown_unloads_once_and_refuses_new_loads PASSED [ 51%]
+backend/tests/test_provider_service.py::test_shutdown_handles_load_failure_and_partial_model_cleanup PASSED [ 55%]
+backend/tests/test_provider_service.py::test_shutdown_cleanup_failure_is_safe_and_remains_error PASSED [ 59%]
+backend/tests/test_provider_service.py::test_shutdown_waits_for_loading_and_blocks_new_requests PASSED [ 62%]
+backend/tests/test_provider_service.py::test_system_status_tracks_live_state_after_hardware_cache PASSED [ 66%]
+backend/tests/test_provider_service.py::test_lifespan_unloads_ready_provider PASSED [ 70%]
+backend/tests/test_provider_service.py::test_system_service_startup_failure_still_cleans_provider PASSED [ 74%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_NOT_FOUND-404] PASSED [ 77%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_UNAVAILABLE-503] PASSED [ 81%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_LOAD_FAILED-503] PASSED [ 85%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_NOT_READY-503] PASSED [ 88%]
+backend/tests/test_provider_service.py::test_load_error_response_hides_original_exception PASSED [ 92%]
+backend/tests/test_provider_service.py::test_device_override_has_no_cpu_fallback PASSED [ 96%]
+backend/tests/test_provider_service.py::test_real_adapter_api_reuses_load_once_without_real_model PASSED [100%]
+
+============================== warnings summary ===============================
+external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 27 passed, 2 warnings in 0.74s ========================

@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "runtime": {
+    "python": "3.12.10",
+    "interpreter": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+    "torch": "2.8.0+cu128",
+    "cuda_available": true,
+    "cuda_version": "12.8",
+    "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU"
+  },
+  "provider_state_before": "NOT_LOADED",
+  "reference": {
+    "file_size": 1282220,
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration": 26.711,
+    "transcript_length": 498
+  },
+  "provider_instance_count": 1,
+  "model_load_count": 1,
+  "profile_creation_count": 1,
+  "profile": {
+    "profile_id": "e95189f7-96fd-4a49-b083-4554c9e5eb2c",
+    "creation_time_seconds": 26.719,
+    "creation_count": 1,
+    "status": "ready"
+  },
+  "generations": [
+    {
+      "index": 1,
+      "file": "clone_01.wav",
+      "text_length": 57,
+      "duration_seconds": 3.2,
+      "wall_time_seconds": 104.275,
+      "sample_rate": 24000,
+      "channels": 1,
+      "file_size": 153644,
+      "valid": true
+    },
+    {
+      "index": 2,
+      "file": "clone_02.wav",
+      "text_length": 81,
+      "duration_seconds": 4.56,
+      "wall_time_seconds": 109.273,
+      "sample_rate": 24000,
+      "channels": 1,
+      "file_size": 218924,
+      "valid": true
+    },
+    {
+      "index": 3,
+      "file": "clone_03.wav",
+      "text_length": 88,
+      "duration_seconds": 4.72,
+      "wall_time_seconds": 110.715,
+      "sample_rate": 24000,
+      "channels": 1,
+      "file_size": 226604,
+      "valid": true
+    }
+  ],
+  "human_evaluation": {
+    "reference": "đúng giọng mẫu",
+    "clone_01": "cùng người nói",
+    "clone_02": "cùng người nói",
+    "clone_03": "cùng người nói",
+    "robotic_artifact": false,
+    "pronunciation_error": false,
+    "speaker_consistency": true,
+    "verdict": "PASS"
+  }
+}

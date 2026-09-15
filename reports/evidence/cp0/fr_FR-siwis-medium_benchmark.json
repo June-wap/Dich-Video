@@ -1,0 +1,72 @@
+{
+  "model_id": "fr_FR-siwis-medium",
+  "python_network_guard": true,
+  "os_firewall_verified": false,
+  "subjective_quality": "NOT VERIFIED",
+  "gpu_inference": "NOT VERIFIED",
+  "runs": [
+    {
+      "duration_s": 5.143219954648526,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 226860,
+      "rms": 0.21803167742272134,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 1.7635440180586906e-05,
+      "sha256": "60f3b208cf63c9a1816c480c22ae48221eb2370a37175f9a1ccb3b4c56a5fc21",
+      "kind": "first",
+      "generation_and_write_s": 0.41627900000094087,
+      "rtf": 0.08093742901753621,
+      "path": ".cp0/audio/fr_FR-siwis-medium/short_0.wav",
+      "input_sha256": "6dd11da35a832ae4b2fb861a433956c441b3241c35ae85d2144d754f561b7d32"
+    },
+    {
+      "duration_s": 5.166439909297052,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 227884,
+      "rms": 0.2049350949891595,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 1.75561797752809e-05,
+      "sha256": "bf00dbb140f65b69fb41f5674f9035419d45e053eaa889f3bbea0745b117ffd1",
+      "kind": "warm",
+      "generation_and_write_s": 0.4571666000010737,
+      "rtf": 0.08848774166102243,
+      "path": ".cp0/audio/fr_FR-siwis-medium/short_1.wav",
+      "input_sha256": "6dd11da35a832ae4b2fb861a433956c441b3241c35ae85d2144d754f561b7d32"
+    },
+    {
+      "duration_s": 5.166439909297052,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 227884,
+      "rms": 0.20299442531245776,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 1.75561797752809e-05,
+      "sha256": "4702edb6080a4bc88804d8aab7efe0c2d3ec8261e9eb0b5f459283b99fba598b",
+      "kind": "warm",
+      "generation_and_write_s": 0.8709354999991774,
+      "rtf": 0.16857555982252337,
+      "path": ".cp0/audio/fr_FR-siwis-medium/short_2.wav",
+      "input_sha256": "6dd11da35a832ae4b2fb861a433956c441b3241c35ae85d2144d754f561b7d32"
+    }
+  ],
+  "runtime": {
+    "piper-tts": "1.8.0",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.5.3"
+  },
+  "available_ort_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "model_load_s": 3.294385199998942,
+  "import_verify_load_s": 3.5606354999981704,
+  "actual_session_providers": [
+    "CPUExecutionProvider"
+  ],
+  "status": "SYNTHESIS_AND_PCM_VALIDATED",
+  "peak_sampled_rss_bytes": 250109952,
+  "windows_peak_working_set_bytes": 250109952
+}

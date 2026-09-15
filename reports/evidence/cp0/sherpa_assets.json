@@ -1,0 +1,62 @@
+[
+  {
+    "name": "vits-mimic3-vi_VN-vais1000_low.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-mimic3-vi_VN-vais1000_low.tar.bz2",
+    "size": 66821421,
+    "digest": null
+  },
+  {
+    "name": "vits-piper-vi_VN-25hours_single-low.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-25hours_single-low.tar.bz2",
+    "size": 67059380,
+    "digest": "sha256:8aa8bbe88a1cb26ef4f33de56fced1720e72ec00491d23a3551de25a53c75149"
+  },
+  {
+    "name": "vits-piper-vi_VN-25hours_single-low-int8.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-25hours_single-low-int8.tar.bz2",
+    "size": 21222102,
+    "digest": "sha256:88df4b7fdff4bd441f1f1fa9f4b4d0f03b8777d69fd0d423912e3f78bba57312"
+  },
+  {
+    "name": "vits-piper-vi_VN-25hours_single-low-fp16.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-25hours_single-low-fp16.tar.bz2",
+    "size": 35794724,
+    "digest": "sha256:d2674d6960e6bbe5a63884dc9c5fc1058f34a786783af2aab54106b6455f884e"
+  },
+  {
+    "name": "vits-piper-vi_VN-vais1000-medium.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-vais1000-medium.tar.bz2",
+    "size": 67154040,
+    "digest": "sha256:fa1367710767d36ed5cf13b4a449e20c35ffd12791c2e47c2e64142bfa55551a"
+  },
+  {
+    "name": "vits-piper-vi_VN-vais1000-medium-int8.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-vais1000-medium-int8.tar.bz2",
+    "size": 21574925,
+    "digest": "sha256:60e8b82a27cfb9bfa527f5789f0879d02ec73a7397659973b937c823c326d5dd"
+  },
+  {
+    "name": "vits-piper-vi_VN-vais1000-medium-fp16.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-vi_VN-vais1000-medium-fp16.tar.bz2",
+    "size": 35857397,
+    "digest": "sha256:a30d84c47e73f748518c7c30344190d6488f9d72c6c04620406810a99f1d6ba6"
+  },
+  {
+    "name": "vits-piper-hi_IN-pratham-medium.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-pratham-medium.tar.bz2",
+    "size": 67238438,
+    "digest": "sha256:2084d321e1d2752f2b64ed3012ba27751df01a80da46f52920098cdcb7e35648"
+  },
+  {
+    "name": "vits-piper-hi_IN-pratham-medium-int8.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-pratham-medium-int8.tar.bz2",
+    "size": 20987965,
+    "digest": "sha256:20f568c56207c13b9a0d9478aec8b7d1449122e618aeebc7211f6abc942b58b7"
+  },
+  {
+    "name": "vits-piper-hi_IN-pratham-medium-fp16.tar.bz2",
+    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-hi_IN-pratham-medium-fp16.tar.bz2",
+    "size": 35955273,
+    "digest": "sha256:76b8f4404825e1c6a588bc3cee4b2e8eef1cfe1f785950f4a1b0cdf8d1050c97"
+  }
+]

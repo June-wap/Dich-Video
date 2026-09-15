@@ -1,0 +1,260 @@
+---
+license: apache-2.0
+datasets:
+- pnnbao-ump/VieNeu-TTS-1000h
+language:
+- vi
+pipeline_tag: text-to-speech
+tags:
+- on-device
+- tts
+- vietnamese
+- cpu
+- onnx
+---
+# 🪶 VieNeu-TTS v3 Nano (preview)
+
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/pnnbao97/VieNeu-TTS)
+[![Model](https://img.shields.io/badge/Hugging%20Face-Model-yellow)](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano)
+[![Turbo](https://img.shields.io/badge/Default%20model-v3%20Turbo-orange)](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo)
+[![PyPI](https://img.shields.io/badge/PyPI-vieneu%203.5.0-blue?logo=pypi&logoColor=white)](https://pypi.org/project/vieneu/)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?logo=discord&logoColor=white)](https://discord.gg/yJt8kzjzWZ)
+
+> [!WARNING]
+> **Preview release — still under active testing.** VieNeu-TTS v3 Nano is an experimental, lightweight model. It has known shortcomings (see *Limitations* below), its quality is **noticeably lower than v3 Turbo**, and weights, voices and the API may still change between revisions. **[VieNeu-TTS v3 Turbo](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo) remains the default and recommended model.** Reach for Nano only when Turbo is too slow on your hardware or when you are deploying on a phone / edge device.
+
+## Overview
+
+**VieNeu-TTS v3 Nano** is a **48M-parameter flow-matching TTS model** for Vietnamese, built for **edge devices and weak CPUs**: old laptops, mini PCs, ARM single-board computers and Android phones. It ships as a handful of small **ONNX** graphs (≈280 MB at runtime), runs **torch-free on ONNX Runtime**, loads in about 3 seconds and synthesizes at roughly **3× the speed of v3 Turbo** on the same CPU.
+
+It is a different architecture from v3 Turbo (a non-autoregressive flow model instead of an LLM-style autoregressive backbone), which is where the speed comes from — and also where the quality gap comes from. It supports **6 built-in preset voices**, inline **emotion cues** (`[cười]`, `[thở dài]`, `[hắng giọng]`) and outputs **24 kHz** audio.
+
+The reference implementation is the **`vieneu` Python SDK (v3.5.0)** via `Vieneu(mode="v3nano")`.
+
+### ⚖️ Nano vs. Turbo at a glance
+
+| | **v3 Nano (preview)** | **v3 Turbo (default)** |
+|---|---|---|
+| Architecture | Flow-matching (OT-CFM), 48M params | Autoregressive LLM backbone + neural codec |
+| Runtime | ONNX Runtime, CPU only, torch-free | ONNX (CPU) / PyTorch (GPU, auto-batched) |
+| Speed on CPU (RTF, lower = faster) | **0.22** (16 steps) · **0.11** (8 steps) | 0.62 (fp32) · 0.37 (int8) |
+| Model load time | **~3 s** | ~14–19 s |
+| Download size | **~280 MB** | larger |
+| Sample rate | 24 kHz | **48 kHz** |
+| Vietnamese quality | Good, close to Turbo on plain text | **Best** |
+| English / En–Vi code-switching | **Weak** — Vietnamese accent, less stable | **Good** |
+| Preset voices | 11 | **23** |
+| Voice cloning | ✅ from a 3–8 s clip (SDK ≥ 3.5.4) | ✅ instant cloning from a 3–8 s clip |
+| Frame-level streaming | ❌ (chunk-by-chunk only) | ✅ ~300 ms first audio |
+| Emotion cues `[cười]` `[thở dài]` `[hắng giọng]` | ✅ | ✅ |
+| Status | **Experimental / preview** | Stable, recommended |
+
+**Choose Nano when:** you need speed on a weak CPU, you are deploying on Android / ARM boards, or model load time and download size matter more than fidelity.
+**Choose Turbo when:** you want the best quality, English or bilingual text, the most faithful cloning, 48 kHz output, or real-time streaming — i.e. almost every other case.
+
+## 🏗️ Architecture & Credits
+
+The **VieNeu-TTS v3 Nano** architecture:
+
+- **Model:** a conditional flow-matching (OT-CFM) model that maps text to codec latents in a fixed number of Euler steps, then decodes them to a waveform:
+  - **Text encoder** — ConvNeXt blocks + self-attention over the phoneme sequence, conditioned on 50 **style tokens** extracted from the reference voice.
+  - **Duration predictor** — predicts the total utterance length from the text context and the speaker embedding.
+  - **Vector estimator** — dilated ConvNeXt blocks with FiLM conditioning on (time step, speaker) and cross-attention to the text with a length-aware rotary position bias for stable alignment; run with **classifier-free guidance** (default `cfg=3`, 16 Euler steps).
+  - **Speaker conditioning** — a 192-d x-vector from a frozen speaker encoder plus the style tokens; each preset voice is pre-packed as `{speaker_emb, style}` so nothing needs to be encoded at runtime.
+- **Training data:** predominantly Vietnamese speech from the author's corpus, with very little English — which is why English and code-switched text are the weakest part of this model.
+- **Audio codec:** VieNeu-Codec-Nano — a 24 kHz neural codec by the author; only the **decoder** is shipped here (the encoder is not released, hence no voice cloning).
+- **Phonemizer:** [sea-g2p](https://github.com/pnnbao97/sea-g2p) — fast Vietnamese/English grapheme-to-phoneme, also by the author.
+
+Tác giả: **Phạm Nguyễn Ngọc Bảo**
+
+---
+
+## 📦 Using the Python SDK (`vieneu`)
+
+Nano needs only the minimal, torch-free install:
+
+```bash
+pip install vieneu
+```
+
+```python
+from vieneu import Vieneu
+from time import time
+
+# v3 Turbo is the default: Vieneu(). Nano must be requested explicitly.
+tts = Vieneu(mode="v3nano")          # ONNX, CPU, torch-free, ~3 s to load
+
+text = "Xin chào các bạn, mình là giọng đọc của VieNeu Nano. [cười] Mình nhẹ hơn nhiều so với bản Turbo, nên chạy được cả trên những máy yếu."
+
+# 1. Default voice (Adam) — 24 kHz
+start = time()
+audio = tts.infer(text)
+tts.save(audio, "output_nano.wav")
+print(f"{len(audio) / tts.sample_rate:.1f}s of audio in {time() - start:.2f}s")
+
+# 2. Built-in voices by name
+for label, voice_id in tts.list_preset_voices():
+    print(label, voice_id)
+audio = tts.infer("Mình là Ái Hân nè!", voice="Ái Hân")
+
+# 3. Emotion / non-verbal cues — EXPERIMENTAL: [cười] [thở dài] [hắng giọng]
+audio = tts.infer("Nghe hay quá đi [cười]. Để mình nói tiếp [hắng giọng].", voice="Đức Trí")
+
+# 4. Faster on very slow CPUs: 8 Euler steps + sway sampling (~2× faster, slightly rougher)
+audio = tts.infer("Bản nhanh cho máy rất yếu.", voice="Xuân Tiên", steps=8, sway=-1)
+```
+
+**Knobs:** `steps` (Euler steps, default 16; 8 ≈ 2× faster, pair with `sway=-1`), `cfg` (classifier-free guidance, default 3.0; `cfg=0` halves compute but hurts intelligibility), `speed`, `seed`, `threads` (ONNX Runtime threads). `infer_stream()` yields one finished sentence-chunk at a time; `infer_batch()` runs sequentially.
+
+> [!NOTE]
+> **Voice cloning (SDK ≥ 3.5.4).** `ref_audio=`, `add_voice()` and `encode_reference()` work exactly like v3 Turbo. The three cloning graphs (`speaker_encoder.onnx`, `codec_encoder.onnx`, `reference_encoder.onnx`, ~95 MB) plus the optional `denoiser.onnx` are downloaded on first use; preset-only usage never touches them. Timbre fidelity is below Turbo's — for the most faithful clone use Turbo.
+
+### 🔥 Web UI
+
+The Gradio app in the [GitHub repo](https://github.com/pnnbao97/VieNeu-TTS) lists **VieNeu-TTS-v3-Nano (preview)** in the model dropdown. v3 Turbo stays selected by default; pick Nano only when Turbo is too slow on your machine.
+
+```bash
+git clone https://github.com/pnnbao97/VieNeu-TTS.git && cd VieNeu-TTS
+uv sync
+uv run vieneu-web
+```
+
+---
+
+## ⏱️ Speed
+
+Measured on one desktop CPU (12th-gen Intel i7, 6 ONNX Runtime threads, ~9 s of speech). RTF = compute time ÷ audio duration; lower is faster.
+
+| Engine | RTF ↓ | Sample rate | Load time |
+|---|---|---|---|
+| v3 Turbo ONNX fp32 (default on CPU) | 0.62 | 48 kHz | ~19 s |
+| v3 Turbo ONNX int8 | 0.37 | 48 kHz | ~14 s |
+| **v3 Nano, 16 steps, cfg 3** (default) | **0.22** | 24 kHz | ~3 s |
+| **v3 Nano, 8 steps, sway −1** | **0.11** | 24 kHz | ~3 s |
+
+The ratio carries over to slower machines: expect Nano to be roughly **1.7× faster than Turbo int8** and **~3× faster than Turbo fp32**, and — unlike the int8 Turbo build — it does not depend on AVX-512 / VNNI instructions.
+
+---
+
+## ⚠️ Limitations (known issues)
+
+Nano is a **preview**. Things we already know are not right:
+
+- **Quality is clearly below v3 Turbo.** Prosody is flatter and timbre is less faithful to the preset speaker.
+- **English and code-switched (En–Vi) text is weak** — English words are read with a Vietnamese accent and are less stable than in Turbo. Use Turbo for bilingual content.
+- **Occasional dropped or garbled syllables** on long or unusual sentences; long inputs are split into ≤15 s chunks and joined, so pauses at chunk boundaries can sound slightly abrupt.
+- **Very short inputs** (one or two words) can still be imperfect.
+- **24 kHz output, no frame-level streaming; cloned voices are less faithful than on v3 Turbo.**
+- Out-of-vocabulary characters are dropped with a warning instead of being spoken.
+- Voices, weights and defaults may change in later revisions while the model is being iterated on.
+
+If you hit something not on this list, please open an issue on GitHub or tell us on Discord — feedback on the preview is what decides what gets fixed next.
+
+---
+
+## 🎭 Preset Voices (11)
+
+Call any of them by name via `voice="<name>"` — no reference audio required. Or clone your own: `tts.infer(text, ref_audio="clip.wav")`.
+
+| Voice | Gender | Region | Character |
+|---|---|---|---|
+| Adam *(default)* | Male | Nam | Natural |
+| Ái Hân | Female | Nam | News |
+| Mỹ Duyên | Female | Bắc | Storytelling |
+| Đức Trí | Male | Bắc | Storytelling |
+| Hữu Quân | Male | Bắc | News |
+| Xuân Tiên | Female | Bắc | News |
+| Mai Anh | Female | Bắc | News |
+| Trúc Ly | Female | Bắc | Natural |
+| Anh Khôi | Male | Bắc | Storytelling |
+| Minh Quân | Male | Bắc | Natural |
+| Mạnh Dũng | Male | Bắc | Natural |
+
+Need a different voice? Clone one from a 3–8 s clip with `ref_audio=` / `add_voice()`, or use **v3 Turbo** (23 preset voices, higher-fidelity cloning).
+
+---
+
+## 📁 Files in this repository
+
+| File | Purpose |
+|---|---|
+| `text_encoder.onnx` | phoneme ids + style tokens → text context |
+| `duration_predictor.onnx` | text context + speaker → utterance length |
+| `vector_estimator.onnx` | flow-matching velocity network (run twice per step for CFG) |
+| `codec_decoder.onnx` | codec latents → 24 kHz waveform (un-normalization baked in) |
+| `speaker_encoder.onnx` | 80-mel Kaldi fbank (16 kHz) → 192-d x-vector (voice cloning / packing preset voices) |
+| `codec_encoder.onnx` | 24 kHz waveform → codec latents; feeds the reference encoder when cloning |
+| `reference_encoder.onnx` | first 5 s of reference latents → 50×256 style tokens (voice cloning) |
+| `denoiser.onnx` | optional reference-clip denoiser (same graph as v3 Turbo) |
+| `config.json` | architecture knobs, phoneme vocab, latent statistics, emotion-tag mapping, defaults |
+| `constants.npz` | `null_spk` / `null_style` for the unconditional CFG branch |
+
+The codec encoder, the reference (style) encoder and a denoiser ship here as well (used by SDK ≥ 3.5.4 for voice cloning); the 11 preset voices are pre-packed inside the `vieneu` SDK (`voices_v3_nano.json`) so preset-only use never downloads them.
+
+---
+
+## 🔬 Model Variants
+
+| Model | Format | Device | Sample Rate | Quality | Features |
+| --- | --- | --- | --- | --- | --- |
+| **VieNeu-TTS-v3-Turbo** *(default)* | ONNX (CPU) / PyTorch (GPU) | CPU/GPU | 48 kHz | ⭐⭐⭐⭐⭐ | 23 preset voices, cloning, streaming, emotion cues, conversation |
+| **VieNeu-TTS-v3-Nano** *(preview, this repo)* | ONNX | weak CPU / edge | 24 kHz | ⭐⭐⭐ | **Fastest on CPU**, 11 preset voices, cloning, emotion cues — weaker English |
+| VieNeu-TTS-v2 | PyTorch | GPU/CPU | 24 kHz | ⭐⭐⭐⭐⭐ | Podcast, En-Vi code-switching |
+| VieNeu-TTS-v2 (GGUF) | GGUF Q4 | CPU | 24 kHz | ⭐⭐⭐⭐ | Podcast |
+| VieNeu-TTS-v1 | PyTorch | GPU | 24 kHz | ⭐⭐⭐⭐ | Stable (Vi only) |
+
+---
+
+## 📜 Usage Rights & Licensing FAQ
+
+**Does Apache-2.0 cover every artifact in this repository?**
+Yes. The license applies to **all** artifacts shipped here — the ONNX graphs, `config.json`, `constants.npz` — and to the bundled **preset-voice assets** (speaker embeddings + style tokens in the SDK's `voices_v3_nano.json`).
+
+**May I use the preset voices and the generated audio commercially?**
+Yes. The bundled preset voices are distributed under the same Apache-2.0 license as the rest of the repository, and audio generated with them **may be used in commercial and monetized content** (voice-over, videos, products, services) — no additional license or fee. Given the preview status, please evaluate the output quality for your use case first.
+
+**Did the speakers behind the preset voices consent to AI training and synthetic speech?**
+Yes. The speakers (or rightsholders) behind the shipped preset-voice assets granted appropriate rights and consent for their voice data to be used in **AI training and synthetic speech generation**, which is what allows those assets to be distributed under Apache-2.0 for both non-commercial and commercial synthetic audio generation.
+
+**What about the training dataset?**
+The detailed internal data-collection and processing pipeline for the training corpus is **not publicly disclosed**. The confirmations above cover the **preset voices shipped with this model** and the model weights released here, which are the artifacts you actually redistribute or generate audio with.
+
+**Which preset list is authoritative?**
+`Vieneu(mode="v3nano").list_preset_voices()` at the version you have installed. This card documents **SDK v3.5.4 (11 voices, default `Adam`)**; as a preview, the roster may change in later revisions, so pin the SDK version if the exact list matters to you.
+
+**Third-party components** — permissively licensed, keep their notices when redistributing:
+- [sea-g2p](https://github.com/pnnbao97/sea-g2p) — phonemizer, by the same author as this project.
+
+> [!WARNING]
+> **Responsible use.** Voice cloning and the preset voices can be used to produce misleading content. Only clone voices you have the right to use. Do not use it to impersonate, defraud, or deceive, and disclose synthetic speech where your audience would reasonably expect to know.
+
+---
+
+## License
+
+This model package is distributed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0), matching the upstream model repository.
+
+When you reuse, redistribute, or convert these assets, please keep the license notice and attribution intact for both:
+
+- the original project: [pnnbao97/VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS)
+- this Hugging Face package: [pnnbao-ump/VieNeu-TTS-v3-Nano](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano)
+
+If you bundle additional third-party assets, their own licenses still apply as well.
+
+---
+
+## 📑 Citation
+
+```bibtex
+@misc{vieneutts_nano_2026,
+  title        = {VieNeu-TTS v3 Nano: A Lightweight Flow-Matching Vietnamese Text-to-Speech Model for Edge Devices},
+  author       = {Pham Nguyen Ngoc Bao},
+  year         = {2026},
+  publisher    = {Hugging Face},
+  howpublished = {\url{https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano}}
+}
+```
+
+---
+
+**Made with ❤️ for the Vietnamese TTS community**

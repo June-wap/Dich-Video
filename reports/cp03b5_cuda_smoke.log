@@ -1,0 +1,48 @@
+D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+{"words": 308, "characters": 1393, "chunks": 8}
+2026-09-14 19:50:48,149 INFO backend.providers provider_registered provider=omnivoice state=NOT_LOADED
+2026-09-14 19:50:48,149 INFO backend.lifecycle backend_start version=0.3.0-dev
+2026-09-14 19:50:48,205 INFO backend.providers provider_transition provider=omnivoice state=LOADING
+
+Loading weights:   0%|          | 0/313 [00:00<?, ?it/s]
+Loading weights:   1%|▏         | 4/313 [00:00<00:09, 30.97it/s]
+Loading weights:   9%|▊         | 27/313 [00:00<00:02, 133.42it/s]
+Loading weights:  14%|█▍        | 44/313 [00:00<00:01, 140.91it/s]
+Loading weights:  19%|█▉        | 59/313 [00:00<00:01, 140.45it/s]
+Loading weights:  25%|██▍       | 78/313 [00:00<00:01, 136.59it/s]
+Loading weights:  32%|███▏      | 100/313 [00:00<00:01, 157.41it/s]
+Loading weights:  37%|███▋      | 117/313 [00:00<00:01, 150.22it/s]
+Loading weights:  42%|████▏     | 133/313 [00:00<00:01, 144.18it/s]
+Loading weights:  49%|████▉     | 154/313 [00:01<00:01, 138.57it/s]
+Loading weights:  56%|█████▌    | 176/313 [00:01<00:00, 146.57it/s]
+Loading weights:  62%|██████▏   | 195/313 [00:01<00:00, 150.10it/s]
+Loading weights:  67%|██████▋   | 211/313 [00:01<00:00, 144.57it/s]
+Loading weights:  72%|███████▏  | 226/313 [00:01<00:00, 128.89it/s]
+Loading weights:  77%|███████▋  | 241/313 [00:01<00:00, 119.72it/s]
+Loading weights:  83%|████████▎ | 259/313 [00:01<00:00, 129.72it/s]
+Loading weights:  87%|████████▋ | 273/313 [00:02<00:00, 118.77it/s]
+Loading weights:  92%|█████████▏| 288/313 [00:02<00:00, 122.10it/s]
+Loading weights:  97%|█████████▋| 305/313 [00:02<00:00, 128.03it/s]
+Loading weights: 100%|██████████| 313/313 [00:02<00:00, 136.87it/s]
+
+Loading weights:   0%|          | 0/527 [00:00<?, ?it/s]
+Loading weights:  33%|███▎      | 176/527 [00:00<00:00, 1675.80it/s]
+Loading weights:  65%|██████▌   | 344/527 [00:00<00:00, 572.17it/s] 
+Loading weights:  83%|████████▎ | 436/527 [00:00<00:00, 505.13it/s]
+Loading weights:  96%|█████████▌| 505/527 [00:00<00:00, 489.87it/s]
+Loading weights: 100%|██████████| 527/527 [00:00<00:00, 539.50it/s]
+2026-09-14 19:51:44,596 INFO backend.providers provider_transition provider=omnivoice state=READY
+2026-09-14 19:51:51,796 INFO backend.voices voice_profile_created profile_id=94b37349-e0ed-4aad-b42f-e196c82aad0e provider=omnivoice duration=26.71 rate=24000 channels=1 transcript_len=498
+chunk_finished count=1 status=PASS seconds=121.807
+chunk_finished count=2 status=PASS seconds=120.709
+chunk_finished count=3 status=PASS seconds=132.725
+chunk_finished count=4 status=PASS seconds=312.565
+chunk_finished count=5 status=PASS seconds=466.832
+chunk_finished count=6 status=PASS seconds=368.814
+chunk_finished count=7 status=PASS seconds=360.635
+chunk_finished count=8 status=PASS seconds=343.759
+smoke_complete seconds=2228.587 duration=76.300 rtf=29.208
+2026-09-14 20:29:00,617 INFO backend.providers provider_transition provider=omnivoice state=UNLOADING
+2026-09-14 20:29:03,167 INFO backend.providers provider_transition provider=omnivoice state=NOT_LOADED
+2026-09-14 20:29:03,167 INFO backend.lifecycle backend_stop

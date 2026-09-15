@@ -1,0 +1,98 @@
+{
+  "status": "PASS",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "result": {
+    "job_id": "027c3f80c510401a8fa03124387e4a80",
+    "status": "COMPLETED",
+    "provider": "omnivoice",
+    "language": "vi",
+    "voice": "omnivoice_auto",
+    "text_length": 166,
+    "chunk_count": 3,
+    "completed_chunks": 3,
+    "elapsed_sec": 16.389,
+    "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02d_long_vi.wav",
+    "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02d_long_vi.mp3",
+    "error": null,
+    "chunks": [
+      {
+        "index": 0,
+        "text": "Xin chào, đây là phép thử văn bản dài bằng tiếng Việt.",
+        "paragraph_index": 0,
+        "sentence_count": 1,
+        "is_paragraph_end": false,
+        "status": "COMPLETED",
+        "attempts": 1,
+        "error": null
+      },
+      {
+        "index": 1,
+        "text": "Mỗi câu được tạo thành một đoạn âm thanh riêng.",
+        "paragraph_index": 0,
+        "sentence_count": 1,
+        "is_paragraph_end": false,
+        "status": "COMPLETED",
+        "attempts": 1,
+        "error": null
+      },
+      {
+        "index": 2,
+        "text": "Các đoạn sau đó được ghép đúng thứ tự thành một tệp hoàn chỉnh.",
+        "paragraph_index": 0,
+        "sentence_count": 1,
+        "is_paragraph_end": true,
+        "status": "COMPLETED",
+        "attempts": 1,
+        "error": null
+      }
+    ],
+    "boundary_diagnostics": [
+      {
+        "segment_index": 0,
+        "trim_leading_ms": 140,
+        "trim_trailing_ms": 195,
+        "edge_fade_ms": 3,
+        "gain_db": 0.0,
+        "boundary_after": "period",
+        "pause_after_ms": 350
+      },
+      {
+        "segment_index": 1,
+        "trim_leading_ms": 115,
+        "trim_trailing_ms": 130,
+        "edge_fade_ms": 3,
+        "gain_db": 0.0,
+        "boundary_after": "period",
+        "pause_after_ms": 350
+      },
+      {
+        "segment_index": 2,
+        "trim_leading_ms": 150,
+        "trim_trailing_ms": 175,
+        "edge_fade_ms": 3,
+        "gain_db": 0.0,
+        "boundary_after": null,
+        "pause_after_ms": 0
+      }
+    ]
+  },
+  "audio": {
+    "path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02d_long_vi.wav",
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration_sec": 9.845,
+    "generation_time_sec": 16.389,
+    "rtf": 1.6647
+  },
+  "provider_health": {
+    "provider": "omnivoice",
+    "model_path": "k2-fsa/OmniVoice",
+    "device": "cuda:0",
+    "loaded": true,
+    "status": "LOADED",
+    "load_count": 1,
+    "cpu_verified": false
+  }
+}

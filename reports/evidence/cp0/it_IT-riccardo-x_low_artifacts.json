@@ -1,0 +1,29 @@
+{
+  "model_id": "it_IT-riccardo-x_low",
+  "repository": "rhasspy/piper-voices",
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "artifacts": [
+    {
+      "path": ".cp0/models/piper/it_IT-riccardo-x_low/it_IT-riccardo-x_low.onnx",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/it/it_IT/riccardo/x_low/it_IT-riccardo-x_low.onnx",
+      "size_bytes": 28130791,
+      "sha256": "1368de15f123275a7ef951c9e5e30be0f58a032daa14a0da44037443c1d1d21b",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/it_IT-riccardo-x_low/it_IT-riccardo-x_low.onnx.json",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/it/it_IT/riccardo/x_low/it_IT-riccardo-x_low.onnx.json",
+      "size_bytes": 4161,
+      "sha256": "146ab9c634afe524e9fb7530f2510df7a42fb1db56b52658ca1fb3d98001a62a",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/it_IT-riccardo-x_low/MODEL_CARD",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/it/it_IT/riccardo/x_low/MODEL_CARD",
+      "size_bytes": 260,
+      "sha256": "7ce3b2fc4f454c84936887971574e436cc2154049b427a530f70bee050b2fdc6",
+      "catalog_md5_match": true
+    }
+  ],
+  "status": "DOWNLOADED_NOT_PRODUCTION_APPROVED"
+}

@@ -1,0 +1,15 @@
+{
+  "model_id": "ja_JA-hi_fi_captain-medium",
+  "model_revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "runtime": "piper-tts 1.8.0 (installed CP0 runtime)",
+  "input": "こんにちは。これはパソコンで行う音声合成のテストです。",
+  "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/ja/ja_JA/hi_fi_captain/medium/ja_JA-hi_fi_captain-medium.onnx",
+  "load_attempted": false,
+  "synthesis_attempted": false,
+  "cp0_failure": "HTTPS redirected model download timeout, before inference",
+  "classification": "download_recovered",
+  "status": "VERIFIED",
+  "bytes": 76753841,
+  "sha256": "5eafa1610fc7a0ff2e7fde9cbe0972d876266e23d8db331727eb2466f19460eb",
+  "elapsed_s": 3.581132499999512
+}

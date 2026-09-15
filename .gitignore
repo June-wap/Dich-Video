@@ -1,0 +1,52 @@
+# --- Vendored external library (has its own git + venv, kept out of this repo) ---
+external/OmniVoice/
+
+# --- Python ---
+.venv*/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.cp0/
+
+# --- Node / frontend ---
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist/
+dist-ssr/
+*.local
+
+# --- Generated / runtime data (models, audio, logs, temp) ---
+*.wav
+*.mp3
+*.onnx
+*.safetensors
+*.pt
+*.pth
+*.gguf
+*.sqlite3
+*.db
+logs/
+prototype/logs/
+prototype/outputs/
+prototype/temp/
+backend/**/outputs/
+
+# --- Editor / OS junk ---
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Secrets / local env ---
+.env
+.env.local
+*.env

@@ -1,0 +1,68 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Tool Dich Cho Khach
+plugins: anyio-4.15.1
+collecting ... collected 49 items
+
+backend/tests/test_backend.py::test_fresh_process_import_startup_health_and_shutdown_without_ai_imports PASSED [  2%]
+backend/tests/test_backend.py::test_health_schema_and_no_probe PASSED    [  4%]
+backend/tests/test_backend.py::test_system_schema_cache_and_no_internal_fields PASSED [  6%]
+backend/tests/test_backend.py::test_runtime_probe_does_not_construct_or_load_models PASSED [  8%]
+backend/tests/test_backend.py::test_missing_runtime_is_degraded_and_sanitized PASSED [ 10%]
+backend/tests/test_backend.py::test_cpu_only_runtime_does_not_probe_device_name PASSED [ 12%]
+backend/tests/test_backend.py::test_unknown_route_normalized PASSED      [ 14%]
+backend/tests/test_backend.py::test_method_not_allowed PASSED            [ 16%]
+backend/tests/test_backend.py::test_validation_error_sanitized PASSED    [ 18%]
+backend/tests/test_backend.py::test_unexpected_error_is_safe_and_has_cors PASSED [ 20%]
+backend/tests/test_backend.py::test_unavailable_service_error PASSED     [ 22%]
+backend/tests/test_backend.py::test_allowed_cors_origins[http://localhost:5173] PASSED [ 24%]
+backend/tests/test_backend.py::test_allowed_cors_origins[http://127.0.0.1:5173] PASSED [ 26%]
+backend/tests/test_backend.py::test_disallowed_cors_origin PASSED        [ 28%]
+backend/tests/test_backend.py::test_disallowed_host PASSED               [ 30%]
+backend/tests/test_backend.py::test_openapi_only_checkpoint_routes PASSED [ 32%]
+backend/tests/test_backend.py::test_lifespan_releases_service_and_logs_once PASSED [ 34%]
+backend/tests/test_backend.py::test_settings_defaults_and_environment PASSED [ 36%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[*] PASSED [ 38%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[https://arbitrary.example] PASSED [ 40%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[http://localhost:5173/path] PASSED [ 42%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[http://user:password@localhost:5173] PASSED [ 44%]
+backend/tests/test_provider_service.py::test_bootstrap_one_primary_adapter_and_never_loads PASSED [ 46%]
+backend/tests/test_provider_service.py::test_capabilities_preserve_verified_language_scope PASSED [ 48%]
+backend/tests/test_provider_service.py::test_unknown_primary_does_not_fallback PASSED [ 51%]
+backend/tests/test_provider_service.py::test_lookup_and_duplicate_registration PASSED [ 53%]
+backend/tests/test_provider_service.py::test_no_primary_selected_is_normalized PASSED [ 55%]
+backend/tests/test_provider_service.py::test_unavailable_provider_never_loads_or_falls_back PASSED [ 57%]
+backend/tests/test_provider_service.py::test_missing_package_marks_unavailable PASSED [ 59%]
+backend/tests/test_provider_service.py::test_repeated_ensure_reuses_one_load_and_same_instance PASSED [ 61%]
+backend/tests/test_provider_service.py::test_loading_state_is_visible_and_concurrent_ensure_calls_load_once PASSED [ 63%]
+backend/tests/test_provider_service.py::test_failure_is_sticky_until_explicit_retry PASSED [ 65%]
+backend/tests/test_provider_service.py::test_concurrent_load_failure_is_shared_without_automatic_retries PASSED [ 67%]
+backend/tests/test_provider_service.py::test_load_without_actual_loaded_state_is_an_error PASSED [ 69%]
+backend/tests/test_provider_service.py::test_unload_transitions_and_can_load_again PASSED [ 71%]
+backend/tests/test_provider_service.py::test_shutdown_unloads_once_and_refuses_new_loads PASSED [ 73%]
+backend/tests/test_provider_service.py::test_shutdown_handles_load_failure_and_partial_model_cleanup PASSED [ 75%]
+backend/tests/test_provider_service.py::test_shutdown_cleanup_failure_is_safe_and_remains_error PASSED [ 77%]
+backend/tests/test_provider_service.py::test_shutdown_waits_for_loading_and_blocks_new_requests PASSED [ 79%]
+backend/tests/test_provider_service.py::test_system_status_tracks_live_state_after_hardware_cache PASSED [ 81%]
+backend/tests/test_provider_service.py::test_lifespan_unloads_ready_provider PASSED [ 83%]
+backend/tests/test_provider_service.py::test_system_service_startup_failure_still_cleans_provider PASSED [ 85%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_NOT_FOUND-404] PASSED [ 87%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_UNAVAILABLE-503] PASSED [ 89%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_LOAD_FAILED-503] PASSED [ 91%]
+backend/tests/test_provider_service.py::test_provider_errors_use_existing_http_contract[PROVIDER_NOT_READY-503] PASSED [ 93%]
+backend/tests/test_provider_service.py::test_load_error_response_hides_original_exception PASSED [ 95%]
+backend/tests/test_provider_service.py::test_device_override_has_no_cpu_fallback PASSED [ 97%]
+backend/tests/test_provider_service.py::test_real_adapter_api_reuses_load_once_without_real_model PASSED [100%]
+
+============================== warnings summary ===============================
+external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 49 passed, 2 warnings in 2.06s ========================

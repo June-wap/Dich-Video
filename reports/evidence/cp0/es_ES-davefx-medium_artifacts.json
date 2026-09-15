@@ -1,0 +1,29 @@
+{
+  "model_id": "es_ES-davefx-medium",
+  "repository": "rhasspy/piper-voices",
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "artifacts": [
+    {
+      "path": ".cp0/models/piper/es_ES-davefx-medium/es_ES-davefx-medium.onnx",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/es/es_ES/davefx/medium/es_ES-davefx-medium.onnx",
+      "size_bytes": 63201294,
+      "sha256": "6658b03b1a6c316ee4c265a9896abc1393353c2d9e1bca7d66c2c442e222a917",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/es_ES-davefx-medium/es_ES-davefx-medium.onnx.json",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/es/es_ES/davefx/medium/es_ES-davefx-medium.onnx.json",
+      "size_bytes": 4817,
+      "sha256": "0e0dda87c732f6f38771ff274a6380d9252f327dca77aa2963d5fbdf9ec54842",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/es_ES-davefx-medium/MODEL_CARD",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/es/es_ES/davefx/medium/MODEL_CARD",
+      "size_bytes": 276,
+      "sha256": "420703b5d8ea239b729f13d83f31eea9bae5fcb89447de23ebc94aa8a4768f95",
+      "catalog_md5_match": true
+    }
+  ],
+  "status": "DOWNLOADED_NOT_PRODUCTION_APPROVED"
+}

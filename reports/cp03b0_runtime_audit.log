@@ -1,0 +1,200 @@
+{
+  "checkpoint": "CP0.3B-0",
+  "timestamp_utc": "2026-09-14T06:46:10.523076+00:00",
+  "backend_python": "3.12.10",
+  "backend_sys_executable": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+  "base_executable": "C:\\Users\\GIGABUYTE\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+  "architecture": "AMD64",
+  "official_interpreter": true,
+  "packages": {
+    "pip": {
+      "version": "26.2.1",
+      "import": "PASS"
+    },
+    "pytest": {
+      "version": "9.1.1",
+      "import": "PASS"
+    },
+    "torch": {
+      "version": "2.8.0+cu128",
+      "import": "PASS"
+    },
+    "torchaudio": {
+      "version": "2.8.0+cu128",
+      "import": "PASS"
+    },
+    "numpy": {
+      "version": "2.5.3",
+      "import": "PASS"
+    },
+    "soundfile": {
+      "version": "0.14.0",
+      "import": "PASS"
+    },
+    "librosa": {
+      "version": "1.0.0",
+      "import": "PASS"
+    },
+    "pydub": {
+      "version": "0.25.1",
+      "import": "PASS"
+    },
+    "transformers": {
+      "version": "5.17.0",
+      "import": "PASS"
+    },
+    "accelerate": {
+      "version": "1.15.0",
+      "import": "PASS"
+    },
+    "gradio": {
+      "version": "6.27.0",
+      "import": "PASS"
+    },
+    "fastapi": {
+      "version": "0.141.1",
+      "import": "PASS"
+    },
+    "uvicorn": {
+      "version": "0.52.4",
+      "import": "PASS"
+    },
+    "pydantic": {
+      "version": "2.13.5",
+      "import": "PASS"
+    },
+    "psutil": {
+      "version": "7.2.2",
+      "import": "PASS"
+    },
+    "tensorboardX": {
+      "version": "2.6.5",
+      "import": "PASS"
+    },
+    "webdataset": {
+      "version": "1.0.2",
+      "import": "PASS"
+    }
+  },
+  "core_imports": {
+    "core.tts_manager.TTSManager": "PASS",
+    "providers.omnivoice.OmniVoiceProvider": "PASS",
+    "core.long_text.build_chunks": "PASS",
+    "core.audio_utils.merge_segments": "PASS",
+    "core.hardware.get_hardware_info": "PASS"
+  },
+  "errors": [],
+  "dependency_pins": {
+    "transformers": {
+      "expected": "5.17.0",
+      "actual": "5.17.0"
+    },
+    "accelerate": {
+      "expected": "1.15.0",
+      "actual": "1.15.0"
+    },
+    "numpy": {
+      "expected": "2.5.3",
+      "actual": "2.5.3"
+    },
+    "soundfile": {
+      "expected": "0.14.0",
+      "actual": "0.14.0"
+    },
+    "librosa": {
+      "expected": "1.0.0",
+      "actual": "1.0.0"
+    },
+    "pydub": {
+      "expected": "0.25.1",
+      "actual": "0.25.1"
+    },
+    "gradio": {
+      "expected": "6.27.0",
+      "actual": "6.27.0"
+    },
+    "tensorboardX": {
+      "expected": "2.6.5",
+      "actual": "2.6.5"
+    },
+    "webdataset": {
+      "expected": "1.0.2",
+      "actual": "1.0.2"
+    },
+    "psutil": {
+      "expected": "7.2.2",
+      "actual": "7.2.2"
+    },
+    "fastapi": {
+      "expected": "0.141.1",
+      "actual": "0.141.1"
+    },
+    "uvicorn": {
+      "expected": "0.52.4",
+      "actual": "0.52.4"
+    },
+    "pydantic": {
+      "expected": "2.13.5",
+      "actual": "2.13.5"
+    },
+    "pytest": {
+      "expected": "9.1.1",
+      "actual": "9.1.1"
+    },
+    "torch": {
+      "expected": "2.8.0+cu128",
+      "actual": "2.8.0+cu128"
+    },
+    "torchaudio": {
+      "expected": "2.8.0+cu128",
+      "actual": "2.8.0+cu128"
+    }
+  },
+  "omnivoice": {
+    "import": "PASS",
+    "path": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\omnivoice\\__init__.py",
+    "version": "0.2.1",
+    "local_source": true
+  },
+  "cuda": {
+    "torch": "2.8.0+cu128",
+    "build": "12.8",
+    "available": true,
+    "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "vram_gb": 6.0,
+    "kernel_check": "PASS"
+  },
+  "ffmpeg": {
+    "path": "C:\\ffv2\\bin\\ffmpeg.EXE",
+    "version": "ffmpeg version 2025-06-02-git-688f3944ce-full_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers"
+  },
+  "ffprobe": {
+    "path": "C:\\ffv2\\bin\\ffprobe.EXE",
+    "version": "ffprobe version 2025-06-02-git-688f3944ce-full_build-www.gyan.dev Copyright (c) 2007-2025 the FFmpeg developers"
+  },
+  "global_python": {
+    "exit_code": 0,
+    "output": "Python 3.12.10"
+  },
+  "python_launcher": {
+    "exit_code": 0,
+    "output": "-V:3.14 *        C:\\Python314\\python.exe\n -V:3.12          C:\\Users\\GIGABUYTE\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\n -V:3.11          C:\\Users\\GIGABUYTE\\AppData\\Local\\Programs\\Python\\Python311\\python.exe"
+  },
+  "pip_check": {
+    "exit_code": 0,
+    "output": "No broken requirements found."
+  },
+  "pip_cli": {
+    "exit_code": 0,
+    "output": "pip 26.2.1 from D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Lib\\site-packages\\pip (python 3.12)"
+  },
+  "pytest_cli": {
+    "exit_code": 0,
+    "output": "pytest 9.1.1"
+  },
+  "source_sha256": {
+    "external/OmniVoice/pyproject.toml": "922e94875657fb1761319c113fc4d24062df9a686fced8d4639a44a3c11c4943",
+    "external/OmniVoice/omnivoice/models/omnivoice.py": "5b790ce64fb95e4ca87b7a9060af02d3d90b84166dc2771edf5ad0212809871f"
+  },
+  "status": "PASS"
+}

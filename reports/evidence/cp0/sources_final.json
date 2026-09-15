@@ -1,0 +1,189 @@
+[
+  {
+    "id": "vi_VN-vais1000-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/vi/vi_VN/vais1000/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.708973+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/vi/vi_VN/vais1000/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 361,
+    "sha256": "302db8a930ffc2b1c2181db26deaf8272116eca2b08b8f80da6375b0a994af7b",
+    "file": "reports/evidence/cp0/vi_VN-vais1000-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "en_US-lessac-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/en/en_US/lessac/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.710662+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/en/en_US/lessac/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 351,
+    "sha256": "ce49eb457742208166d399a40cdec2c7fa9db77960930031564ab56f12882645",
+    "file": "reports/evidence/cp0/en_US-lessac-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "zh_CN-huayan-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/zh/zh_CN/huayan/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.711565+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/zh/zh_CN/huayan/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 276,
+    "sha256": "25d7d8f7a03e9382e629c5c4f074176e7ca84e08be12a873022e91fcac98c2c7",
+    "file": "reports/evidence/cp0/zh_CN-huayan-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "ja_JA-hi_fi_captain-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/ja/ja_JA/hi_fi_captain/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.712221+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/ja/ja_JA/hi_fi_captain/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 361,
+    "sha256": "73e9bfa50a268cc1dd62fda8c6cd7cb9f1857c599e006585cdae247d05217b13",
+    "file": "reports/evidence/cp0/ja_JA-hi_fi_captain-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "es_ES-davefx-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/es/es_ES/davefx/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.712921+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/es/es_ES/davefx/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 276,
+    "sha256": "420703b5d8ea239b729f13d83f31eea9bae5fcb89447de23ebc94aa8a4768f95",
+    "file": "reports/evidence/cp0/es_ES-davefx-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "pt_BR-faber-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/pt/pt_BR/faber/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:05.714526+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/pt/pt_BR/faber/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 279,
+    "sha256": "01f1a5bcfd0538782726059ae407eae9c2dd1b5b35f7298fd53a68de91afe563",
+    "file": "reports/evidence/cp0/pt_BR-faber-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "it_IT-riccardo-x_low_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/it/it_IT/riccardo/x_low/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:06.434399+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/it/it_IT/riccardo/x_low/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 260,
+    "sha256": "7ce3b2fc4f454c84936887971574e436cc2154049b427a530f70bee050b2fdc6",
+    "file": "reports/evidence/cp0/it_IT-riccardo-x_low_MODEL_CARD.txt"
+  },
+  {
+    "id": "fr_FR-siwis-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/fr/fr_FR/siwis/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:06.437017+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/fr/fr_FR/siwis/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 284,
+    "sha256": "bd8b8d079d4d3d2c4cc20345889bbcd586d72f021a132f93357a763eb5232cce",
+    "file": "reports/evidence/cp0/fr_FR-siwis-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "hi_IN-pratham-medium_MODEL_CARD",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/hi/hi_IN/pratham/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T14:35:06.437284+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/1162a9173d0ce503555aed757976b7a9912eae4c/hi/hi_IN/pratham/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 304,
+    "sha256": "89cf491ea99e69b27c94599cecea3f0fc6aeacb30f4ccdb12897f659868df29e",
+    "file": "reports/evidence/cp0/hi_IN-pratham-medium_MODEL_CARD.txt"
+  },
+  {
+    "id": "sherpa_license",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/LICENSE",
+    "retrieved_at": "2026-09-11T14:35:06.440267+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/LICENSE",
+    "status": "FETCHED",
+    "bytes": 11358,
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "file": "reports/evidence/cp0/sherpa_license.txt"
+  },
+  {
+    "id": "sherpa_pypi",
+    "url": "https://pypi.org/pypi/sherpa-onnx/1.12.26/json",
+    "retrieved_at": "2026-09-11T14:35:06.440649+00:00",
+    "resolved_url": "https://pypi.org/pypi/sherpa-onnx/1.12.26/json",
+    "status": "FETCHED",
+    "bytes": 96976,
+    "sha256": "c6159be6a86c6b2d5d132739b79c299bc13e61d0f5b5158c4049a167caaff929",
+    "file": "reports/evidence/cp0/sherpa_pypi.txt"
+  },
+  {
+    "id": "espeak_license",
+    "url": "https://raw.githubusercontent.com/espeak-ng/espeak-ng/master/COPYING",
+    "retrieved_at": "2026-09-11T14:35:06.473304+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/espeak-ng/espeak-ng/master/COPYING",
+    "status": "FETCHED",
+    "bytes": 35147,
+    "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "file": "reports/evidence/cp0/espeak_license.txt"
+  },
+  {
+    "id": "onnxruntime_license",
+    "url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.30.0/LICENSE",
+    "retrieved_at": "2026-09-11T14:35:06.719044+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/microsoft/onnxruntime/v1.30.0/LICENSE",
+    "status": "FETCHED",
+    "bytes": 1073,
+    "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+    "file": "reports/evidence/cp0/onnxruntime_license.txt"
+  },
+  {
+    "id": "vieneu_dataset_10k",
+    "url": "https://huggingface.co/api/datasets/pnnbao-ump/VieNeu-TTS-10k-ENVI",
+    "retrieved_at": "2026-09-11T14:35:06.731295+00:00",
+    "status": "ERROR",
+    "error": "HTTPError: HTTP Error 401: Unauthorized"
+  },
+  {
+    "id": "vieneu_dataset_1000",
+    "url": "https://huggingface.co/api/datasets/pnnbao-ump/VieNeu-TTS-1000h",
+    "retrieved_at": "2026-09-11T14:35:06.731958+00:00",
+    "resolved_url": "https://huggingface.co/api/datasets/pnnbao-ump/VieNeu-TTS-1000h",
+    "status": "FETCHED",
+    "bytes": 14908,
+    "sha256": "6b781b644ddcd89c13c4b4c62bd6f7393d255264c9c71c1afa3f1436a6e82ea6",
+    "file": "reports/evidence/cp0/vieneu_dataset_1000.txt"
+  },
+  {
+    "id": "kokoro_voices",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M/raw/f3ff3571791e39611d31c381e3a41a3af07b4987/VOICES.md",
+    "retrieved_at": "2026-09-11T14:35:06.857492+00:00",
+    "resolved_url": "https://huggingface.co/hexgrad/Kokoro-82M/raw/f3ff3571791e39611d31c381e3a41a3af07b4987/VOICES.md",
+    "status": "FETCHED",
+    "bytes": 7625,
+    "sha256": "ec7e4941ad7e194af61e3455928528a9ff5360c7c505e412efab27d6a69ea106",
+    "file": "reports/evidence/cp0/kokoro_voices.txt"
+  },
+  {
+    "id": "vieneu_turbo_tree",
+    "url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Turbo/tree/8b7e9cffb4b41918cb638b9f62f0a751184d14a6?recursive=true&expand=false",
+    "retrieved_at": "2026-09-11T14:35:06.901655+00:00",
+    "resolved_url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Turbo/tree/8b7e9cffb4b41918cb638b9f62f0a751184d14a6?recursive=true&expand=false",
+    "status": "FETCHED",
+    "bytes": 7809,
+    "sha256": "5086c87f8c71e1fb61ed5431306f3054962b8a69232f3917d4d8595a3a1e6824",
+    "file": "reports/evidence/cp0/vieneu_turbo_tree.txt"
+  },
+  {
+    "id": "vieneu_nano_tree",
+    "url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Nano/tree/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc?recursive=true&expand=false",
+    "retrieved_at": "2026-09-11T14:35:06.934983+00:00",
+    "resolved_url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Nano/tree/aba295eb96a6fa6003ebe417cc1f2802a7adc1dc?recursive=true&expand=false",
+    "status": "FETCHED",
+    "bytes": 3001,
+    "sha256": "159679b1650b0f5edfd25430d5d6bf12b5547d2b8e8e254c92cf6c3e476367ae",
+    "file": "reports/evidence/cp0/vieneu_nano_tree.txt"
+  },
+  {
+    "id": "xtts_tree",
+    "url": "https://huggingface.co/api/models/coqui/XTTS-v2/tree/6c2b0d75eae4b7047358e3b6bd9325f857d43f77?recursive=true&expand=false",
+    "retrieved_at": "2026-09-11T14:35:07.018942+00:00",
+    "resolved_url": "https://huggingface.co/api/models/coqui/XTTS-v2/tree/6c2b0d75eae4b7047358e3b6bd9325f857d43f77?recursive=true&expand=false",
+    "status": "FETCHED",
+    "bytes": 2740,
+    "sha256": "c8cb76b65dbbc5684b17baae62e501589c3f2bf492541d5ad98a0c591008a6d0",
+    "file": "reports/evidence/cp0/xtts_tree.txt"
+  }
+]

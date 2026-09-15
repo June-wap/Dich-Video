@@ -1,0 +1,41 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.1.1, pluggy-1.6.0 -- D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Tool Dich Cho Khach
+plugins: anyio-4.15.1
+collecting ... collected 22 items
+
+backend/tests/test_backend.py::test_fresh_process_import_startup_health_and_shutdown_without_ai_imports PASSED [  4%]
+backend/tests/test_backend.py::test_health_schema_and_no_probe PASSED    [  9%]
+backend/tests/test_backend.py::test_system_schema_cache_and_no_internal_fields PASSED [ 13%]
+backend/tests/test_backend.py::test_runtime_probe_does_not_construct_or_load_models PASSED [ 18%]
+backend/tests/test_backend.py::test_missing_runtime_is_degraded_and_sanitized PASSED [ 22%]
+backend/tests/test_backend.py::test_cpu_only_runtime_does_not_probe_device_name PASSED [ 27%]
+backend/tests/test_backend.py::test_unknown_route_normalized PASSED      [ 31%]
+backend/tests/test_backend.py::test_method_not_allowed PASSED            [ 36%]
+backend/tests/test_backend.py::test_validation_error_sanitized PASSED    [ 40%]
+backend/tests/test_backend.py::test_unexpected_error_is_safe_and_has_cors PASSED [ 45%]
+backend/tests/test_backend.py::test_unavailable_service_error PASSED     [ 50%]
+backend/tests/test_backend.py::test_allowed_cors_origins[http://localhost:5173] PASSED [ 54%]
+backend/tests/test_backend.py::test_allowed_cors_origins[http://127.0.0.1:5173] PASSED [ 59%]
+backend/tests/test_backend.py::test_disallowed_cors_origin PASSED        [ 63%]
+backend/tests/test_backend.py::test_disallowed_host PASSED               [ 68%]
+backend/tests/test_backend.py::test_openapi_only_checkpoint_routes PASSED [ 72%]
+backend/tests/test_backend.py::test_lifespan_releases_service_and_logs_once PASSED [ 77%]
+backend/tests/test_backend.py::test_settings_defaults_and_environment PASSED [ 81%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[*] PASSED [ 86%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[https://arbitrary.example] PASSED [ 90%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[http://localhost:5173/path] PASSED [ 95%]
+backend/tests/test_backend.py::test_cors_config_rejects_broad_or_invalid_origins[http://user:password@localhost:5173] PASSED [100%]
+
+============================== warnings summary ===============================
+external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 22 passed, 2 warnings in 2.61s ========================

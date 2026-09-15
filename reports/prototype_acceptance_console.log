@@ -1,0 +1,134 @@
+2026-09-12 10:59:31,998 prototype INFO SherpaPiper: 8 languages: ['vi', 'en', 'zh', 'es', 'pt', 'it', 'fr', 'hi']
+2026-09-12 10:59:35,804 prototype INFO Loaded Sherpa for vi in 2.68s (sr=22050)
+2026-09-12 10:59:36,200 prototype INFO WAV written: tts_vi_1789185572837.wav (69632 samples, 22050 Hz)
+2026-09-12 10:59:36,339 prototype INFO MP3 exported: tts_vi_1789185572837.mp3
+2026-09-12 10:59:36,339 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185572837.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185572837.mp3", "export_error": null, "load_time": 2.9670243000000482, "preparation_time": 0.0, "text_length": 72, "sample_rate": 22050, "duration": 3.158, "gen_time": 0.383, "rtf": 0.1213, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 10:59:36,340 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.383s gen, 3.158s dur, RTF=0.1213 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 10:59:36,611 Vieneu.V3Turbo INFO ⏳ Loading VieNeu-TTS v3 Turbo (ONNX/CPU) from: pnnbao-ump/VieNeu-TTS-v3-Turbo/onnx_update ...
+2026-09-12 10:59:50,066 Vieneu.V3Turbo INFO ✅ VieNeu-TTS v3 Turbo ready (backend=onnx)
+2026-09-12 10:59:50,074 Vieneu.V3Turbo INFO 📢 Loaded 23 preset voices (default: Minh Quân)
+2026-09-12 10:59:50,078 prototype INFO VieNeu loaded in 13.71s (sr=48000)
+2026-09-12 10:59:53,717 prototype INFO WAV written: tts_vi_1789185576370.wav (199680 samples, 48000 Hz)
+2026-09-12 10:59:53,896 prototype INFO MP3 exported: tts_vi_1789185576370.mp3
+2026-09-12 10:59:53,896 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185576370.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185576370.mp3", "export_error": null, "load_time": 13.706883000000289, "preparation_time": 0.0, "text_length": 72, "sample_rate": 48000, "duration": 4.16, "gen_time": 3.638, "rtf": 0.8746, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Minh Đức", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 10:59:53,896 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Minh Đức | 3.638s gen, 4.160s dur, RTF=0.8746 | PASS
+vi vieneu:Minh Đức PASS None
+2026-09-12 10:59:57,734 prototype INFO WAV written: tts_vi_1789185593928.wav (188160 samples, 48000 Hz)
+2026-09-12 10:59:57,954 prototype INFO MP3 exported: tts_vi_1789185593928.mp3
+2026-09-12 10:59:57,954 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185593928.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185593928.mp3", "export_error": null, "load_time": 3.6999999792897142e-06, "preparation_time": 0.0, "text_length": 72, "sample_rate": 48000, "duration": 3.92, "gen_time": 3.803, "rtf": 0.97, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Trúc Ly", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 10:59:57,957 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Trúc Ly | 3.803s gen, 3.920s dur, RTF=0.9700 | PASS
+vi vieneu:Trúc Ly PASS None
+2026-09-12 10:59:58,503 prototype INFO Generated tokens.txt for en_US-lessac-medium (154 tokens)
+2026-09-12 11:00:00,960 prototype INFO Loaded Sherpa for en in 2.46s (sr=22050)
+2026-09-12 11:00:01,314 prototype INFO WAV written: tts_en_1789185597992.wav (69888 samples, 22050 Hz)
+2026-09-12 11:00:01,450 prototype INFO MP3 exported: tts_en_1789185597992.mp3
+2026-09-12 11:00:01,451 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_en_1789185597992.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_en_1789185597992.mp3", "export_error": null, "load_time": 2.979172099999687, "preparation_time": 0.0, "text_length": 62, "sample_rate": 22050, "duration": 3.17, "gen_time": 0.332, "rtf": 0.1047, "provider": "Sherpa-ONNX + Piper VITS", "model": "en_US-lessac-medium", "language": "en", "voice": "en_lessac", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:01,451 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=en voice=en_lessac | 0.332s gen, 3.170s dur, RTF=0.1047 | PASS
+en en_lessac PASS None
+2026-09-12 11:00:01,825 prototype INFO Generated tokens.txt for zh_CN-huayan-medium (152 tokens)
+2026-09-12 11:00:03,959 prototype INFO Loaded Sherpa for zh in 2.13s (sr=22050)
+2026-09-12 11:00:04,525 prototype INFO WAV written: tts_zh_1789185601467.wav (59337 samples, 22050 Hz)
+2026-09-12 11:00:04,682 prototype INFO MP3 exported: tts_zh_1789185601467.mp3
+2026-09-12 11:00:04,682 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_zh_1789185601467.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_zh_1789185601467.mp3", "export_error": null, "load_time": 2.5022899999999026, "preparation_time": 0.0, "text_length": 16, "sample_rate": 22050, "duration": 2.691, "gen_time": 0.506, "rtf": 0.1879, "provider": "Sherpa-ONNX + Piper VITS", "model": "zh_CN-huayan-medium", "language": "zh", "voice": "zh_huayan", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:04,682 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=zh voice=zh_huayan | 0.506s gen, 2.691s dur, RTF=0.1879 | PASS
+zh zh_huayan PASS None
+2026-09-12 11:00:08,240 prototype INFO JA ORT session loaded in 3.54s
+2026-09-12 11:00:08,736 prototype INFO WAV written: tts_ja_1789185604696.wav (84736 samples, 22050 Hz)
+2026-09-12 11:00:08,893 prototype INFO MP3 exported: tts_ja_1789185604696.mp3
+2026-09-12 11:00:08,893 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_ja_1789185604696.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_ja_1789185604696.mp3", "export_error": null, "load_time": 3.545629299999746, "preparation_time": 0.0, "text_length": 23, "sample_rate": 22050, "duration": 3.843, "gen_time": 0.482, "rtf": 0.1255, "provider": "ORT-Direct Japanese (GPL-free)", "model": "ja_JA-hi_fi_captain-medium", "language": "ja", "voice": "ja_female", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:08,894 prototype INFO TTS ORT-Direct Japanese (GPL-free) | lang=ja voice=ja_female | 0.482s gen, 3.843s dur, RTF=0.1255 | PASS
+ja ja_female PASS None
+2026-09-12 11:00:09,349 prototype INFO WAV written: tts_ja_1789185608920.wav (81664 samples, 22050 Hz)
+2026-09-12 11:00:09,501 prototype INFO MP3 exported: tts_ja_1789185608920.mp3
+2026-09-12 11:00:09,502 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_ja_1789185608920.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_ja_1789185608920.mp3", "export_error": null, "load_time": 2.8999997994105797e-06, "preparation_time": 0.0, "text_length": 23, "sample_rate": 22050, "duration": 3.704, "gen_time": 0.425, "rtf": 0.1148, "provider": "ORT-Direct Japanese (GPL-free)", "model": "ja_JA-hi_fi_captain-medium", "language": "ja", "voice": "ja_male", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:09,503 prototype INFO TTS ORT-Direct Japanese (GPL-free) | lang=ja voice=ja_male | 0.425s gen, 3.704s dur, RTF=0.1148 | PASS
+ja ja_male PASS None
+2026-09-12 11:00:10,032 prototype INFO Generated tokens.txt for es_ES-davefx-medium (152 tokens)
+2026-09-12 11:00:12,472 prototype INFO Loaded Sherpa for es in 2.44s (sr=22050)
+2026-09-12 11:00:12,814 prototype INFO WAV written: tts_es_1789185609521.wav (65536 samples, 22050 Hz)
+2026-09-12 11:00:12,957 prototype INFO MP3 exported: tts_es_1789185609521.mp3
+2026-09-12 11:00:12,957 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_es_1789185609521.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_es_1789185609521.mp3", "export_error": null, "load_time": 2.957601799999793, "preparation_time": 0.0, "text_length": 55, "sample_rate": 22050, "duration": 2.972, "gen_time": 0.323, "rtf": 0.1085, "provider": "Sherpa-ONNX + Piper VITS", "model": "es_ES-davefx-medium", "language": "es", "voice": "es_davefx", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:12,957 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=es voice=es_davefx | 0.323s gen, 2.972s dur, RTF=0.1085 | PASS
+es es_davefx PASS None
+2026-09-12 11:00:13,491 prototype INFO Generated tokens.txt for pt_BR-faber-medium (152 tokens)
+2026-09-12 11:00:17,199 prototype INFO Loaded Sherpa for pt in 3.71s (sr=22050)
+2026-09-12 11:00:17,570 prototype INFO WAV written: tts_pt_1789185612975.wav (66816 samples, 22050 Hz)
+2026-09-12 11:00:17,691 prototype INFO MP3 exported: tts_pt_1789185612975.mp3
+2026-09-12 11:00:17,691 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_pt_1789185612975.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_pt_1789185612975.mp3", "export_error": null, "load_time": 4.229602899999918, "preparation_time": 0.0, "text_length": 52, "sample_rate": 22050, "duration": 3.03, "gen_time": 0.353, "rtf": 0.1163, "provider": "Sherpa-ONNX + Piper VITS", "model": "pt_BR-faber-medium", "language": "pt", "voice": "pt_faber", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:17,691 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=pt voice=pt_faber | 0.353s gen, 3.030s dur, RTF=0.1163 | PASS
+pt pt_faber PASS None
+2026-09-12 11:00:17,917 prototype INFO Generated tokens.txt for it_IT-riccardo-x_low (130 tokens)
+2026-09-12 11:00:19,931 prototype INFO Loaded Sherpa for it in 2.01s (sr=16000)
+2026-09-12 11:00:20,119 prototype INFO WAV written: tts_it_1789185617709.wav (45568 samples, 16000 Hz)
+2026-09-12 11:00:20,237 prototype INFO MP3 exported: tts_it_1789185617709.mp3
+2026-09-12 11:00:20,238 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_it_1789185617709.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_it_1789185617709.mp3", "export_error": null, "load_time": 2.226383100000021, "preparation_time": 0.0, "text_length": 53, "sample_rate": 16000, "duration": 2.848, "gen_time": 0.175, "rtf": 0.0614, "provider": "Sherpa-ONNX + Piper VITS", "model": "it_IT-riccardo-x_low", "language": "it", "voice": "it_riccardo", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:20,238 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=it voice=it_riccardo | 0.175s gen, 2.848s dur, RTF=0.0614 | PASS
+it it_riccardo PASS None
+2026-09-12 11:00:20,728 prototype INFO Generated tokens.txt for fr_FR-siwis-medium (154 tokens)
+2026-09-12 11:00:22,731 prototype INFO Loaded Sherpa for fr in 2.00s (sr=22050)
+2026-09-12 11:00:23,088 prototype INFO WAV written: tts_fr_1789185620256.wav (69728 samples, 22050 Hz)
+2026-09-12 11:00:23,215 prototype INFO MP3 exported: tts_fr_1789185620256.mp3
+2026-09-12 11:00:23,215 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_fr_1789185620256.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_fr_1789185620256.mp3", "export_error": null, "load_time": 2.4837843999998768, "preparation_time": 0.0, "text_length": 57, "sample_rate": 22050, "duration": 3.162, "gen_time": 0.342, "rtf": 0.1082, "provider": "Sherpa-ONNX + Piper VITS", "model": "fr_FR-siwis-medium", "language": "fr", "voice": "fr_siwis", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:23,215 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=fr voice=fr_siwis | 0.342s gen, 3.162s dur, RTF=0.1082 | PASS
+fr fr_siwis PASS None
+2026-09-12 11:00:23,692 prototype INFO Generated tokens.txt for hi_IN-pratham-medium (157 tokens)
+2026-09-12 11:00:26,519 prototype INFO Loaded Sherpa for hi in 2.83s (sr=22050)
+2026-09-12 11:00:26,984 prototype INFO WAV written: tts_hi_1789185623232.wav (84619 samples, 22050 Hz)
+2026-09-12 11:00:27,110 prototype INFO MP3 exported: tts_hi_1789185623232.mp3
+2026-09-12 11:00:27,111 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_hi_1789185623232.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_hi_1789185623232.mp3", "export_error": null, "load_time": 3.2954099000003225, "preparation_time": 0.0, "text_length": 55, "sample_rate": 22050, "duration": 3.838, "gen_time": 0.446, "rtf": 0.1162, "provider": "Sherpa-ONNX + Piper VITS", "model": "hi_IN-pratham-medium", "language": "hi", "voice": "hi_pratham", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:27,112 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=hi voice=hi_pratham | 0.446s gen, 3.838s dur, RTF=0.1162 | PASS
+hi hi_pratham PASS None
+2026-09-12 11:00:27,522 prototype INFO WAV written: tts_vi_1789185627126.wav (70656 samples, 22050 Hz)
+2026-09-12 11:00:27,643 prototype INFO MP3 exported: tts_vi_1789185627126.mp3
+2026-09-12 11:00:27,644 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627126.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627126.mp3", "export_error": null, "load_time": 4.800000169780105e-06, "preparation_time": 0.0, "text_length": 72, "sample_rate": 22050, "duration": 3.204, "gen_time": 0.386, "rtf": 0.1204, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:27,644 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.386s gen, 3.204s dur, RTF=0.1204 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:27,862 prototype INFO WAV written: tts_vi_1789185627660.wav (44544 samples, 22050 Hz)
+2026-09-12 11:00:27,966 prototype INFO MP3 exported: tts_vi_1789185627660.mp3
+2026-09-12 11:00:27,968 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627660.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627660.mp3", "export_error": null, "load_time": 3.000000106112566e-06, "preparation_time": 0.0, "text_length": 28, "sample_rate": 22050, "duration": 2.02, "gen_time": 0.196, "rtf": 0.0971, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:27,968 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.196s gen, 2.020s dur, RTF=0.0971 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:28,298 prototype INFO WAV written: tts_vi_1789185627981.wav (69632 samples, 22050 Hz)
+2026-09-12 11:00:28,407 prototype INFO MP3 exported: tts_vi_1789185627981.mp3
+2026-09-12 11:00:28,407 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627981.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185627981.mp3", "export_error": null, "load_time": 1.5999999050109182e-06, "preparation_time": 0.0, "text_length": 40, "sample_rate": 22050, "duration": 3.158, "gen_time": 0.31, "rtf": 0.0981, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:28,407 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.310s gen, 3.158s dur, RTF=0.0981 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:28,734 prototype INFO WAV written: tts_vi_1789185628423.wav (71424 samples, 22050 Hz)
+2026-09-12 11:00:28,848 prototype INFO MP3 exported: tts_vi_1789185628423.mp3
+2026-09-12 11:00:28,850 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185628423.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185628423.mp3", "export_error": null, "load_time": 1.5999999050109182e-06, "preparation_time": 0.0, "text_length": 36, "sample_rate": 22050, "duration": 3.239, "gen_time": 0.302, "rtf": 0.0932, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:28,850 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.302s gen, 3.239s dur, RTF=0.0932 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:29,071 prototype INFO WAV written: tts_vi_1789185628864.wav (41472 samples, 22050 Hz)
+2026-09-12 11:00:29,170 prototype INFO MP3 exported: tts_vi_1789185628864.mp3
+2026-09-12 11:00:29,170 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185628864.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185628864.mp3", "export_error": null, "load_time": 1.6999997569655534e-06, "preparation_time": 0.0, "text_length": 30, "sample_rate": 22050, "duration": 1.881, "gen_time": 0.201, "rtf": 0.1066, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:29,170 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.201s gen, 1.881s dur, RTF=0.1066 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:29,545 prototype INFO WAV written: tts_vi_1789185629184.wav (83456 samples, 22050 Hz)
+2026-09-12 11:00:29,664 prototype INFO MP3 exported: tts_vi_1789185629184.mp3
+2026-09-12 11:00:29,666 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185629184.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185629184.mp3", "export_error": null, "load_time": 1.99999976757681e-06, "preparation_time": 0.0, "text_length": 36, "sample_rate": 22050, "duration": 3.785, "gen_time": 0.348, "rtf": 0.092, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:29,666 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.348s gen, 3.785s dur, RTF=0.0920 | PASS
+vi vi_vais1000 PASS None
+2026-09-12 11:00:32,076 prototype INFO WAV written: tts_vi_1789185629684.wav (99840 samples, 48000 Hz)
+2026-09-12 11:00:32,232 prototype INFO MP3 exported: tts_vi_1789185629684.mp3
+2026-09-12 11:00:32,233 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185629684.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185629684.mp3", "export_error": null, "load_time": 1.0100000054080738e-05, "preparation_time": 0.0, "text_length": 28, "sample_rate": 48000, "duration": 2.08, "gen_time": 2.389, "rtf": 1.1483, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Trúc Ly", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:32,233 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Trúc Ly | 2.389s gen, 2.080s dur, RTF=1.1483 | PASS
+vi vieneu:Trúc Ly PASS None
+2026-09-12 11:00:34,151 prototype INFO WAV written: tts_vi_1789185632248.wav (115200 samples, 48000 Hz)
+2026-09-12 11:00:34,290 prototype INFO MP3 exported: tts_vi_1789185632248.mp3
+2026-09-12 11:00:34,290 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185632248.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185632248.mp3", "export_error": null, "load_time": 1.500000053056283e-06, "preparation_time": 0.0, "text_length": 31, "sample_rate": 48000, "duration": 2.4, "gen_time": 1.899, "rtf": 0.7912, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Minh Đức", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:34,292 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Minh Đức | 1.899s gen, 2.400s dur, RTF=0.7912 | PASS
+vi vieneu:Minh Đức PASS None
+2026-09-12 11:00:35,862 prototype INFO WAV written: tts_vi_1789185634307.wav (96000 samples, 48000 Hz)
+2026-09-12 11:00:35,990 prototype INFO MP3 exported: tts_vi_1789185634307.mp3
+2026-09-12 11:00:35,990 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185634307.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185634307.mp3", "export_error": null, "load_time": 1.2000000424450263e-06, "preparation_time": 0.0, "text_length": 30, "sample_rate": 48000, "duration": 2.0, "gen_time": 1.548, "rtf": 0.7742, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Trúc Ly", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:35,990 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Trúc Ly | 1.548s gen, 2.000s dur, RTF=0.7742 | PASS
+vi vieneu:Trúc Ly PASS None
+2026-09-12 11:00:38,105 prototype INFO WAV written: tts_vi_1789185636006.wav (126720 samples, 48000 Hz)
+2026-09-12 11:00:38,242 prototype INFO MP3 exported: tts_vi_1789185636006.mp3
+2026-09-12 11:00:38,242 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185636006.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185636006.mp3", "export_error": null, "load_time": 1.8000000636675395e-06, "preparation_time": 0.0, "text_length": 39, "sample_rate": 48000, "duration": 2.64, "gen_time": 2.096, "rtf": 0.794, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Minh Đức", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:00:38,242 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Minh Đức | 2.096s gen, 2.640s dur, RTF=0.7940 | PASS
+vi vieneu:Minh Đức PASS None
+2026-09-12 11:00:38,268 prototype INFO Merged 4 segments -> acceptance_conversation.wav (10.9s)
+2026-09-12 11:00:38,475 prototype INFO MP3 exported: acceptance_conversation.mp3
+2026-09-12 11:00:38,661 prototype INFO WAV written: synthetic_reference_5s.wav (240000 samples, 48000 Hz)

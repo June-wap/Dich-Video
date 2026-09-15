@@ -1,0 +1,11 @@
+test_artifact_escape_rejected (test_cp0_evidence.EvidenceTests.test_artifact_escape_rejected) ... ok
+test_evidence_snapshots_match_receipts (test_cp0_evidence.EvidenceTests.test_evidence_snapshots_match_receipts) ... ok
+test_real_output_matches_recorded_hash (test_cp0_evidence.EvidenceTests.test_real_output_matches_recorded_hash) ... ok
+test_silence_is_not_successful_speech_evidence (test_cp0_evidence.EvidenceTests.test_silence_is_not_successful_speech_evidence) ... ok
+test_truncated_pcm_is_rejected (test_cp0_evidence.EvidenceTests.test_truncated_pcm_is_rejected) ... ok
+test_wrong_artifact_hash_rejected (test_cp0_evidence.EvidenceTests.test_wrong_artifact_hash_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.014s
+
+OK

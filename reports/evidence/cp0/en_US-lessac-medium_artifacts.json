@@ -1,0 +1,29 @@
+{
+  "model_id": "en_US-lessac-medium",
+  "repository": "rhasspy/piper-voices",
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "artifacts": [
+    {
+      "path": ".cp0/models/piper/en_US-lessac-medium/en_US-lessac-medium.onnx",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/en/en_US/lessac/medium/en_US-lessac-medium.onnx",
+      "size_bytes": 63201294,
+      "sha256": "5efe09e69902187827af646e1a6e9d269dee769f9877d17b16b1b46eeaaf019f",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/en_US-lessac-medium/en_US-lessac-medium.onnx.json",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json",
+      "size_bytes": 4885,
+      "sha256": "efe19c417bed055f2d69908248c6ba650fa135bc868b0e6abb3da181dab690a0",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/en_US-lessac-medium/MODEL_CARD",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/en/en_US/lessac/medium/MODEL_CARD",
+      "size_bytes": 351,
+      "sha256": "ce49eb457742208166d399a40cdec2c7fa9db77960930031564ab56f12882645",
+      "catalog_md5_match": true
+    }
+  ],
+  "status": "DOWNLOADED_NOT_PRODUCTION_APPROVED"
+}

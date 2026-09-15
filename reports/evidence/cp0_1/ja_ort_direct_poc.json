@@ -1,0 +1,66 @@
+{
+  "task": "cp0_1_ja_ort_direct",
+  "model": "ja_JA-hi_fi_captain-medium",
+  "runtime": "onnxruntime",
+  "ort_version": "1.30.0",
+  "phonemizer": "pyopenjtalk (MIT)",
+  "gpl_imports": "NONE",
+  "tests": [
+    {
+      "label": "basic",
+      "text": "こんにちは世界",
+      "speaker_id": 0,
+      "phonemes": "ko↑ɴnitɕiwa#se↓kai.",
+      "num_phoneme_ids": 41,
+      "phonemize_s": 0.1683,
+      "gen_s": 0.272,
+      "dur": 1.428,
+      "rtf": 0.1904,
+      "rms": 0.0735,
+      "sha": "1853efa395cf4a432ff3085fded9c31397990ae8a181a2d6a1d1e9de4ae7ff65",
+      "path": ".cp0\\audio\\ja_ort_direct\\ja_basic_spk0.wav",
+      "status": "PASS"
+    },
+    {
+      "label": "weather",
+      "text": "今日は天気がいいです。",
+      "speaker_id": 1,
+      "phonemes": "kʲo↓owa#te↓ɴkiɡa#i↓ides.",
+      "num_phoneme_ids": 51,
+      "phonemize_s": 0.0006,
+      "gen_s": 0.378,
+      "dur": 1.637,
+      "rtf": 0.231,
+      "rms": 0.0792,
+      "sha": "040b3167aa830d9984e35031d17d008be43b4a503fe364c0099a8792ceb4d8ed",
+      "path": ".cp0\\audio\\ja_ort_direct\\ja_weather_spk1.wav",
+      "status": "PASS"
+    },
+    {
+      "label": "long",
+      "text": "人工知能は私たちの生活を大きく変えています。音声合成技術はますます自然になっています。",
+      "speaker_id": 0,
+      "phonemes": "dʑi↑ɴkootɕi↓noowa#wa↑taɕi↓tatɕino#se↑ekatsɯo#o↓okkɯ#ka↑eteima↓s.o↑ɴseeɡooseeɡi↓dʑɯtsɯwa#ma↑sɯ↓masɯ#ɕi↑zeɴni#na↓ʔteimas.",
+      "num_phoneme_ids": 241,
+      "phonemize_s": 0.0191,
+      "gen_s": 0.588,
+      "dur": 7.872,
+      "rtf": 0.0747,
+      "rms": 0.0612,
+      "sha": "3d58a770f8b708219b1c1ac5d062d39d2b9a29aa0f0f5178f696535b2fc665e4",
+      "path": ".cp0\\audio\\ja_ort_direct\\ja_long_spk0.wav",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "sample_rate": 22050,
+  "num_speakers": 2,
+  "model_sha": "5eafa1610fc7a0ff2e7fde9cbe0972d876266e23d8db331727eb2466f19460eb",
+  "load_s": 1.585,
+  "offline": {
+    "status": "PASS",
+    "dur": 1.614,
+    "sha": "900c76e936a608b6d11d3f83f5c14ffcd0a7ab3f5715fd599d9066f7adc5c182"
+  },
+  "status": "PASS"
+}

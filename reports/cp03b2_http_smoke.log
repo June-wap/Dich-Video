@@ -1,0 +1,167 @@
+INFO:     Started server process [16852]
+INFO:     Waiting for application startup.
+2026-09-14 14:45:02,773 INFO backend.providers provider_registered provider=omnivoice state=NOT_LOADED
+2026-09-14 14:45:02,773 INFO backend.lifecycle backend_start version=0.3.0-dev
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-09-14 14:45:04,747 INFO backend.lifecycle backend_stop
+INFO:     Application shutdown complete.
+INFO:     Finished server process [16852]
+{
+  "status": "PASS",
+  "python": "3.12.10",
+  "interpreter": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+  "fastapi": "0.141.1",
+  "uvicorn": "0.52.4",
+  "startup_no_ai_imports": true,
+  "startup_provider_state": "NOT_LOADED",
+  "health": {
+    "status": "ok",
+    "service": "local-ai-voice-api",
+    "version": "0.3.0-dev"
+  },
+  "health_no_ai_imports": true,
+  "providers": {
+    "primary": "omnivoice",
+    "providers": [
+      {
+        "id": "omnivoice",
+        "available": true,
+        "state": "NOT_LOADED",
+        "loaded": false,
+        "device": "cuda:0",
+        "languages": [
+          "vi",
+          "en",
+          "zh",
+          "ja",
+          "es",
+          "pt",
+          "it",
+          "fr",
+          "hi"
+        ],
+        "language_metadata": [
+          {
+            "id": "vi",
+            "display_name": "Vietnamese",
+            "native_name": "Tiếng Việt",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": true,
+            "production_ready": false
+          },
+          {
+            "id": "en",
+            "display_name": "English",
+            "native_name": "English",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "zh",
+            "display_name": "Chinese",
+            "native_name": "中文",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "ja",
+            "display_name": "Japanese",
+            "native_name": "日本語",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "es",
+            "display_name": "Spanish",
+            "native_name": "Español",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "pt",
+            "display_name": "Portuguese",
+            "native_name": "Português",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "it",
+            "display_name": "Italian",
+            "native_name": "Italiano",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "fr",
+            "display_name": "French",
+            "native_name": "Français",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          },
+          {
+            "id": "hi",
+            "display_name": "Hindi",
+            "native_name": "हिन्दी",
+            "status": "VERIFIED",
+            "verification_scope": "CUDA normal short TTS baseline",
+            "cloned_live_verified": false,
+            "production_ready": false
+          }
+        ],
+        "experimental_languages_enabled": false,
+        "production_ready": false,
+        "error_code": null
+      }
+    ]
+  },
+  "system": {
+    "status": "ready",
+    "python_version": "3.12.10",
+    "torch_version": "2.8.0+cu128",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "omnivoice_available": true,
+    "omnivoice_model_loaded": false,
+    "primary_provider": "omnivoice",
+    "provider_state": "NOT_LOADED",
+    "audio": {
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    "runtime_mode": "local"
+  },
+  "openapi_paths": [
+    "/api/health",
+    "/api/providers/status",
+    "/api/system/status"
+  ],
+  "cuda_allocated_bytes": 0,
+  "no_model_runtime_or_manager_imports": true,
+  "lifecycle_counts": {
+    "provider_instances": 1,
+    "load_calls": 0
+  },
+  "model_load_count": 0,
+  "model_vram_bytes": 0,
+  "vram_scope": "No model instance/load; tensor allocation measured after status. Not total driver/context memory.",
+  "server_stopped": true,
+  "service_released": true,
+  "provider_service_released": true
+}

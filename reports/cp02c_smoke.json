@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "scope": "EN normal and VI cloned only",
+  "runs": [
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02c_en_normal.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 28,
+      "sample_rate": 24000,
+      "duration": 2.04,
+      "gen_time": 2.794954400000279,
+      "rtf": 1.3700756862746464,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "en",
+      "voice": "omnivoice_auto",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true,
+        "diagnostics": {
+          "provider": "omnivoice",
+          "language": "en",
+          "language_status": "VERIFIED",
+          "device": "cuda:0",
+          "dtype": "float16",
+          "audio_dtype": "float32",
+          "generation_time": 2.794954400000279,
+          "duration": 2.04,
+          "rtf": 1.3700756862746464,
+          "mode": "normal",
+          "status": "PASS"
+        }
+      }
+    },
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02c_vi_cloned.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 30,
+      "sample_rate": 24000,
+      "duration": 2.09,
+      "gen_time": 1.8399787999996988,
+      "rtf": 0.8803726315788033,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "vi",
+      "voice": "144557bca9674d8da5783122da25fe6d",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true,
+        "diagnostics": {
+          "provider": "omnivoice",
+          "language": "vi",
+          "language_status": "VERIFIED",
+          "device": "cuda:0",
+          "dtype": "float16",
+          "audio_dtype": "float32",
+          "generation_time": 1.8399787999996988,
+          "duration": 2.09,
+          "rtf": 0.8803726315788033,
+          "mode": "cloned",
+          "status": "PASS"
+        }
+      }
+    }
+  ]
+}

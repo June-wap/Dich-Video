@@ -1,0 +1,12 @@
+[
+  {
+    "id": "moss_onnx_metadata",
+    "url": "https://huggingface.co/api/models/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX",
+    "retrieved_at": "2026-09-11T16:25:48.943174+00:00",
+    "resolved_url": "https://huggingface.co/api/models/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX",
+    "status": "FETCHED",
+    "bytes": 1500,
+    "sha256": "2ab686e1c7470ac66234f3fb653e3cdb8c0c3e6725ff7e66d4e3fd23e6569c08",
+    "file": "reports/evidence/cp0_1/moss_onnx_metadata.txt"
+  }
+]

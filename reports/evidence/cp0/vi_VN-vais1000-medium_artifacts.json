@@ -1,0 +1,29 @@
+{
+  "model_id": "vi_VN-vais1000-medium",
+  "repository": "rhasspy/piper-voices",
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "artifacts": [
+    {
+      "path": ".cp0/models/piper/vi_VN-vais1000-medium/vi_VN-vais1000-medium.onnx",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx",
+      "size_bytes": 63201294,
+      "sha256": "ec7c89e2c85f4d1edc24b6120c18aaf1bda614f06b511567eb9c7c0de15e2dab",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/vi_VN-vais1000-medium/vi_VN-vais1000-medium.onnx.json",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/vi/vi_VN/vais1000/medium/vi_VN-vais1000-medium.onnx.json",
+      "size_bytes": 4860,
+      "sha256": "fafb9da1354ed4b77c31af228ed41fb41cd825c14cffa105454b25e6ae751ee0",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/vi_VN-vais1000-medium/MODEL_CARD",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/vi/vi_VN/vais1000/medium/MODEL_CARD",
+      "size_bytes": 361,
+      "sha256": "302db8a930ffc2b1c2181db26deaf8272116eca2b08b8f80da6375b0a994af7b",
+      "catalog_md5_match": true
+    }
+  ],
+  "status": "DOWNLOADED_NOT_PRODUCTION_APPROVED"
+}

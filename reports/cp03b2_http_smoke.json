@@ -1,0 +1,11 @@
+{
+  "status": "FAIL",
+  "python": "3.12.10",
+  "interpreter": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+  "fastapi": "0.141.1",
+  "uvicorn": "0.52.4",
+  "startup_no_ai_imports": false,
+  "server_stopped": true,
+  "service_released": true,
+  "provider_service_released": true
+}

@@ -1,0 +1,31 @@
+{
+  "variant_id": "variant_3",
+  "name": "size_100_150_chars_step16",
+  "description": "Chunk size 100-150 chars: 2 short sentences (141 chars), num_step=16",
+  "strategy": "100_150_chars",
+  "num_step": 16,
+  "full_text": "Buổi sáng, tôi mở cửa sổ và nhìn khu vườn nhỏ trước nhà. Những giọt nước còn đọng trên lá, trong khi tiếng chim vang lên từ hàng cây phía xa.",
+  "chars": 141,
+  "words": 31,
+  "chunk_count": 1,
+  "total_gen_time_sec": 124.127,
+  "final_duration_sec": 7.385,
+  "rtf": 16.808,
+  "speech_rate_chars_per_sec": 19.09,
+  "speech_rate_words_per_sec": 4.2,
+  "peak_amplitude": 0.6482,
+  "rms_db": -18.35,
+  "chunks_detail": [
+    {
+      "chunk_index": 0,
+      "text": "Buổi sáng, tôi mở cửa sổ và nhìn khu vườn nhỏ trước nhà. Những giọt nước còn đọng trên lá, trong khi tiếng chim vang lên từ hàng cây phía xa.",
+      "chars": 141,
+      "words": 31,
+      "gen_time_sec": 124.127,
+      "raw_duration_sec": 7.72,
+      "processed_duration_sec": 7.385,
+      "trim_leading_ms": 165,
+      "trim_trailing_ms": 170
+    }
+  ]
+}

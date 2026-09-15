@@ -1,0 +1,302 @@
+CHECKPOINT 0.1 — CRITICAL FEASIBILITY CLOSURE
+
+PROJECT: LOCAL AI VOICE
+ROLE: Codex/AI Agent = Implementer + Tester. ChatGPT = Architect + Reviewer/Gatekeeper.
+
+Read RULES.txt, AGENTS.md if present, checkpoint_00.txt, the CP0 feasibility report,
+docs/model_compatibility_matrix.md and docs/model_license_matrix.md before work.
+
+OBJECTIVE
+Close the four critical gaps remaining after CP0:
+1. Voice cloning feasibility.
+2. Japanese TTS feasibility.
+3. Pending model/dataset license review.
+4. espeak-ng licensing/redistribution impact.
+
+Do not implement unrelated CP1–CP15 features.
+
+============================================================
+A. VOICE CLONING POC
+============================================================
+
+Primary candidate: VieNeu v3 Turbo.
+
+Evaluate another candidate only if VieNeu is technically blocked, unavailable,
+commercially unsuitable, or fails the required tests.
+
+Record:
+- repository/source and exact revision/version
+- model ID/revision and artifact hashes
+- runtime/dependency versions
+- code/model/dataset/voice licenses
+- redistribution/attribution requirements
+- CPU/GPU support and RAM/VRAM
+- offline behavior
+
+MANDATORY LIVE POC
+
+Use legally safe reference audio and execute:
+Reference audio → conditioning/profile → Vietnamese text → cloned Vietnamese audio.
+
+Test approximately:
+- 5-second reference
+- 10-second reference
+- 30-second reference
+
+For each run record:
+- success/failure
+- model load/generation time
+- generated duration and RTF where meaningful
+- RAM/VRAM and device
+- artifact/checksum
+- errors/warnings
+
+Evaluate actual generated samples:
+- Vietnamese pronunciation
+- naturalness
+- speaker similarity
+- prosody
+- stability
+
+Use a documented 1–5 scale. Clearly distinguish measured data from subjective
+listening scores. Do not claim quality was verified unless audio was actually heard.
+
+OFFLINE TEST
+After artifacts are installed locally, block/disconnect network where practical
+and repeat generation. Record hidden downloads/network dependencies.
+
+If VieNeu fails, preserve diagnostics and classify the cause before evaluating
+an alternative. README/model-card claims are not a successful POC.
+
+============================================================
+B. JAPANESE TTS
+============================================================
+
+First reproduce the Japanese failure from CP0 using the same model/runtime.
+
+Record:
+- exact model/revision/runtime
+- Japanese input
+- stack/error
+- model loading and synthesis result
+- tokenizer/phonemizer dependencies
+- artifact hashes
+
+Classify the failure:
+model incompatibility / runtime incompatibility / tokenizer-phonemizer /
+missing dependency / bad artifact / configuration / unsupported / unknown.
+
+Attempt a minimal legitimate fix.
+
+If the existing Sherpa-ONNX/Piper path cannot be reliable, evaluate a local,
+offline, Windows-compatible, commercially acceptable alternative Japanese
+provider/model with exact model/revision and license evidence.
+
+MANDATORY TEST
+Generate real Japanese audio from a fixed Japanese sentence and verify:
+- valid PCM/audio
+- non-zero duration
+- successful synthesis
+- offline operation after installation
+- basic listening intelligibility/pronunciation where practical
+
+Never silently substitute another language or voice.
+
+============================================================
+C. LICENSE CLOSURE
+============================================================
+
+Review every proposed production artifact still PENDING from CP0 for:
+- runtime/code license
+- model/weights license
+- dataset license where documented
+- voice/speaker rights where documented
+- tokenizer/phonemizer/data license
+- redistribution requirements
+- attribution requirements
+
+Allowed review states only:
+PENDING / APPROVED / REJECTED
+
+APPROVED requires sufficient evidence for the intended commercial distribution.
+If evidence is missing, remain PENDING and state exactly what is missing.
+
+Record evidence sources, reviewed revisions and artifact hashes.
+Do not make unsupported legal conclusions.
+
+============================================================
+D. ESPEAK-NG REVIEW
+============================================================
+
+Determine with evidence:
+- whether executable/library code is bundled
+- whether data is bundled
+- exact required files/artifacts
+- which component loads them
+- whether they are runtime-required
+- whether they are copied into model packages
+- licenses applying to exact bundled artifacts
+- redistribution/attribution/source obligations
+- whether bundling can be avoided
+- technically viable alternatives
+- compatibility/quality consequences of changing phonemizer/runtime
+
+Do not assume Sherpa-ONNX automatically removes all espeak-ng obligations.
+
+============================================================
+MATRICES
+============================================================
+
+Update docs/model_compatibility_matrix.md for:
+VI EN ZH JA ES PT IT FR HI
+
+Include:
+standard TTS, fixed voices, cloning, CPU, GPU, offline, Windows,
+tested model/revision and verification status.
+
+Use precise statuses:
+VERIFIED / NOT_VERIFIED / FAILED / BLOCKED / NOT_APPLICABLE
+
+Update docs/model_license_matrix.md with:
+component, source, revision, model/artifact ID, hash, code license,
+model license, dataset/voice license, phonemizer/data license,
+redistribution, attribution, evidence, review status, unresolved questions.
+
+Never replace uncertainty with assumptions.
+
+============================================================
+EVIDENCE AND TESTS
+============================================================
+
+Store reproducible evidence under:
+reports/evidence/cp0_1/
+
+Include as relevant:
+environment snapshot, dependency versions, benchmark JSON, hashes,
+model metadata, logs, generated sample metadata, license evidence,
+failure diagnostics.
+
+Do not commit large model weights or private voice samples unless policy permits.
+
+Add/update evidence-integrity tests. Verify at minimum:
+- required matrix/report fields
+- model/revision identifiers
+- hash format
+- allowed status vocabulary
+- no APPROVED item without evidence
+- no rejected model labeled production-ready
+
+Run:
+- targeted CP0.1 tests
+- existing CP0 evidence tests
+- relevant regression tests
+
+Record exact commands/results.
+
+============================================================
+NON-GOALS
+============================================================
+
+Do NOT implement:
+production UI, production TTS API, production SQLite schema,
+conversation mode, long-text job engine, production audio pipeline,
+model manager, activation, installer, translation, or speech-to-text.
+
+============================================================
+REQUIRED OUTPUT
+============================================================
+
+Create:
+reports/checkpoint_00_1_feasibility_closure.md
+
+Update:
+docs/model_compatibility_matrix.md
+docs/model_license_matrix.md
+
+Report sections:
+1. Repository State
+2. Instructions Read
+3. CP0 Baseline
+4. Environment
+5. Voice Cloning Investigation
+6. Voice Cloning Live POC
+7. Voice Cloning Quality Results
+8. Japanese Failure Reproduction
+9. Japanese Resolution / Alternative
+10. License Closure
+11. espeak-ng Analysis
+12. Compatibility Matrix Changes
+13. Tests Added/Changed
+14. Test Results
+15. Evidence Created
+16. Security/Privacy Review
+17. Known Limitations
+18. Remaining Blockers
+19. Files Changed
+20. Git Diff Summary
+21. Final Status
+
+============================================================
+ACCEPTANCE GATES
+============================================================
+
+VOICE CLONING PASS only if:
+- concrete commercially viable candidate identified
+- exact runtime/model revision recorded
+- real Vietnamese cloned speech generated
+- output actually evaluated
+- offline behavior tested or explicitly justified
+- license evidence supports the approval state
+
+JAPANESE PASS only if:
+- real Japanese speech generated
+- structurally valid output
+- selected runtime/model identified
+- offline feasibility demonstrated
+- license evidence recorded
+
+LICENSE CLOSURE PASS only if:
+- every proposed production artifact is APPROVED, OR
+- remaining PENDING artifacts are explicitly excluded from production.
+
+ESPEAK-NG PASS only if:
+- exact dependency/bundling relationship documented
+- applicable license evidence recorded
+- production treatment explicitly decided
+
+Allowed final status:
+PASS / PASS_WITH_LIMITATIONS / BLOCKED / FAILED
+
+Do NOT mark PASS if mandatory voice cloning remains unverified.
+Do NOT mark PASS if Japanese remains unsupported for required 9-language V1.
+Do NOT approve a production model set containing required license-PENDING artifacts.
+Missing evidence = NOT VERIFIED.
+
+============================================================
+FINAL DECISION TABLE
+============================================================
+
+End the report with:
+
+Voice Cloning:
+PASS / FAIL / BLOCKED
+
+Japanese TTS:
+PASS / ALTERNATIVE_PASS / FAIL / BLOCKED
+
+9-Language Coverage:
+PASS / PARTIAL / FAIL
+
+Commercial Model Set:
+APPROVED / PARTIAL / BLOCKED
+
+espeak-ng Treatment:
+APPROVED / ALTERNATIVE_REQUIRED / BLOCKED
+
+CP0.1 Final:
+PASS / PASS_WITH_LIMITATIONS / BLOCKED / FAILED
+
+Next Checkpoint Recommendation:
+CP1 / CP2 / FIX_REQUIRED / OTHER
+
+Give a short evidence-based reason for every decision.

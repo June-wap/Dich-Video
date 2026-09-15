@@ -1,0 +1,160 @@
+MASTER RULES
+
+PROJECT: LOCAL AI VOICE
+
+ROLE
+You are the Implementer + Tester.
+ChatGPT is the Architect + Reviewer/Gatekeeper.
+
+Do not redesign the product outside the checkpoint scope.
+
+PRODUCT GOAL
+
+Build a commercial desktop application for local/offline text-to-speech.
+
+Required V1 capabilities:
+- Text-to-Speech
+- Built-in voices
+- Vietnamese
+- English
+- Chinese
+- Japanese
+- Spanish
+- Portuguese
+- Italian
+- French
+- Hindi
+- Conversation mode
+- Voice cloning
+- WAV/MP3 export
+- Local processing
+- No paid TTS API dependency
+
+Translation is NOT in V1 scope.
+
+ARCHITECTURAL PRINCIPLES
+
+1. UI must not call AI engines directly.
+2. Application owns TTS Core.
+3. Engines are integrated through Provider interfaces.
+4. Provider != Model != Voice != VoiceProfile.
+5. SQLite stores metadata/state.
+6. Filesystem stores models/audio/artifacts.
+7. Do not hard-code a specific AI model into product architecture.
+8. Do not silently change selected voice/model during a job.
+9. Jobs must eventually support cancel/retry/resume/crash recovery.
+10. User text/audio/voice data must remain local by default.
+11. No production model may be approved without license evidence.
+12. Never commit secrets, private audio, downloaded model weights, generated audio, license keys, or machine-specific paths unless explicitly required.
+13. Do not claim something is VERIFIED unless it was actually tested.
+
+WORKFLOW
+
+Before implementation:
+1. Read AGENTS.md.
+2. Read Master Prompt.md if present.
+3. Read relevant docs/tasks/reports.
+4. Inspect repository.
+5. Record baseline.
+6. Identify existing architecture before changing code.
+
+During implementation:
+- Keep changes within checkpoint scope.
+- Add/update automated tests.
+- Preserve backward compatibility unless task explicitly changes it.
+- Do not suppress exceptions without diagnostics.
+- Do not introduce hidden network calls.
+
+After implementation:
+1. Run targeted tests.
+2. Run full regression tests where practical.
+3. Run compile/type/lint/build checks relevant to changed code.
+4. Inspect git diff.
+5. Check for secrets and accidental binary/model artifacts.
+6. Produce a checkpoint report.
+
+REPORT FORMAT
+1. Repository State
+2. Instructions Read
+3. Baseline
+4. Files Inspected
+5. Findings
+6. Implementation
+7. Tests Added/Changed
+8. Test Results
+9. Manual Verification
+10. Security/Privacy Review
+11. License Impact
+12. Known Limitations
+13. Files Changed
+14. Git Diff Summary
+15. Final Status
+
+Allowed final status:
+PASS
+PASS_WITH_LIMITATIONS
+BLOCKED
+FAILED
+
+Never mark PASS if a mandatory acceptance criterion remains unverified.
+
+
+CHECKPOINT 6 — CONVERSATION MODE
+
+OBJECTIVE
+Implement multi-speaker scripted dialogue.
+
+DOMAIN MODEL
+Conversation
+ConversationTurn
+
+Each turn contains:
+order
+speaker
+voice_id or voice_profile_id
+language
+text
+pause_after_ms
+generation parameters where allowed
+
+EXAMPLE
+A | Vietnamese Female | "Xin chào."
+B | Vietnamese Male   | "Chào bạn."
+A | Vietnamese Female | "Hôm nay bạn thế nào?"
+
+PIPELINE
+Conversation
+→ ordered turns
+→ validate voices/languages
+→ create synthesis work
+→ generate segments
+→ validate segments
+→ apply pauses
+→ merge
+→ final audio
+
+Do not translate turn text.
+
+Allow different languages if corresponding providers/voices are available.
+
+Maintain deterministic ordering even if synthesis jobs run concurrently.
+
+A failed turn must identify:
+conversation
+turn index
+provider
+error
+
+TEST
+2 speakers
+3+ speakers
+same voice repeated
+mixed languages
+failed middle turn
+cancel
+correct ordering
+pause handling
+
+OUTPUT
+docs/conversation_mode.md
+reports/checkpoint_06_conversation.md

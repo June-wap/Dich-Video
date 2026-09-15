@@ -1,0 +1,48 @@
+{
+  "checkpoint": "CP0.2E.2_REFERENCE_SMOKE",
+  "status": "REFERENCE_SMOKE_PASS",
+  "human_review": {
+    "status": "PASS",
+    "speaker_match": "CONFIRMED",
+    "finding": "Correct speaker; voice is relatively similar to the reference."
+  },
+  "reference_preflight": {
+    "decodable": true,
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration_sec": 26.711,
+    "finite": true,
+    "non_empty": true,
+    "transcript_non_empty": true,
+    "transcript_chars": 498
+  },
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "voice_profile": {
+    "created_count": 1,
+    "reference_duration_sec": 26.711
+  },
+  "output": {
+    "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e2_listening\\reference_smoke.wav",
+    "sample_rate": 24000,
+    "channels": 1,
+    "sample_count": 85920,
+    "duration_sec": 3.58,
+    "finite": true,
+    "non_empty": true,
+    "peak": 0.595398,
+    "generation_time_sec": 81.651,
+    "rtf": 22.8076
+  },
+  "provider_health": {
+    "provider": "omnivoice",
+    "model_path": "k2-fsa/OmniVoice",
+    "device": "cuda:0",
+    "loaded": true,
+    "status": "LOADED",
+    "load_count": 1,
+    "cpu_verified": false
+  },
+  "model_load_count": 1
+}

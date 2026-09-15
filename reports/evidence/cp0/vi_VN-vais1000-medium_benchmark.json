@@ -1,0 +1,72 @@
+{
+  "model_id": "vi_VN-vais1000-medium",
+  "python_network_guard": true,
+  "os_firewall_verified": false,
+  "subjective_quality": "NOT VERIFIED",
+  "gpu_inference": "NOT VERIFIED",
+  "runs": [
+    {
+      "duration_s": 3.959002267573696,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 174636,
+      "rms": 0.1626901227826735,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.2910557184750733e-05,
+      "sha256": "858909e460518b28d3029dca21c649a13002a6d752e64b057dd499945f7b00b1",
+      "kind": "first",
+      "generation_and_write_s": 3.2841493000014452,
+      "rtf": 0.8295396360088878,
+      "path": ".cp0/audio/vi_VN-vais1000-medium/short_0.wav",
+      "input_sha256": "8c9f07ed82704bdc7ccf0afcaf97ea44eca1e451d88b87fa261b8aaec05cfba3"
+    },
+    {
+      "duration_s": 4.1099319727891155,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 181292,
+      "rms": 0.16398184802364318,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.2069209039548023e-05,
+      "sha256": "063d53cb09a25e5ea5175547290e941052fdc3b0bba764aab2c874d7fa2a304c",
+      "kind": "warm",
+      "generation_and_write_s": 0.9646054000004369,
+      "rtf": 0.23470106230148344,
+      "path": ".cp0/audio/vi_VN-vais1000-medium/short_1.wav",
+      "input_sha256": "8c9f07ed82704bdc7ccf0afcaf97ea44eca1e451d88b87fa261b8aaec05cfba3"
+    },
+    {
+      "duration_s": 4.017052154195011,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 177196,
+      "rms": 0.16500296714775753,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.2579479768786126e-05,
+      "sha256": "52bdbd88ce790117bba34896b28d208684fcad19a828c435a02c4a74e20a75cf",
+      "kind": "warm",
+      "generation_and_write_s": 0.7605786000021908,
+      "rtf": 0.1893374969523156,
+      "path": ".cp0/audio/vi_VN-vais1000-medium/short_2.wav",
+      "input_sha256": "8c9f07ed82704bdc7ccf0afcaf97ea44eca1e451d88b87fa261b8aaec05cfba3"
+    }
+  ],
+  "runtime": {
+    "piper-tts": "1.8.0",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.5.3"
+  },
+  "available_ort_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "model_load_s": 3.3624295000008715,
+  "import_verify_load_s": 4.0493421999999555,
+  "actual_session_providers": [
+    "CPUExecutionProvider"
+  ],
+  "status": "SYNTHESIS_AND_PCM_VALIDATED",
+  "peak_sampled_rss_bytes": 258342912,
+  "windows_peak_working_set_bytes": 258347008
+}

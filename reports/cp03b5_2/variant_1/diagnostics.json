@@ -1,0 +1,31 @@
+{
+  "variant_id": "variant_1",
+  "name": "baseline_2_sentences_step16",
+  "description": "Baseline B-5/B-5.1: 2 sentences in 1 chunk (209 chars), num_step=16",
+  "strategy": "2_sentences",
+  "num_step": 16,
+  "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+  "chars": 209,
+  "words": 47,
+  "chunk_count": 1,
+  "total_gen_time_sec": 145.676,
+  "final_duration_sec": 11.03,
+  "rtf": 13.207,
+  "speech_rate_chars_per_sec": 18.95,
+  "speech_rate_words_per_sec": 4.26,
+  "peak_amplitude": 0.5898,
+  "rms_db": -18.02,
+  "chunks_detail": [
+    {
+      "chunk_index": 0,
+      "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "gen_time_sec": 145.676,
+      "raw_duration_sec": 11.31,
+      "processed_duration_sec": 11.03,
+      "trim_leading_ms": 115,
+      "trim_trailing_ms": 165
+    }
+  ]
+}

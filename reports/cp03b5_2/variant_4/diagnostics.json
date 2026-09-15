@@ -1,0 +1,31 @@
+{
+  "variant_id": "variant_4",
+  "name": "step24_2_sentences",
+  "description": "Num_step increase: 2 sentences in 1 chunk (209 chars), num_step=24",
+  "strategy": "2_sentences",
+  "num_step": 24,
+  "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+  "chars": 209,
+  "words": 47,
+  "chunk_count": 1,
+  "total_gen_time_sec": 231.811,
+  "final_duration_sec": 11.025,
+  "rtf": 21.026,
+  "speech_rate_chars_per_sec": 18.96,
+  "speech_rate_words_per_sec": 4.26,
+  "peak_amplitude": 0.7675,
+  "rms_db": -17.91,
+  "chunks_detail": [
+    {
+      "chunk_index": 0,
+      "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "gen_time_sec": 231.811,
+      "raw_duration_sec": 11.34,
+      "processed_duration_sec": 11.025,
+      "trim_leading_ms": 145,
+      "trim_trailing_ms": 170
+    }
+  ]
+}

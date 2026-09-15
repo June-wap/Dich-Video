@@ -1,0 +1,178 @@
+/* ==========================================================================
+   CP0.3A-1 DESIGN TOKENS & CSS VARIABLES
+   Professional Desktop SaaS Foundation
+   ========================================================================== */
+
+:root {
+  /* --------------------------------------------------------------------------
+     1. COLOR PALETTE: BRAND & ACCENT (Blue)
+     -------------------------------------------------------------------------- */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb; /* Primary Accent */
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-contrast: #ffffff;
+
+  /* --------------------------------------------------------------------------
+     2. COLOR PALETTE: DARK NAVY SIDEBAR
+     -------------------------------------------------------------------------- */
+  --sidebar-bg: #0b1329;
+  --sidebar-bg-surface: #111c38;
+  --sidebar-bg-hover: #17254a;
+  --sidebar-bg-active: #1d305f;
+  --sidebar-border: #1a2849;
+  --sidebar-text: #cbd5e1;
+  --sidebar-text-muted: #64748b;
+  --sidebar-text-active: #ffffff;
+  --sidebar-accent-border: #3b82f6;
+
+  /* --------------------------------------------------------------------------
+     3. COLOR PALETTE: LIGHT WORKSPACE
+     -------------------------------------------------------------------------- */
+  --workspace-bg: #f8fafc;
+  --workspace-bg-alt: #f1f5f9;
+  --surface-white: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-subtle: #f8fafc;
+  --surface-muted: #f1f5f9;
+
+  /* --------------------------------------------------------------------------
+     4. COLOR PALETTE: NEUTRALS (Slate / Gray)
+     -------------------------------------------------------------------------- */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
+  --neutral-950: #020617;
+
+  /* --------------------------------------------------------------------------
+     5. BORDERS & DIVIDERS
+     -------------------------------------------------------------------------- */
+  --border-subtle: #f1f5f9;
+  --border-default: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus: #2563eb;
+  --border-error: #ef4444;
+
+  /* --------------------------------------------------------------------------
+     6. SEMANTIC / FEEDBACK COLORS
+     -------------------------------------------------------------------------- */
+  /* Success */
+  --success-bg: #f0fdf4;
+  --success-border: #bbf7d0;
+  --success-text: #166534;
+  --success-solid: #16a34a;
+  --success-dot: #22c55e;
+
+  /* Warning */
+  --warning-bg: #fffbeb;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  --warning-solid: #d97706;
+  --warning-dot: #f59e0b;
+
+  /* Danger / Error */
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #991b1b;
+  --danger-solid: #dc2626;
+  --danger-dot: #ef4444;
+
+  /* Info */
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+  --info-text: #1e40af;
+  --info-solid: #2563eb;
+  --info-dot: #3b82f6;
+
+  /* Neutral Status */
+  --status-neutral-bg: #f1f5f9;
+  --status-neutral-border: #e2e8f0;
+  --status-neutral-text: #475569;
+  --status-neutral-dot: #94a3b8;
+
+  /* --------------------------------------------------------------------------
+     7. TYPOGRAPHY SYSTEM
+     -------------------------------------------------------------------------- */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 22px;
+  --font-size-3xl: 28px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.625;
+
+  /* --------------------------------------------------------------------------
+     8. SPACING SCALE
+     -------------------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* --------------------------------------------------------------------------
+     9. RADIUS SCALE (8–12px target)
+     -------------------------------------------------------------------------- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* --------------------------------------------------------------------------
+     10. ELEVATION / SHADOWS (SaaS Desktop - clean, sharp)
+     -------------------------------------------------------------------------- */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+
+  /* --------------------------------------------------------------------------
+     11. FOCUS RING & TRANSITIONS
+     -------------------------------------------------------------------------- */
+  --focus-ring-color: rgba(37, 99, 235, 0.25);
+  --focus-ring: 0 0 0 3px var(--focus-ring-color);
+  --focus-ring-error: 0 0 0 3px rgba(239, 68, 68, 0.25);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --------------------------------------------------------------------------
+     12. DESKTOP LAYOUT SIZES
+     -------------------------------------------------------------------------- */
+  --sidebar-width: 240px;
+  --topbar-height: 56px;
+  --content-max-width: 1440px;
+}

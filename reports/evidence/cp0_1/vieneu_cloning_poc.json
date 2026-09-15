@@ -1,0 +1,117 @@
+{
+  "task": "cp0_1_vieneu_cloning",
+  "provider": "VieNeu v3 Turbo ONNX",
+  "version": "3.6.4",
+  "device": "cpu",
+  "runs": [],
+  "errors": [],
+  "cloning_tests": [
+    {
+      "ref": "5s",
+      "ref_dur": 2.64,
+      "ref_sha": "53064af7ee9c5f197e35d57d93d5dbd766a3557f5648eae3143b4f2a31773788",
+      "prep_s": 11.861,
+      "spk_shape": [
+        192
+      ],
+      "rc_shape": [
+        31,
+        16
+      ],
+      "g1": {
+        "txt": "Chào mừng bạn đến với phần mềm giọng nói thông minh.",
+        "gen_s": 3.187,
+        "dur": 2.24,
+        "rtf": 1.4227,
+        "sha": "82945cd95e1220ef144a9f28d8a92830682bb8f72640be9dfd4e8193de1af33f",
+        "rms": 0.1106
+      },
+      "g2": {
+        "txt": "Hôm nay thời tiết đẹp, chúng ta đi dạo công viên.",
+        "gen_s": 2.806,
+        "dur": 2.24,
+        "rtf": 1.2525,
+        "sha": "5eeb9b81eedb79d5f2fd99e3921a5b1afce10c25814620c901e9bcaa279b6f11"
+      },
+      "status": "PASS"
+    },
+    {
+      "ref": "10s",
+      "ref_dur": 3.68,
+      "ref_sha": "838409fc20a4ed2a51f99e457295d79d5ce8d2bcb41d98417656beb2f945743c",
+      "prep_s": 1.956,
+      "spk_shape": [
+        192
+      ],
+      "rc_shape": [
+        44,
+        16
+      ],
+      "g1": {
+        "txt": "Chào mừng bạn đến với phần mềm giọng nói thông minh.",
+        "gen_s": 3.727,
+        "dur": 2.32,
+        "rtf": 1.6066,
+        "sha": "d75974194f84bca83b654791dc84dcb0f2061483b4c9318c4687b824dbc4d327",
+        "rms": 0.1139
+      },
+      "g2": {
+        "txt": "Hôm nay thời tiết đẹp, chúng ta đi dạo công viên.",
+        "gen_s": 3.959,
+        "dur": 2.32,
+        "rtf": 1.7067,
+        "sha": "36890c3e79eab9d5cde0708e129e336b4fffe9c32e9eec81162e6b17291a83b2"
+      },
+      "status": "PASS"
+    },
+    {
+      "ref": "30s",
+      "ref_dur": 9.68,
+      "ref_sha": "bf31cffd96b1dfc05d3958b37dd221c0f42ddf7b99ec6459f49bcfae16549c43",
+      "prep_s": 4.766,
+      "spk_shape": [
+        192
+      ],
+      "rc_shape": [
+        101,
+        16
+      ],
+      "g1": {
+        "txt": "Chào mừng bạn đến với phần mềm giọng nói thông minh.",
+        "gen_s": 6.067,
+        "dur": 2.16,
+        "rtf": 2.8088,
+        "sha": "be67d0939153fd38e023d492e524ad2e26311e9496014f6e70779abd97d795ba",
+        "rms": 0.121
+      },
+      "g2": {
+        "txt": "Hôm nay thời tiết đẹp, chúng ta đi dạo công viên.",
+        "gen_s": 5.605,
+        "dur": 2.48,
+        "rtf": 2.2599,
+        "sha": "4041890be7b57eb747b740b9b6f24b65c319559b78c74acc8ccfda768925066a"
+      },
+      "status": "PASS"
+    }
+  ],
+  "load_s": 8.614,
+  "sr": 48000,
+  "preset": {
+    "txt": "Xin chào, đây là hệ thống chuyển văn bản thành giọng nói.",
+    "gen_s": 2.356,
+    "dur": 2.88,
+    "rtf": 0.8181,
+    "rms": 0.0997,
+    "sha": "e10de79db0f28bf595f274ded79a329f549f1d84b1ee31d27dffe69adb1b3bef",
+    "path": ".cp0\\audio\\vieneu_cloning_poc\\preset.wav",
+    "ok": true
+  },
+  "offline": {
+    "status": "PASS",
+    "gen_s": 2.804,
+    "dur": 1.12,
+    "sha": "0b7af051ece79ef1eeb1a61e4e372cd34011f64430d518ebde8cab6c15ab791e"
+  },
+  "rss": 2908979200,
+  "status": "PASS"
+}

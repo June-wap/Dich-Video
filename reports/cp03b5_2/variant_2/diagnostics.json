@@ -1,0 +1,42 @@
+{
+  "variant_id": "variant_2",
+  "name": "size_1_sentence_step16",
+  "description": "Chunk size reduction: 1 sentence/chunk (94 chars, 114 chars), num_step=16",
+  "strategy": "1_sentence",
+  "num_step": 16,
+  "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+  "chars": 209,
+  "words": 47,
+  "chunk_count": 2,
+  "total_gen_time_sec": 229.758,
+  "final_duration_sec": 11.12,
+  "rtf": 20.662,
+  "speech_rate_chars_per_sec": 18.79,
+  "speech_rate_words_per_sec": 4.23,
+  "peak_amplitude": 0.6108,
+  "rms_db": -17.89,
+  "chunks_detail": [
+    {
+      "chunk_index": 0,
+      "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt.",
+      "chars": 93,
+      "words": 21,
+      "gen_time_sec": 111.385,
+      "raw_duration_sec": 5.12,
+      "processed_duration_sec": 4.81,
+      "trim_leading_ms": 140,
+      "trim_trailing_ms": 170
+    },
+    {
+      "chunk_index": 1,
+      "text": "Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 115,
+      "words": 26,
+      "gen_time_sec": 118.373,
+      "raw_duration_sec": 6.29,
+      "processed_duration_sec": 5.96,
+      "trim_leading_ms": 165,
+      "trim_trailing_ms": 165
+    }
+  ]
+}

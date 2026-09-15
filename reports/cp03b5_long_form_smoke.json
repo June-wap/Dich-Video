@@ -1,0 +1,109 @@
+{
+  "status": "PASS_WITH_LISTENING_REQUIRED",
+  "words": 308,
+  "characters": 1393,
+  "transport": "FastAPI TestClient / real ASGI lifespan and routes",
+  "provider_instances": 1,
+  "profile_creations": 1,
+  "generation_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "merge_order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "profile_ids_used": [
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a",
+    "17965153a8da4fc888616588277d969a"
+  ],
+  "reference": "prototype/voices/e2_test/reference.wav",
+  "chunks": 8,
+  "reference_sha256": "940df57ce29ba8ea3eb27e47102d18f3c2fe9db23480fb656309a2be8ecd30fa",
+  "submission_seconds": 0.054040000002714805,
+  "job_id": "da9f660e-e0c8-4c6e-904c-385a9c0f48f2",
+  "profile_id": "94b37349-e0ed-4aad-b42f-e196c82aad0e",
+  "total_seconds": 2228.5874860999975,
+  "job_status": "COMPLETED",
+  "model_load_count": 1,
+  "profile_creation_during_job": 0,
+  "unique_profile_ids_used": 1,
+  "same_profile_object": true,
+  "same_model_object": true,
+  "progress_monotonic": true,
+  "missing_chunks": 0,
+  "duplicate_chunks": 0,
+  "order_violations": 0,
+  "failed_chunks": 0,
+  "source_content_preserved": true,
+  "audio": {
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration": 76.3,
+    "finite": true,
+    "decodable": true,
+    "non_empty": true
+  },
+  "rtf": 29.208223933158553,
+  "service_diagnostics": {
+    "chunk_count": 8,
+    "generation_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "unique_profiles_used": 1,
+    "model_load_count": 1,
+    "completed_chunks": 8,
+    "audio": {
+      "sample_rate": 24000,
+      "channels": 1,
+      "duration": 76.3,
+      "finite": true,
+      "decodable": true,
+      "non_empty": true
+    },
+    "elapsed_seconds": 2228.2916992000028,
+    "mp3_export_failed": false
+  },
+  "extracts": {
+    "beginning": {
+      "start_seconds": 0.0,
+      "duration": 12.0,
+      "exact_final_samples": true
+    },
+    "middle": {
+      "start_seconds": 32.15,
+      "duration": 12.0,
+      "exact_final_samples": true
+    },
+    "end": {
+      "start_seconds": 64.3,
+      "duration": 12.0,
+      "exact_final_samples": true
+    }
+  }
+}

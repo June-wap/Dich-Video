@@ -1,0 +1,132 @@
+[
+  {
+    "id": "nghi_piper_source",
+    "url": "https://raw.githubusercontent.com/nghimestudio/nghitts/46d160da32041f7e176607203b958069265df7da/src/lib/piper-tts.js",
+    "retrieved_at": "2026-09-11T09:42:26.971287+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/nghimestudio/nghitts/46d160da32041f7e176607203b958069265df7da/src/lib/piper-tts.js",
+    "status": "FETCHED",
+    "bytes": 12203,
+    "sha256": "64f847e6958de27fa01ce6b6850b4274a28d57cd36d02422b2e9b5aeb566cf96",
+    "file": "reports/evidence/cp0/nghi_piper_source.txt"
+  },
+  {
+    "id": "nghi_lock",
+    "url": "https://raw.githubusercontent.com/nghimestudio/nghitts/46d160da32041f7e176607203b958069265df7da/package-lock.json",
+    "retrieved_at": "2026-09-11T09:42:26.972003+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/nghimestudio/nghitts/46d160da32041f7e176607203b958069265df7da/package-lock.json",
+    "status": "FETCHED",
+    "bytes": 139323,
+    "sha256": "4bf32deebfb3e0452a19c30607ee5229484da94d84684e329775eef1ad177872",
+    "file": "reports/evidence/cp0/nghi_lock.txt"
+  },
+  {
+    "id": "coqui_license",
+    "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/LICENSE.txt",
+    "retrieved_at": "2026-09-11T09:42:26.972384+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/coqui-ai/TTS/dbf1a08a0d4e47fdad6172e433eeb34bc6b13b4e/LICENSE.txt",
+    "status": "FETCHED",
+    "bytes": 16726,
+    "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+    "file": "reports/evidence/cp0/coqui_license.txt"
+  },
+  {
+    "id": "vieneu_license",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/LICENSE",
+    "retrieved_at": "2026-09-11T09:42:26.972755+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/LICENSE",
+    "status": "FETCHED",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "file": "reports/evidence/cp0/vieneu_license.txt"
+  },
+  {
+    "id": "vieneu_turbo_metadata",
+    "url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Turbo",
+    "retrieved_at": "2026-09-11T09:42:26.973173+00:00",
+    "resolved_url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Turbo",
+    "status": "FETCHED",
+    "bytes": 2933,
+    "sha256": "d876ae98fbfff3c90c10e2258992e77262c4323b1e766b9b26761112b0e7c346",
+    "file": "reports/evidence/cp0/vieneu_turbo_metadata.txt"
+  },
+  {
+    "id": "vieneu_turbo_card",
+    "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:42:27.452131+00:00",
+    "resolved_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 13318,
+    "sha256": "f8a7927b5a6f27d1ab54c63a22a3c010f8622b006c3239a691bcd014b108b2b7",
+    "file": "reports/evidence/cp0/vieneu_turbo_card.txt"
+  },
+  {
+    "id": "vieneu_nano_metadata",
+    "url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Nano",
+    "retrieved_at": "2026-09-11T09:42:27.766650+00:00",
+    "resolved_url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS-v3-Nano",
+    "status": "FETCHED",
+    "bytes": 1209,
+    "sha256": "fa43fbb664e53774951cd33021ca174b8ed30524c018b36ad0f2c47f01f6fa17",
+    "file": "reports/evidence/cp0/vieneu_nano_metadata.txt"
+  },
+  {
+    "id": "vieneu_nano_card",
+    "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:42:28.074815+00:00",
+    "resolved_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Nano/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 15403,
+    "sha256": "b384262645214848872036daae39265a268b86c4403f44d6ff4caddf5a183df1",
+    "file": "reports/evidence/cp0/vieneu_nano_card.txt"
+  },
+  {
+    "id": "vieneu_pypi",
+    "url": "https://pypi.org/pypi/vieneu/json",
+    "retrieved_at": "2026-09-11T09:42:28.389431+00:00",
+    "resolved_url": "https://pypi.org/pypi/vieneu/json",
+    "status": "FETCHED",
+    "bytes": 159588,
+    "sha256": "9e37a284cd2d2a4f70310a0cf4e03c7c9120b35e34f9e8eb27ea07cd1dee1f2c",
+    "file": "reports/evidence/cp0/vieneu_pypi.txt"
+  },
+  {
+    "id": "moss_card",
+    "url": "https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:42:34.897169+00:00",
+    "resolved_url": "https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 12491,
+    "sha256": "83cae343211c7c482433c9758f16fc9d17046a0cd450d185b473542e87e35ef8",
+    "file": "reports/evidence/cp0/moss_card.txt"
+  },
+  {
+    "id": "sea_g2p_pypi",
+    "url": "https://pypi.org/pypi/sea-g2p/json",
+    "retrieved_at": "2026-09-11T09:42:35.219780+00:00",
+    "resolved_url": "https://pypi.org/pypi/sea-g2p/json",
+    "status": "FETCHED",
+    "bytes": 416775,
+    "sha256": "f49916e8608e62ca0cd0f573f4a39d32fefc0e5cdb63766e1988d6c52a882abb",
+    "file": "reports/evidence/cp0/sea_g2p_pypi.txt"
+  },
+  {
+    "id": "piper_usage",
+    "url": "https://raw.githubusercontent.com/OHF-Voice/piper1-gpl/v1.8.0/docs/API_PYTHON.md",
+    "retrieved_at": "2026-09-11T09:42:35.591478+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/OHF-Voice/piper1-gpl/v1.8.0/docs/API_PYTHON.md",
+    "status": "FETCHED",
+    "bytes": 1163,
+    "sha256": "734acd1cbcbb971c03746d818e91baef1d0a540fee2c462d1be3a50ef4ed8bde",
+    "file": "reports/evidence/cp0/piper_usage.txt"
+  },
+  {
+    "id": "piper_license",
+    "url": "https://raw.githubusercontent.com/OHF-Voice/piper1-gpl/v1.8.0/COPYING",
+    "retrieved_at": "2026-09-11T09:42:36.087148+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/OHF-Voice/piper1-gpl/v1.8.0/COPYING",
+    "status": "FETCHED",
+    "bytes": 35148,
+    "sha256": "0ae0485a5bd37a63e63603596417e4eb0e653334fa6c7f932ca3a0e85d4af227",
+    "file": "reports/evidence/cp0/piper_license.txt"
+  }
+]

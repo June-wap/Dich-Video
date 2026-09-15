@@ -1,0 +1,158 @@
+MASTER RULES
+
+PROJECT: LOCAL AI VOICE
+
+ROLE
+You are the Implementer + Tester.
+ChatGPT is the Architect + Reviewer/Gatekeeper.
+
+Do not redesign the product outside the checkpoint scope.
+
+PRODUCT GOAL
+
+Build a commercial desktop application for local/offline text-to-speech.
+
+Required V1 capabilities:
+- Text-to-Speech
+- Built-in voices
+- Vietnamese
+- English
+- Chinese
+- Japanese
+- Spanish
+- Portuguese
+- Italian
+- French
+- Hindi
+- Conversation mode
+- Voice cloning
+- WAV/MP3 export
+- Local processing
+- No paid TTS API dependency
+
+Translation is NOT in V1 scope.
+
+ARCHITECTURAL PRINCIPLES
+
+1. UI must not call AI engines directly.
+2. Application owns TTS Core.
+3. Engines are integrated through Provider interfaces.
+4. Provider != Model != Voice != VoiceProfile.
+5. SQLite stores metadata/state.
+6. Filesystem stores models/audio/artifacts.
+7. Do not hard-code a specific AI model into product architecture.
+8. Do not silently change selected voice/model during a job.
+9. Jobs must eventually support cancel/retry/resume/crash recovery.
+10. User text/audio/voice data must remain local by default.
+11. No production model may be approved without license evidence.
+12. Never commit secrets, private audio, downloaded model weights, generated audio, license keys, or machine-specific paths unless explicitly required.
+13. Do not claim something is VERIFIED unless it was actually tested.
+
+WORKFLOW
+
+Before implementation:
+1. Read AGENTS.md.
+2. Read Master Prompt.md if present.
+3. Read relevant docs/tasks/reports.
+4. Inspect repository.
+5. Record baseline.
+6. Identify existing architecture before changing code.
+
+During implementation:
+- Keep changes within checkpoint scope.
+- Add/update automated tests.
+- Preserve backward compatibility unless task explicitly changes it.
+- Do not suppress exceptions without diagnostics.
+- Do not introduce hidden network calls.
+
+After implementation:
+1. Run targeted tests.
+2. Run full regression tests where practical.
+3. Run compile/type/lint/build checks relevant to changed code.
+4. Inspect git diff.
+5. Check for secrets and accidental binary/model artifacts.
+6. Produce a checkpoint report.
+
+REPORT FORMAT
+1. Repository State
+2. Instructions Read
+3. Baseline
+4. Files Inspected
+5. Findings
+6. Implementation
+7. Tests Added/Changed
+8. Test Results
+9. Manual Verification
+10. Security/Privacy Review
+11. License Impact
+12. Known Limitations
+13. Files Changed
+14. Git Diff Summary
+15. Final Status
+
+Allowed final status:
+PASS
+PASS_WITH_LIMITATIONS
+BLOCKED
+FAILED
+
+Never mark PASS if a mandatory acceptance criterion remains unverified.
+
+
+CHECKPOINT 14 — WINDOWS INSTALLER + OFFLINE VALIDATION
+
+OBJECTIVE
+Create a distributable Windows application.
+
+INSTALLER SHOULD CONTAIN
+application
+required runtime
+minimal dependencies
+
+Models may be:
+bundled in approved offline pack
+or
+installed separately through Model Manager
+
+USER DATA
+Separate program files from writable user data.
+
+Support model storage on configurable drive if architecture allows.
+
+OFFLINE PACK
+Must contain everything required for promised offline features:
+runtime
+tokenizer
+phonemizer
+vocoder
+speaker encoder
+model configuration
+weights
+other required artifacts
+
+Do not allow libraries to silently download missing dependencies during offline inference.
+
+TEST ON CLEAN WINDOWS MACHINE
+install
+launch
+backend
+UI
+model load
+standard TTS
+conversation
+voice clone
+WAV
+MP3
+history
+restart
+uninstall
+
+Then repeat core inference with network blocked.
+
+Verify all worker processes terminate on exit.
+
+Test installation/user-data paths containing Vietnamese characters.
+
+OUTPUT
+docs/packaging_release.md
+reports/checkpoint_14_installer_offline.md

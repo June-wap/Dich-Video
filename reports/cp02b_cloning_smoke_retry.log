@@ -1,0 +1,42 @@
+Importing CUDA runtime
+Loading model
+
+Loading weights:   0%|          | 0/313 [00:00<?, ?it/s]
+Loading weights:   6%|▌         | 18/313 [00:00<00:01, 168.11it/s]
+Loading weights:  11%|█         | 35/313 [00:00<00:02, 107.86it/s]
+Loading weights:  15%|█▌        | 47/313 [00:00<00:02, 107.61it/s]
+Loading weights:  20%|█▉        | 62/313 [00:00<00:02, 118.07it/s]
+Loading weights:  24%|██▍       | 75/313 [00:00<00:02, 115.33it/s]
+Loading weights:  28%|██▊       | 87/313 [00:00<00:01, 114.69it/s]
+Loading weights:  32%|███▏      | 99/313 [00:00<00:02, 105.41it/s]
+Loading weights:  35%|███▌      | 111/313 [00:01<00:02, 99.79it/s]
+Loading weights:  39%|███▉      | 122/313 [00:01<00:01, 101.57it/s]
+Loading weights:  44%|████▍     | 137/313 [00:01<00:01, 112.51it/s]
+Loading weights:  48%|████▊     | 150/313 [00:01<00:01, 108.92it/s]
+Loading weights:  53%|█████▎    | 165/313 [00:01<00:01, 113.98it/s]
+Loading weights:  57%|█████▋    | 178/313 [00:01<00:01, 117.39it/s]
+Loading weights:  61%|██████    | 190/313 [00:01<00:01, 113.21it/s]
+Loading weights:  65%|██████▍   | 202/313 [00:01<00:01, 110.63it/s]
+Loading weights:  68%|██████▊   | 214/313 [00:01<00:00, 110.28it/s]
+Loading weights:  72%|███████▏  | 226/313 [00:02<00:00, 109.84it/s]
+Loading weights:  77%|███████▋  | 242/313 [00:02<00:00, 122.72it/s]
+Loading weights:  81%|████████▏ | 255/313 [00:02<00:00, 112.87it/s]
+Loading weights:  86%|████████▌ | 268/313 [00:02<00:00, 117.05it/s]
+Loading weights:  89%|████████▉ | 280/313 [00:02<00:00, 115.26it/s]
+Loading weights:  93%|█████████▎| 292/313 [00:02<00:00, 115.38it/s]
+Loading weights:  97%|█████████▋| 304/313 [00:02<00:00, 105.46it/s]
+Loading weights: 100%|██████████| 313/313 [00:02<00:00, 113.89it/s]
+
+Loading weights:   0%|          | 0/527 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/527 [00:00<01:02,  8.41it/s]
+Loading weights:  32%|███▏      | 171/527 [00:00<00:00, 851.85it/s]
+Loading weights:  49%|████▉     | 257/527 [00:00<00:00, 350.72it/s]
+Loading weights:  65%|██████▍   | 342/527 [00:00<00:00, 439.08it/s]
+Loading weights:  77%|███████▋  | 406/527 [00:00<00:00, 403.36it/s]
+Loading weights:  87%|████████▋ | 459/527 [00:01<00:00, 397.60it/s]
+Loading weights:  96%|█████████▌| 507/527 [00:01<00:00, 376.39it/s]
+Loading weights: 100%|██████████| 527/527 [00:01<00:00, 395.93it/s]
+Preparing profile
+Profile ready
+VI clone 1: PASS, 3.43s
+VI clone 2: PASS, 2.94s

@@ -1,0 +1,646 @@
+{
+  "timestamp": "2026-09-14T08:28:34Z",
+  "status": "PASS_WITH_LISTENING_REQUIRED",
+  "system_status": {
+    "status_code": 200,
+    "body": {
+      "status": "ready",
+      "python_version": "3.12.10",
+      "torch_version": "2.8.0+cu128",
+      "cuda_available": true,
+      "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "omnivoice_available": true,
+      "omnivoice_model_loaded": false,
+      "primary_provider": "omnivoice",
+      "provider_state": "NOT_LOADED",
+      "audio": {
+        "sample_rate": 24000,
+        "channels": 1
+      },
+      "runtime_mode": "local"
+    }
+  },
+  "provider_before": {
+    "status_code": 200,
+    "body": {
+      "primary": "omnivoice",
+      "providers": [
+        {
+          "id": "omnivoice",
+          "available": true,
+          "state": "NOT_LOADED",
+          "loaded": false,
+          "device": "cuda:0",
+          "languages": [
+            "vi",
+            "en",
+            "zh",
+            "ja",
+            "es",
+            "pt",
+            "it",
+            "fr",
+            "hi"
+          ],
+          "language_metadata": [
+            {
+              "id": "vi",
+              "display_name": "Vietnamese",
+              "native_name": "Ti\u1ebfng Vi\u1ec7t",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": true,
+              "production_ready": false
+            },
+            {
+              "id": "en",
+              "display_name": "English",
+              "native_name": "English",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "zh",
+              "display_name": "Chinese",
+              "native_name": "\u4e2d\u6587",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "ja",
+              "display_name": "Japanese",
+              "native_name": "\u65e5\u672c\u8a9e",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "es",
+              "display_name": "Spanish",
+              "native_name": "Espa\u00f1ol",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "pt",
+              "display_name": "Portuguese",
+              "native_name": "Portugu\u00eas",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "it",
+              "display_name": "Italian",
+              "native_name": "Italiano",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "fr",
+              "display_name": "French",
+              "native_name": "Fran\u00e7ais",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "hi",
+              "display_name": "Hindi",
+              "native_name": "\u0939\u093f\u0928\u094d\u0926\u0940",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            }
+          ],
+          "experimental_languages_enabled": false,
+          "production_ready": false,
+          "error_code": null
+        }
+      ]
+    }
+  },
+  "request_1": {
+    "status_code": 200,
+    "wall_time_seconds": 31.462,
+    "response": {
+      "ok": true,
+      "data": {
+        "generation_id": "f6be4900-8c3d-4090-9f74-6567ddaa2866",
+        "status": "completed",
+        "provider": "omnivoice",
+        "language": "vi",
+        "voice_id": "omnivoice_auto",
+        "duration_seconds": 4.48,
+        "sample_rate": 24000,
+        "channels": 1,
+        "format": "wav",
+        "audio_url": "/api/audio/f6be4900-8c3d-4090-9f74-6567ddaa2866.wav"
+      }
+    }
+  },
+  "wav_1_metrics": {
+    "file_exists": true,
+    "file_size": 215084,
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration": 4.48,
+    "finite": true,
+    "has_nan": false,
+    "has_inf": false,
+    "valid": true,
+    "media_type": "audio/wav"
+  },
+  "provider_after_1": {
+    "status_code": 200,
+    "body": {
+      "primary": "omnivoice",
+      "providers": [
+        {
+          "id": "omnivoice",
+          "available": true,
+          "state": "READY",
+          "loaded": true,
+          "device": "cuda:0",
+          "languages": [
+            "vi",
+            "en",
+            "zh",
+            "ja",
+            "es",
+            "pt",
+            "it",
+            "fr",
+            "hi"
+          ],
+          "language_metadata": [
+            {
+              "id": "vi",
+              "display_name": "Vietnamese",
+              "native_name": "Ti\u1ebfng Vi\u1ec7t",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": true,
+              "production_ready": false
+            },
+            {
+              "id": "en",
+              "display_name": "English",
+              "native_name": "English",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "zh",
+              "display_name": "Chinese",
+              "native_name": "\u4e2d\u6587",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "ja",
+              "display_name": "Japanese",
+              "native_name": "\u65e5\u672c\u8a9e",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "es",
+              "display_name": "Spanish",
+              "native_name": "Espa\u00f1ol",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "pt",
+              "display_name": "Portuguese",
+              "native_name": "Portugu\u00eas",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "it",
+              "display_name": "Italian",
+              "native_name": "Italiano",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "fr",
+              "display_name": "French",
+              "native_name": "Fran\u00e7ais",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "hi",
+              "display_name": "Hindi",
+              "native_name": "\u0939\u093f\u0928\u094d\u0926\u0940",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            }
+          ],
+          "experimental_languages_enabled": false,
+          "production_ready": false,
+          "error_code": null
+        }
+      ]
+    }
+  },
+  "request_2": {
+    "status_code": 200,
+    "wall_time_seconds": 2.036,
+    "response": {
+      "ok": true,
+      "data": {
+        "generation_id": "52bc7e21-4f4e-4792-9e83-23f153c2eba3",
+        "status": "completed",
+        "provider": "omnivoice",
+        "language": "vi",
+        "voice_id": "omnivoice_auto",
+        "duration_seconds": 4.53,
+        "sample_rate": 24000,
+        "channels": 1,
+        "format": "wav",
+        "audio_url": "/api/audio/52bc7e21-4f4e-4792-9e83-23f153c2eba3.wav"
+      }
+    }
+  },
+  "wav_2_metrics": {
+    "file_exists": true,
+    "file_size": 217484,
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration": 4.53,
+    "finite": true,
+    "has_nan": false,
+    "has_inf": false,
+    "valid": true,
+    "media_type": "audio/wav"
+  },
+  "provider_after_2": {
+    "status_code": 200,
+    "body": {
+      "primary": "omnivoice",
+      "providers": [
+        {
+          "id": "omnivoice",
+          "available": true,
+          "state": "READY",
+          "loaded": true,
+          "device": "cuda:0",
+          "languages": [
+            "vi",
+            "en",
+            "zh",
+            "ja",
+            "es",
+            "pt",
+            "it",
+            "fr",
+            "hi"
+          ],
+          "language_metadata": [
+            {
+              "id": "vi",
+              "display_name": "Vietnamese",
+              "native_name": "Ti\u1ebfng Vi\u1ec7t",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": true,
+              "production_ready": false
+            },
+            {
+              "id": "en",
+              "display_name": "English",
+              "native_name": "English",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "zh",
+              "display_name": "Chinese",
+              "native_name": "\u4e2d\u6587",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "ja",
+              "display_name": "Japanese",
+              "native_name": "\u65e5\u672c\u8a9e",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "es",
+              "display_name": "Spanish",
+              "native_name": "Espa\u00f1ol",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "pt",
+              "display_name": "Portuguese",
+              "native_name": "Portugu\u00eas",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "it",
+              "display_name": "Italian",
+              "native_name": "Italiano",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "fr",
+              "display_name": "French",
+              "native_name": "Fran\u00e7ais",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            },
+            {
+              "id": "hi",
+              "display_name": "Hindi",
+              "native_name": "\u0939\u093f\u0928\u094d\u0926\u0940",
+              "status": "VERIFIED",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": false,
+              "production_ready": false
+            }
+          ],
+          "experimental_languages_enabled": false,
+          "production_ready": false,
+          "error_code": null
+        }
+      ]
+    }
+  },
+  "performance": {
+    "cold_wall_time_seconds": 31.462,
+    "warm_wall_time_seconds": 2.036,
+    "speedup_factor": 15.45,
+    "audio_1_duration": 4.48,
+    "audio_2_duration": 4.53,
+    "warm_rtf": 0.45
+  },
+  "mp3_test": {
+    "status_code": 200,
+    "response": {
+      "ok": true,
+      "data": {
+        "generation_id": "3da7df8e-29b6-48c3-bb49-7bb204bdd8b3",
+        "status": "completed",
+        "provider": "omnivoice",
+        "language": "vi",
+        "voice_id": "omnivoice_auto",
+        "duration_seconds": 3.81,
+        "sample_rate": 24000,
+        "channels": 1,
+        "format": "mp3",
+        "audio_url": "/api/audio/3da7df8e-29b6-48c3-bb49-7bb204bdd8b3.mp3"
+      }
+    },
+    "file_size": 77804,
+    "media_type": "audio/mpeg",
+    "sample_rate": 24000,
+    "duration": 3.81,
+    "valid": true
+  },
+  "input_validation": {
+    "all_passed": true,
+    "cases": {
+      "empty_text": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_TEXT",
+        "expected_code": "INVALID_TEXT",
+        "has_traceback": false,
+        "passed": true
+      },
+      "whitespace_text": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_TEXT",
+        "expected_code": "INVALID_TEXT",
+        "has_traceback": false,
+        "passed": true
+      },
+      "oversized_text": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "TEXT_TOO_LONG",
+        "expected_code": "TEXT_TOO_LONG",
+        "has_traceback": false,
+        "passed": true
+      },
+      "unsupported_language": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "LANGUAGE_NOT_SUPPORTED",
+        "expected_code": "LANGUAGE_NOT_SUPPORTED",
+        "has_traceback": false,
+        "passed": true
+      },
+      "invalid_voice": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "VOICE_NOT_FOUND",
+        "expected_code": "VOICE_NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "speed_too_low": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_SPEED",
+        "expected_code": "INVALID_SPEED",
+        "has_traceback": false,
+        "passed": true
+      },
+      "speed_too_high": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_SPEED",
+        "expected_code": "INVALID_SPEED",
+        "has_traceback": false,
+        "passed": true
+      },
+      "speed_not_one": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_SPEED",
+        "expected_code": "INVALID_SPEED",
+        "has_traceback": false,
+        "passed": true
+      },
+      "invalid_format": {
+        "status_code": 422,
+        "expected_status": 422,
+        "error_code": "INVALID_FORMAT",
+        "expected_code": "INVALID_FORMAT",
+        "has_traceback": false,
+        "passed": true
+      }
+    }
+  },
+  "security": {
+    "all_passed": true,
+    "cases": {
+      "nonexistent_uuid": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "ARTIFACT_NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "path_traversal_relative": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "path_traversal_parent_wav": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "absolute_windows_path": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "unix_passwd": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "non_uuid_filename": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "ARTIFACT_NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      },
+      "exe_extension": {
+        "status_code": 404,
+        "expected_status": 404,
+        "error_code": "ARTIFACT_NOT_FOUND",
+        "has_traceback": false,
+        "passed": true
+      }
+    }
+  },
+  "privacy_request": {
+    "status_code": 200,
+    "marker": "CP03B3_PRIVACY_MARKER_92841"
+  },
+  "runtime": {
+    "python_version": "3.12.10",
+    "sys_executable": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+    "torch_version": "2.8.0+cu128",
+    "cuda_version": "12.8",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "omnivoice_version": "0.2.1",
+    "fastapi_version": "0.141.1"
+  },
+  "test_suites": {
+    "backend_tests": {
+      "suite": "backend/tests",
+      "passed": 86,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 2.63,
+      "status": "PASS"
+    },
+    "targeted_regression": {
+      "suite": "prototype/tests/test_omnivoice_*.py, test_long_text*.py, test_audio_boundary.py",
+      "passed": 92,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 1.93,
+      "status": "PASS"
+    },
+    "broader_regression": {
+      "suite": "prototype/tests tests",
+      "passed": 103,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 2.68,
+      "status": "PASS"
+    }
+  },
+  "model_reuse_evidence": {
+    "pre_inference_load_count": 0,
+    "post_req1_load_count": 1,
+    "post_req2_load_count": 1,
+    "cold_wall_time_seconds": 31.462,
+    "warm_wall_time_seconds": 2.036,
+    "speedup_factor": 15.45,
+    "warm_rtf": 0.45,
+    "model_reloaded_on_req2": false
+  },
+  "privacy_verification": {
+    "marker": "CP03B3_PRIVACY_MARKER_92841",
+    "found_in_server_logs": false,
+    "full_customer_text_logged": false,
+    "allowed_metadata_logged_only": true,
+    "status": "PASS"
+  },
+  "shutdown_verification": {
+    "clean_shutdown": true,
+    "port_8000_released": true,
+    "orphaned_processes": 0,
+    "status": "PASS"
+  }
+}

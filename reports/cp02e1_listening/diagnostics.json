@@ -1,0 +1,1184 @@
+{
+  "checkpoint": "CP0.2E.1",
+  "language": "vi",
+  "provider": "omnivoice",
+  "device": "cuda:0",
+  "dtype": "float16",
+  "model_load_count": 1,
+  "human_evidence": {
+    "generation_voice_drift": "CONFIRMED",
+    "robotic_artifact": "NOT_YET_RATED",
+    "source": "human listening feedback"
+  },
+  "repeatability": {
+    "runs": 3,
+    "results": [
+      {"file": "repeat_1.wav", "duration_sec": 8.16, "rms": 0.107389, "generation_time_sec": 1.6213, "rtf": 0.1987},
+      {"file": "repeat_2.wav", "duration_sec": 8.19, "rms": 0.111747, "generation_time_sec": 2.0643, "rtf": 0.2520},
+      {"file": "repeat_3.wav", "duration_sec": 8.11, "rms": 0.104481, "generation_time_sec": 2.5150, "rtf": 0.3101}
+    ]
+  },
+  "raw_vs_processed": {
+    "same_raw_chunks": true,
+    "raw_merge": {"file": "raw_merge.wav", "duration_sec": 22.69, "rms": 0.092104, "peak": 0.5},
+    "processed_merge": {"file": "processed_merge.wav", "duration_sec": 21.035, "rms": 0.095658, "peak": 0.5},
+    "trimmed_ms_total": 1655,
+    "fade_changed_sample_count": 324,
+    "crossfade_enabled": false,
+    "gain_enabled": false
+  },
+  "chunk_plans": {
+    "A": {"file": "chunk_size_A_1_sentence.wav", "chunk_count": 5, "chars_per_chunk": [66, 74, 67, 76, 74], "sentences_per_chunk": [1, 1, 1, 1, 1], "generation_calls": 5, "generation_time_sec": 14.7981, "final_duration_sec": 21.035, "rtf": 0.7035},
+    "B": {"file": "chunk_size_B_2_sentences.wav", "chunk_count": 3, "chars_per_chunk": [141, 144, 74], "sentences_per_chunk": [2, 2, 1], "generation_calls": 3, "generation_time_sec": 7.1775, "final_duration_sec": 20.775, "rtf": 0.3455},
+    "C": {"file": "chunk_size_C_250_350_chars.wav", "chunk_count": 2, "chars_per_chunk": [286, 74], "sentences_per_chunk": [4, 1], "generation_calls": 2, "generation_time_sec": 3.9494, "final_duration_sec": 20.895, "rtf": 0.1890}
+  },
+  "num_steps": {
+    "16": {"file": "num_step_16.wav", "duration_sec": 8.17, "generation_time_sec": 1.8271, "rtf": 0.2236, "rms": 0.104001, "peak": 0.5},
+    "24": {"file": "num_step_24.wav", "duration_sec": 8.18, "generation_time_sec": 2.8102, "rtf": 0.3435, "rms": 0.119716, "peak": 0.5},
+    "32": {"file": "num_step_32.wav", "duration_sec": 8.19, "generation_time_sec": 3.2073, "rtf": 0.3916, "rms": 0.106515, "peak": 0.5}
+  },
+  "status": "PASS",
+  "text": "Xin chào, đây là bài kiểm tra độ ổn định của giọng nói tiếng Việt. Mỗi câu mô tả một ý riêng để chúng ta nhận biết sự thay đổi giữa các đoạn. Người nghe cần chú ý đến cao độ, nhịp đọc và màu sắc của giọng nói. Các tệp thô được giữ nguyên trước khi cắt im lặng hoặc thêm hiệu ứng ở biên. Sau cùng, các phương án dài hơn giúp đánh giá hiện tượng đặt lại ngữ điệu.",
+  "tests": {
+    "raw_chunks": [
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_chunk_01.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 66,
+          "sample_rate": 24000,
+          "duration": 3.9,
+          "gen_time": 4.032584399999905,
+          "rtf": 1.0339959999999757,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 4.032584399999905,
+              "duration": 3.9,
+              "rtf": 1.0339959999999757,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 3.9,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.072223,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.106433,
+          "spectral_centroid_hz": 2423.48
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_chunk_02.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 74,
+          "sample_rate": 24000,
+          "duration": 4.36,
+          "gen_time": 2.2375518000008014,
+          "rtf": 0.5131999541286242,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 2.2375518000008014,
+              "duration": 4.36,
+              "rtf": 0.5131999541286242,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 4.36,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.097247,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.056537,
+          "spectral_centroid_hz": 1715.69
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_chunk_03.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 67,
+          "sample_rate": 24000,
+          "duration": 3.98,
+          "gen_time": 1.8552761999999348,
+          "rtf": 0.4661497989949585,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 1.8552761999999348,
+              "duration": 3.98,
+              "rtf": 0.4661497989949585,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 3.98,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.112705,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.073807,
+          "spectral_centroid_hz": 2837.97
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_chunk_04.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 76,
+          "sample_rate": 24000,
+          "duration": 4.6,
+          "gen_time": 2.847993100000167,
+          "rtf": 0.6191289347826451,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 2.847993100000167,
+              "duration": 4.6,
+              "rtf": 0.6191289347826451,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 4.6,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.103996,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.068751,
+          "spectral_centroid_hz": 1813.88
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_chunk_05.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 74,
+          "sample_rate": 24000,
+          "duration": 4.45,
+          "gen_time": 3.824663800000053,
+          "rtf": 0.8594750112359669,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 3.824663800000053,
+              "duration": 4.45,
+              "rtf": 0.8594750112359669,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 4.45,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.082924,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.101162,
+          "spectral_centroid_hz": 1831.77
+        }
+      }
+    ],
+    "raw_merge": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\raw_merge.wav",
+      "metrics": {
+        "duration_sec": 22.69,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.092104,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.075882,
+        "spectral_centroid_hz": 2111.1
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 2,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 3,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 4,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ]
+    },
+    "trim": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\trim_merge.wav",
+      "metrics": {
+        "duration_sec": 21.035,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.095658,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.08082,
+        "spectral_centroid_hz": 2108.03
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 125,
+          "trim_trailing_ms": 185,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 165,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 2,
+          "trim_leading_ms": 170,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 3,
+          "trim_leading_ms": 145,
+          "trim_trailing_ms": 175,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 4,
+          "trim_leading_ms": 140,
+          "trim_trailing_ms": 190,
+          "edge_fade_ms": 0,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ]
+    },
+    "trim_fade": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\trim_fade_merge.wav",
+      "metrics": {
+        "duration_sec": 21.035,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.095658,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.08082,
+        "spectral_centroid_hz": 2108.03
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 125,
+          "trim_trailing_ms": 185,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 165,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 2,
+          "trim_leading_ms": 170,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 3,
+          "trim_leading_ms": 145,
+          "trim_trailing_ms": 175,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 4,
+          "trim_leading_ms": 140,
+          "trim_trailing_ms": 190,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ]
+    },
+    "processed": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\processed_merge.wav",
+      "metrics": {
+        "duration_sec": 21.035,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.095658,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.08082,
+        "spectral_centroid_hz": 2108.03
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 125,
+          "trim_trailing_ms": 185,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 165,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 2,
+          "trim_leading_ms": 170,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 3,
+          "trim_leading_ms": 145,
+          "trim_trailing_ms": 175,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 4,
+          "trim_leading_ms": 140,
+          "trim_trailing_ms": 190,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ]
+    },
+    "chunk_size_A": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\chunk_size_A_1_sentence.wav",
+      "metrics": {
+        "duration_sec": 21.035,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.095658,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.08082,
+        "spectral_centroid_hz": 2108.03
+      }
+    },
+    "B_2_sentences": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\chunk_size_B_2_sentences.wav",
+      "metrics": {
+        "duration_sec": 20.775,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.107589,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.072445,
+        "spectral_centroid_hz": 2243.36
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 125,
+          "trim_trailing_ms": 180,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 160,
+          "trim_trailing_ms": 185,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 2,
+          "trim_leading_ms": 110,
+          "trim_trailing_ms": 185,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ],
+      "chunks": [
+        {
+          "result": {
+            "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\B_2_sentences_chunk_01.wav",
+            "mp3_path": null,
+            "export_error": null,
+            "load_time": 0.0,
+            "preparation_time": 0.0,
+            "text_length": 141,
+            "sample_rate": 24000,
+            "duration": 8.13,
+            "gen_time": 2.169415399999707,
+            "rtf": 0.26684076260759,
+            "provider": "omnivoice",
+            "model": "k2-fsa/OmniVoice",
+            "language": "vi",
+            "voice": "omnivoice_auto",
+            "device": "cuda:0",
+            "error": null,
+            "status": "PASS",
+            "metadata": {
+              "num_step": 16,
+              "channels": 1,
+              "dtype": "float32",
+              "load_count": 1,
+              "cpu_verified": false,
+              "model_reused": true,
+              "diagnostics": {
+                "provider": "omnivoice",
+                "language": "vi",
+                "language_status": "VERIFIED",
+                "device": "cuda:0",
+                "dtype": "float16",
+                "verification_scope": "CUDA normal short TTS baseline",
+                "cloned_live_verified": null,
+                "audio_dtype": "float32",
+                "generation_time": 2.169415399999707,
+                "duration": 8.13,
+                "rtf": 0.26684076260759,
+                "mode": "normal",
+                "status": "PASS"
+              }
+            }
+          },
+          "metrics": {
+            "duration_sec": 8.13,
+            "sample_rate": 24000,
+            "channels": 1,
+            "rms": 0.119034,
+            "peak": 0.5,
+            "zero_crossing_rate": 0.082791,
+            "spectral_centroid_hz": 2382.06
+          }
+        },
+        {
+          "result": {
+            "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\B_2_sentences_chunk_02.wav",
+            "mp3_path": null,
+            "export_error": null,
+            "load_time": 0.0,
+            "preparation_time": 0.0,
+            "text_length": 144,
+            "sample_rate": 24000,
+            "duration": 8.43,
+            "gen_time": 2.9399226999994426,
+            "rtf": 0.34874527876624467,
+            "provider": "omnivoice",
+            "model": "k2-fsa/OmniVoice",
+            "language": "vi",
+            "voice": "omnivoice_auto",
+            "device": "cuda:0",
+            "error": null,
+            "status": "PASS",
+            "metadata": {
+              "num_step": 16,
+              "channels": 1,
+              "dtype": "float32",
+              "load_count": 1,
+              "cpu_verified": false,
+              "model_reused": true,
+              "diagnostics": {
+                "provider": "omnivoice",
+                "language": "vi",
+                "language_status": "VERIFIED",
+                "device": "cuda:0",
+                "dtype": "float16",
+                "verification_scope": "CUDA normal short TTS baseline",
+                "cloned_live_verified": null,
+                "audio_dtype": "float32",
+                "generation_time": 2.9399226999994426,
+                "duration": 8.43,
+                "rtf": 0.34874527876624467,
+                "mode": "normal",
+                "status": "PASS"
+              }
+            }
+          },
+          "metrics": {
+            "duration_sec": 8.43,
+            "sample_rate": 24000,
+            "channels": 1,
+            "rms": 0.095325,
+            "peak": 0.5,
+            "zero_crossing_rate": 0.064196,
+            "spectral_centroid_hz": 2260.94
+          }
+        },
+        {
+          "result": {
+            "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\B_2_sentences_chunk_03.wav",
+            "mp3_path": null,
+            "export_error": null,
+            "load_time": 0.0,
+            "preparation_time": 0.0,
+            "text_length": 74,
+            "sample_rate": 24000,
+            "duration": 4.46,
+            "gen_time": 2.0681656999986444,
+            "rtf": 0.46371428251090685,
+            "provider": "omnivoice",
+            "model": "k2-fsa/OmniVoice",
+            "language": "vi",
+            "voice": "omnivoice_auto",
+            "device": "cuda:0",
+            "error": null,
+            "status": "PASS",
+            "metadata": {
+              "num_step": 16,
+              "channels": 1,
+              "dtype": "float32",
+              "load_count": 1,
+              "cpu_verified": false,
+              "model_reused": true,
+              "diagnostics": {
+                "provider": "omnivoice",
+                "language": "vi",
+                "language_status": "VERIFIED",
+                "device": "cuda:0",
+                "dtype": "float16",
+                "verification_scope": "CUDA normal short TTS baseline",
+                "cloned_live_verified": null,
+                "audio_dtype": "float32",
+                "generation_time": 2.0681656999986444,
+                "duration": 4.46,
+                "rtf": 0.46371428251090685,
+                "mode": "normal",
+                "status": "PASS"
+              }
+            }
+          },
+          "metrics": {
+            "duration_sec": 4.46,
+            "sample_rate": 24000,
+            "channels": 1,
+            "rms": 0.104478,
+            "peak": 0.5,
+            "zero_crossing_rate": 0.067975,
+            "spectral_centroid_hz": 1938.72
+          }
+        }
+      ]
+    },
+    "C_250_350_chars": {
+      "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\chunk_size_C_250_350_chars.wav",
+      "metrics": {
+        "duration_sec": 20.895,
+        "sample_rate": 24000,
+        "channels": 1,
+        "rms": 0.126746,
+        "peak": 0.5,
+        "zero_crossing_rate": 0.086343,
+        "spectral_centroid_hz": 1881.72
+      },
+      "diagnostics": [
+        {
+          "segment_index": 0,
+          "trim_leading_ms": 110,
+          "trim_trailing_ms": 75,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": "period",
+          "pause_after_ms": 350
+        },
+        {
+          "segment_index": 1,
+          "trim_leading_ms": 90,
+          "trim_trailing_ms": 190,
+          "edge_fade_ms": 3,
+          "gain_db": 0.0,
+          "boundary_after": null,
+          "pause_after_ms": 0
+        }
+      ],
+      "chunks": [
+        {
+          "result": {
+            "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\C_250_350_chars_chunk_01.wav",
+            "mp3_path": null,
+            "export_error": null,
+            "load_time": 0.0,
+            "preparation_time": 0.0,
+            "text_length": 286,
+            "sample_rate": 24000,
+            "duration": 16.56,
+            "gen_time": 1.9553215999985696,
+            "rtf": 0.11807497584532425,
+            "provider": "omnivoice",
+            "model": "k2-fsa/OmniVoice",
+            "language": "vi",
+            "voice": "omnivoice_auto",
+            "device": "cuda:0",
+            "error": null,
+            "status": "PASS",
+            "metadata": {
+              "num_step": 16,
+              "channels": 1,
+              "dtype": "float32",
+              "load_count": 1,
+              "cpu_verified": false,
+              "model_reused": true,
+              "diagnostics": {
+                "provider": "omnivoice",
+                "language": "vi",
+                "language_status": "VERIFIED",
+                "device": "cuda:0",
+                "dtype": "float16",
+                "verification_scope": "CUDA normal short TTS baseline",
+                "cloned_live_verified": null,
+                "audio_dtype": "float32",
+                "generation_time": 1.9553215999985696,
+                "duration": 16.56,
+                "rtf": 0.11807497584532425,
+                "mode": "normal",
+                "status": "PASS"
+              }
+            }
+          },
+          "metrics": {
+            "duration_sec": 16.56,
+            "sample_rate": 24000,
+            "channels": 1,
+            "rms": 0.128254,
+            "peak": 0.5,
+            "zero_crossing_rate": 0.088638,
+            "spectral_centroid_hz": 1847.15
+          }
+        },
+        {
+          "result": {
+            "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\C_250_350_chars_chunk_02.wav",
+            "mp3_path": null,
+            "export_error": null,
+            "load_time": 0.0,
+            "preparation_time": 0.0,
+            "text_length": 74,
+            "sample_rate": 24000,
+            "duration": 4.45,
+            "gen_time": 1.9940626000006887,
+            "rtf": 0.44810395505633455,
+            "provider": "omnivoice",
+            "model": "k2-fsa/OmniVoice",
+            "language": "vi",
+            "voice": "omnivoice_auto",
+            "device": "cuda:0",
+            "error": null,
+            "status": "PASS",
+            "metadata": {
+              "num_step": 16,
+              "channels": 1,
+              "dtype": "float32",
+              "load_count": 1,
+              "cpu_verified": false,
+              "model_reused": true,
+              "diagnostics": {
+                "provider": "omnivoice",
+                "language": "vi",
+                "language_status": "VERIFIED",
+                "device": "cuda:0",
+                "dtype": "float16",
+                "verification_scope": "CUDA normal short TTS baseline",
+                "cloned_live_verified": null,
+                "audio_dtype": "float32",
+                "generation_time": 1.9940626000006887,
+                "duration": 4.45,
+                "rtf": 0.44810395505633455,
+                "mode": "normal",
+                "status": "PASS"
+              }
+            }
+          },
+          "metrics": {
+            "duration_sec": 4.45,
+            "sample_rate": 24000,
+            "channels": 1,
+            "rms": 0.119244,
+            "peak": 0.5,
+            "zero_crossing_rate": 0.076855,
+            "spectral_centroid_hz": 1671.73
+          }
+        }
+      ]
+    },
+    "num_step": {
+      "16": {
+        "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\num_step_16.wav",
+        "metrics": {
+          "duration_sec": 8.17,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.104001,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.094227,
+          "spectral_centroid_hz": 2542.83,
+          "generation_time_sec": 1.8271,
+          "rtf": 0.2236
+        }
+      },
+      "24": {
+        "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\num_step_24.wav",
+        "metrics": {
+          "duration_sec": 8.18,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.119716,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.056225,
+          "spectral_centroid_hz": 1653.93,
+          "generation_time_sec": 2.8102,
+          "rtf": 0.3435
+        }
+      },
+      "32": {
+        "path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\num_step_32.wav",
+        "metrics": {
+          "duration_sec": 8.19,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.106515,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.099614,
+          "spectral_centroid_hz": 2382.28,
+          "generation_time_sec": 3.2073,
+          "rtf": 0.3916
+        }
+      }
+    },
+    "repeatability": [
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\repeat_1.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 141,
+          "sample_rate": 24000,
+          "duration": 8.16,
+          "gen_time": 1.6212737999994715,
+          "rtf": 0.19868551470581758,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 1.6212737999994715,
+              "duration": 8.16,
+              "rtf": 0.19868551470581758,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 8.16,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.107389,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.080321,
+          "spectral_centroid_hz": 2298.51
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\repeat_2.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 141,
+          "sample_rate": 24000,
+          "duration": 8.19,
+          "gen_time": 2.064268100000845,
+          "rtf": 0.25204738705749025,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 2.064268100000845,
+              "duration": 8.19,
+              "rtf": 0.25204738705749025,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 8.19,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.111747,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.093519,
+          "spectral_centroid_hz": 2209.67
+        }
+      },
+      {
+        "result": {
+          "wav_path": "D:\\Tool Dich Cho Khach\\reports\\cp02e1_listening\\repeat_3.wav",
+          "mp3_path": null,
+          "export_error": null,
+          "load_time": 0.0,
+          "preparation_time": 0.0,
+          "text_length": 141,
+          "sample_rate": 24000,
+          "duration": 8.11,
+          "gen_time": 2.51501350000035,
+          "rtf": 0.31011263871767575,
+          "provider": "omnivoice",
+          "model": "k2-fsa/OmniVoice",
+          "language": "vi",
+          "voice": "omnivoice_auto",
+          "device": "cuda:0",
+          "error": null,
+          "status": "PASS",
+          "metadata": {
+            "num_step": 16,
+            "channels": 1,
+            "dtype": "float32",
+            "load_count": 1,
+            "cpu_verified": false,
+            "model_reused": true,
+            "diagnostics": {
+              "provider": "omnivoice",
+              "language": "vi",
+              "language_status": "VERIFIED",
+              "device": "cuda:0",
+              "dtype": "float16",
+              "verification_scope": "CUDA normal short TTS baseline",
+              "cloned_live_verified": null,
+              "audio_dtype": "float32",
+              "generation_time": 2.51501350000035,
+              "duration": 8.11,
+              "rtf": 0.31011263871767575,
+              "mode": "normal",
+              "status": "PASS"
+            }
+          }
+        },
+        "metrics": {
+          "duration_sec": 8.11,
+          "sample_rate": 24000,
+          "channels": 1,
+          "rms": 0.104481,
+          "peak": 0.5,
+          "zero_crossing_rate": 0.087824,
+          "spectral_centroid_hz": 2252.55
+        }
+      }
+    ]
+  },
+  "generate_signature": "(text: Union[str, list[str]], language: Union[str, list[str], NoneType] = None, ref_text: Union[str, list[str], NoneType] = None, ref_audio: Union[str, list[str], tuple[torch.Tensor, int], list[tuple[torch.Tensor, int]], NoneType] = None, voice_clone_prompt: Union[omnivoice.models.omnivoice.VoiceClonePrompt, list[omnivoice.models.omnivoice.VoiceClonePrompt], NoneType] = None, instruct: Union[str, list[str], NoneType] = None, duration: Union[float, list[Optional[float]], NoneType] = None, speed: Union[float, list[Optional[float]], NoneType] = None, generation_config: Optional[omnivoice.models.omnivoice.OmniVoiceGenerationConfig] = None, normalize_text: bool = False, **kwargs) -> list[numpy.ndarray]",
+  "declared_seed_parameter": false,
+  "chunk_plans_detail": {
+    "A_1_sentence": [
+      {
+        "index": 0,
+        "chars": 66,
+        "sentences": 1
+      },
+      {
+        "index": 1,
+        "chars": 74,
+        "sentences": 1
+      },
+      {
+        "index": 2,
+        "chars": 67,
+        "sentences": 1
+      },
+      {
+        "index": 3,
+        "chars": 76,
+        "sentences": 1
+      },
+      {
+        "index": 4,
+        "chars": 74,
+        "sentences": 1
+      }
+    ],
+    "B_2_sentences": [
+      {
+        "index": 0,
+        "chars": 141,
+        "sentences": 2
+      },
+      {
+        "index": 1,
+        "chars": 144,
+        "sentences": 2
+      },
+      {
+        "index": 2,
+        "chars": 74,
+        "sentences": 1
+      }
+    ],
+    "C_250_350_chars": [
+      {
+        "index": 0,
+        "chars": 286,
+        "sentences": 4
+      },
+      {
+        "index": 1,
+        "chars": 74,
+        "sentences": 1
+      }
+    ]
+  },
+  "provider_health": {
+    "provider": "omnivoice",
+    "model_path": "k2-fsa/OmniVoice",
+    "device": "cuda:0",
+    "loaded": true,
+    "status": "LOADED",
+    "load_count": 1,
+    "cpu_verified": false
+  },
+  "final_health": {
+    "provider": "omnivoice",
+    "model_path": "k2-fsa/OmniVoice",
+    "device": "cuda:0",
+    "loaded": true,
+    "status": "LOADED",
+    "load_count": 1,
+    "cpu_verified": false
+  }
+}

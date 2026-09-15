@@ -1,0 +1,262 @@
+{
+  "status": "COMPLETED",
+  "total_elapsed_seconds": 405.32,
+  "invariants": {
+    "provider_instances": 1,
+    "model_load_count": 1,
+    "profile_creations": 1,
+    "same_profile_used": true
+  },
+  "variants": [
+    {
+      "variant_id": "variant_1",
+      "name": "baseline_2_sentences_step16",
+      "description": "Baseline B-5/B-5.1: 2 sentences in 1 chunk (209 chars), num_step=16",
+      "strategy": "2_sentences",
+      "num_step": 16,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 1,
+      "total_gen_time_sec": 145.676,
+      "final_duration_sec": 11.03,
+      "rtf": 13.207,
+      "speech_rate_chars_per_sec": 18.95,
+      "speech_rate_words_per_sec": 4.26,
+      "peak_amplitude": 0.5898,
+      "rms_db": -18.02,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 209,
+          "words": 47,
+          "gen_time_sec": 145.676,
+          "raw_duration_sec": 11.31,
+          "processed_duration_sec": 11.03,
+          "trim_leading_ms": 115,
+          "trim_trailing_ms": 165
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_2",
+      "name": "size_1_sentence_step16",
+      "description": "Chunk size reduction: 1 sentence/chunk (94 chars, 114 chars), num_step=16",
+      "strategy": "1_sentence",
+      "num_step": 16,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 2,
+      "total_gen_time_sec": 229.758,
+      "final_duration_sec": 11.12,
+      "rtf": 20.662,
+      "speech_rate_chars_per_sec": 18.79,
+      "speech_rate_words_per_sec": 4.23,
+      "peak_amplitude": 0.6108,
+      "rms_db": -17.89,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt.",
+          "chars": 93,
+          "words": 21,
+          "gen_time_sec": 111.385,
+          "raw_duration_sec": 5.12,
+          "processed_duration_sec": 4.81,
+          "trim_leading_ms": 140,
+          "trim_trailing_ms": 170
+        },
+        {
+          "chunk_index": 1,
+          "text": "Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 115,
+          "words": 26,
+          "gen_time_sec": 118.373,
+          "raw_duration_sec": 6.29,
+          "processed_duration_sec": 5.96,
+          "trim_leading_ms": 165,
+          "trim_trailing_ms": 165
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_3",
+      "name": "size_100_150_chars_step16",
+      "description": "Chunk size 100-150 chars: 2 short sentences (141 chars), num_step=16",
+      "strategy": "100_150_chars",
+      "num_step": 16,
+      "full_text": "Buổi sáng, tôi mở cửa sổ và nhìn khu vườn nhỏ trước nhà. Những giọt nước còn đọng trên lá, trong khi tiếng chim vang lên từ hàng cây phía xa.",
+      "chars": 141,
+      "words": 31,
+      "chunk_count": 1,
+      "total_gen_time_sec": 124.127,
+      "final_duration_sec": 7.385,
+      "rtf": 16.808,
+      "speech_rate_chars_per_sec": 19.09,
+      "speech_rate_words_per_sec": 4.2,
+      "peak_amplitude": 0.6482,
+      "rms_db": -18.35,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Buổi sáng, tôi mở cửa sổ và nhìn khu vườn nhỏ trước nhà. Những giọt nước còn đọng trên lá, trong khi tiếng chim vang lên từ hàng cây phía xa.",
+          "chars": 141,
+          "words": 31,
+          "gen_time_sec": 124.127,
+          "raw_duration_sec": 7.72,
+          "processed_duration_sec": 7.385,
+          "trim_leading_ms": 165,
+          "trim_trailing_ms": 170
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_4",
+      "name": "step24_2_sentences",
+      "description": "Num_step increase: 2 sentences in 1 chunk (209 chars), num_step=24",
+      "strategy": "2_sentences",
+      "num_step": 24,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 1,
+      "total_gen_time_sec": 231.811,
+      "final_duration_sec": 11.025,
+      "rtf": 21.026,
+      "speech_rate_chars_per_sec": 18.96,
+      "speech_rate_words_per_sec": 4.26,
+      "peak_amplitude": 0.7675,
+      "rms_db": -17.91,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 209,
+          "words": 47,
+          "gen_time_sec": 231.811,
+          "raw_duration_sec": 11.34,
+          "processed_duration_sec": 11.025,
+          "trim_leading_ms": 145,
+          "trim_trailing_ms": 170
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_5",
+      "name": "step32_2_sentences",
+      "description": "Num_step increase: 2 sentences in 1 chunk (209 chars), num_step=32",
+      "strategy": "2_sentences",
+      "num_step": 32,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 1,
+      "total_gen_time_sec": 282.12,
+      "final_duration_sec": 10.975,
+      "rtf": 25.706,
+      "speech_rate_chars_per_sec": 19.04,
+      "speech_rate_words_per_sec": 4.28,
+      "peak_amplitude": 0.7906,
+      "rms_db": -17.71,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 209,
+          "words": 47,
+          "gen_time_sec": 282.12,
+          "raw_duration_sec": 11.31,
+          "processed_duration_sec": 10.975,
+          "trim_leading_ms": 160,
+          "trim_trailing_ms": 175
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_6",
+      "name": "step24_1_sentence",
+      "description": "Combined: 1 sentence/chunk, num_step=24",
+      "strategy": "1_sentence",
+      "num_step": 24,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 2,
+      "total_gen_time_sec": 395.163,
+      "final_duration_sec": 11.11,
+      "rtf": 35.568,
+      "speech_rate_chars_per_sec": 18.81,
+      "speech_rate_words_per_sec": 4.23,
+      "peak_amplitude": 0.6153,
+      "rms_db": -18.21,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt.",
+          "chars": 93,
+          "words": 21,
+          "gen_time_sec": 159.061,
+          "raw_duration_sec": 5.1,
+          "processed_duration_sec": 4.81,
+          "trim_leading_ms": 125,
+          "trim_trailing_ms": 165
+        },
+        {
+          "chunk_index": 1,
+          "text": "Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 115,
+          "words": 26,
+          "gen_time_sec": 236.102,
+          "raw_duration_sec": 6.28,
+          "processed_duration_sec": 5.95,
+          "trim_leading_ms": 160,
+          "trim_trailing_ms": 170
+        }
+      ]
+    },
+    {
+      "variant_id": "variant_7",
+      "name": "step32_1_sentence",
+      "description": "Combined: 1 sentence/chunk, num_step=32",
+      "strategy": "1_sentence",
+      "num_step": 32,
+      "full_text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt. Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+      "chars": 209,
+      "words": 47,
+      "chunk_count": 2,
+      "total_gen_time_sec": 404.915,
+      "final_duration_sec": 11.07,
+      "rtf": 36.578,
+      "speech_rate_chars_per_sec": 18.88,
+      "speech_rate_words_per_sec": 4.25,
+      "peak_amplitude": 0.6237,
+      "rms_db": -18.03,
+      "chunks_detail": [
+        {
+          "chunk_index": 0,
+          "text": "Khi trở về, tôi nhận ra rằng một ngày tốt đẹp không nhất thiết phải có điều gì thật đặc biệt.",
+          "chars": 93,
+          "words": 21,
+          "gen_time_sec": 0.0,
+          "raw_duration_sec": 5.09,
+          "processed_duration_sec": 4.8,
+          "trim_leading_ms": 0,
+          "trim_trailing_ms": 0
+        },
+        {
+          "chunk_index": 1,
+          "text": "Đôi khi, chỉ cần dành thời gian quan sát, lắng nghe và nói lời cảm ơn đúng lúc, chúng ta đã có thêm nhiều niềm vui.",
+          "chars": 115,
+          "words": 26,
+          "gen_time_sec": 404.915,
+          "raw_duration_sec": 6.26,
+          "processed_duration_sec": 5.92,
+          "trim_leading_ms": 170,
+          "trim_trailing_ms": 170
+        }
+      ]
+    }
+  ]
+}

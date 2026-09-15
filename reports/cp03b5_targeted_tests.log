@@ -1,0 +1,9 @@
+........................................................................ [ 78%]
+....................                                                     [100%]
+============================== warnings summary ===============================
+prototype/tests/test_long_text_manager.py::test_long_text_generates_all_chunks_in_order
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\pydub\utils.py:14: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+92 passed, 1 warning in 1.61s

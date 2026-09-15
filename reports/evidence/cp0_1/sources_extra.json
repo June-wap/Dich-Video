@@ -1,0 +1,92 @@
+[
+  {
+    "id": "vieneu_onnx_lite",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/_v3_turbo_engine/onnx_runtime_lite.py",
+    "retrieved_at": "2026-09-11T16:22:27.742373+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/_v3_turbo_engine/onnx_runtime_lite.py",
+    "status": "FETCHED",
+    "bytes": 31741,
+    "sha256": "0952516b583caa6b00bc7dae8ad7fa1d558cea3a72a360cc93385ff15382d756",
+    "file": "reports/evidence/cp0_1/vieneu_onnx_lite.txt"
+  },
+  {
+    "id": "vieneu_factory",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/factory.py",
+    "retrieved_at": "2026-09-11T16:22:27.743172+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/factory.py",
+    "status": "FETCHED",
+    "bytes": 2065,
+    "sha256": "0cd4631298d4da9de59471c3f3371a8c894b2b9019e40f584373e2c1a3ca3265",
+    "file": "reports/evidence/cp0_1/vieneu_factory.txt"
+  },
+  {
+    "id": "vieneu_hub",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/_v3_turbo_engine/hub_load_v3_turbo.py",
+    "retrieved_at": "2026-09-11T16:22:27.743653+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/_v3_turbo_engine/hub_load_v3_turbo.py",
+    "status": "FETCHED",
+    "bytes": 2687,
+    "sha256": "782c2211e60779804f70beb0edf62160569696432c895298ae01ab6be9b60ab2",
+    "file": "reports/evidence/cp0_1/vieneu_hub.txt"
+  },
+  {
+    "id": "openjtalk_mei_license",
+    "url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/9e4bf25324ac135dfc81ca64aed2fa6a48b83304/pyopenjtalk/htsvoice/LICENSE_mei_normal.htsvoice",
+    "retrieved_at": "2026-09-11T16:22:27.744040+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/9e4bf25324ac135dfc81ca64aed2fa6a48b83304/pyopenjtalk/htsvoice/LICENSE_mei_normal.htsvoice",
+    "status": "FETCHED",
+    "bytes": 2870,
+    "sha256": "af8a05b6ce28e513658fdf0480f36dbf49cbe878d2571d97dd017e8052c71391",
+    "file": "reports/evidence/cp0_1/openjtalk_mei_license.txt"
+  },
+  {
+    "id": "openjtalk_init",
+    "url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/9e4bf25324ac135dfc81ca64aed2fa6a48b83304/pyopenjtalk/__init__.py",
+    "retrieved_at": "2026-09-11T16:22:27.744601+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/9e4bf25324ac135dfc81ca64aed2fa6a48b83304/pyopenjtalk/__init__.py",
+    "status": "FETCHED",
+    "bytes": 107905,
+    "sha256": "025b75a77b05c898fef30b1533efb36909a3dca9c84c14decdc72e91d3d2605e",
+    "file": "reports/evidence/cp0_1/openjtalk_init.txt"
+  },
+  {
+    "id": "openjtalk_tree",
+    "url": "https://api.github.com/repos/tsukumijima/pyopenjtalk-plus/git/trees/9e4bf25324ac135dfc81ca64aed2fa6a48b83304?recursive=1",
+    "retrieved_at": "2026-09-11T16:22:28.383439+00:00",
+    "resolved_url": "https://api.github.com/repos/tsukumijima/pyopenjtalk-plus/git/trees/9e4bf25324ac135dfc81ca64aed2fa6a48b83304?recursive=1",
+    "status": "FETCHED",
+    "bytes": 28042,
+    "sha256": "226330e2b085348a1e2d3d3ccd5ed2cb2d45788d72b84455202fda7c798114b4",
+    "file": "reports/evidence/cp0_1/openjtalk_tree.txt"
+  },
+  {
+    "id": "sherpa_tree",
+    "url": "https://api.github.com/repos/k2-fsa/sherpa-onnx/git/trees/v1.12.26?recursive=1",
+    "retrieved_at": "2026-09-11T16:22:28.411930+00:00",
+    "resolved_url": "https://api.github.com/repos/k2-fsa/sherpa-onnx/git/trees/v1.12.26?recursive=1",
+    "status": "FETCHED",
+    "bytes": 1588904,
+    "sha256": "44aa238f41eb2f4a440468aefa2d2ffd739694477c57e9288d85131e89d62ccb",
+    "file": "reports/evidence/cp0_1/sherpa_tree.txt"
+  },
+  {
+    "id": "sherpa_piper_lexicon",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/piper-phonemize-lexicon.cc",
+    "retrieved_at": "2026-09-11T16:22:28.580477+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/piper-phonemize-lexicon.cc",
+    "status": "FETCHED",
+    "bytes": 17568,
+    "sha256": "a7122ca28d9904b1ffa411a063db92ab9ec694ccbac967fd4932ee32f6da779a",
+    "file": "reports/evidence/cp0_1/sherpa_piper_lexicon.txt"
+  },
+  {
+    "id": "sherpa_cmake",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/CMakeLists.txt",
+    "retrieved_at": "2026-09-11T16:22:28.582311+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/CMakeLists.txt",
+    "status": "FETCHED",
+    "bytes": 25638,
+    "sha256": "9269ef7ebd8efacaa04def9e6bbe4899c061e0881c218f12972de0b7c1c69222",
+    "file": "reports/evidence/cp0_1/sherpa_cmake.txt"
+  }
+]

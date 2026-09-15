@@ -1,0 +1,24 @@
+..............D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\pydub\utils.py:14: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+  import audioop
+D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\pydub\audio_segment.py:808: ResourceWarning: unclosed file <_io.BufferedReader name='C:\\Users\\GIGABU~1\\AppData\\Local\\Temp\\tmpm4kv6pr0\\x.wav'>
+  return cls.from_file(file, 'wav', parameters=parameters)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..Provider failed
+Traceback (most recent call last):
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 68, in synthesize
+    result = provider.synthesize(text, language, voice_id, out_path,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1139, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1143, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\unittest\mock.py", line 1198, in _execute_mock_call
+    raise effect
+RuntimeError: broken
+.
+----------------------------------------------------------------------
+Ran 17 tests in 0.213s
+
+OK

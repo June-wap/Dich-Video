@@ -1,0 +1,25 @@
+{
+  "gpu_smoke": "REUSED",
+  "source": "reports/cp02a_omnivoice_smoke.json",
+  "prior_python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "prior_torch": "2.8.0+cu128",
+  "prior_gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "current_artifact_validation": "PASS",
+  "artifacts": [
+    {
+      "path": "prototype\\outputs\\cp02a_vi_1.wav",
+      "sha256_current": "7a1ae0afe893b57c03050f0a5cb0bf7857dcb07159083820dd8212e1549730d8",
+      "rate": 24000,
+      "samples": 83040,
+      "duration": 3.46
+    },
+    {
+      "path": "prototype\\outputs\\cp02a_vi_2.wav",
+      "sha256_current": "5f1c8e4d44ddf8f7bfab4c96413e411dbf68051219720db570b06c287971a874",
+      "rate": 24000,
+      "samples": 72240,
+      "duration": 3.01
+    }
+  ],
+  "limitation": "Historical model inference only; current WAV integrity/decodability checked, no prior artifact hash available in this report. No new model inference or model-cache identity claim."
+}

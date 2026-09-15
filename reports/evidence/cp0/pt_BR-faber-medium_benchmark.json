@@ -1,0 +1,72 @@
+{
+  "model_id": "pt_BR-faber-medium",
+  "python_network_guard": true,
+  "os_firewall_verified": false,
+  "subjective_quality": "NOT VERIFIED",
+  "gpu_inference": "NOT VERIFIED",
+  "runs": [
+    {
+      "duration_s": 3.924172335600907,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 173100,
+      "rms": 0.18005970522304504,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.3113905325443786e-05,
+      "sha256": "3bef022b61b2b8d654921edef256f5c981db8ed664ce3c79795174323efabb71",
+      "kind": "first",
+      "generation_and_write_s": 0.42417079999722773,
+      "rtf": 0.10809178693531425,
+      "path": ".cp0/audio/pt_BR-faber-medium/short_0.wav",
+      "input_sha256": "33a65dae3c069117f19eca2262868899192e5017d76179b16b60d19bf3764763"
+    },
+    {
+      "duration_s": 3.9706122448979593,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 175148,
+      "rms": 0.17043054943502825,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.2843567251461987e-05,
+      "sha256": "09e84124de9c58ee464d501a78b2b252661d2f86a6fe4a6801751b4a1ef7799d",
+      "kind": "warm",
+      "generation_and_write_s": 0.7351619000000937,
+      "rtf": 0.18515076634459599,
+      "path": ".cp0/audio/pt_BR-faber-medium/short_1.wav",
+      "input_sha256": "33a65dae3c069117f19eca2262868899192e5017d76179b16b60d19bf3764763"
+    },
+    {
+      "duration_s": 3.8312925170068026,
+      "sample_rate": 22050,
+      "channels": 1,
+      "size_bytes": 169004,
+      "rms": 0.15641990936974415,
+      "peak": 0.999969482421875,
+      "clipping_fraction": 2.3674242424242424e-05,
+      "sha256": "fe64e1437bee2f6d564460114eabc392709661983a5d9dc316074b0d365b9773",
+      "kind": "warm",
+      "generation_and_write_s": 0.6899316000017279,
+      "rtf": 0.18007802769931464,
+      "path": ".cp0/audio/pt_BR-faber-medium/short_2.wav",
+      "input_sha256": "33a65dae3c069117f19eca2262868899192e5017d76179b16b60d19bf3764763"
+    }
+  ],
+  "runtime": {
+    "piper-tts": "1.8.0",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.5.3"
+  },
+  "available_ort_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "model_load_s": 3.6828614999976708,
+  "import_verify_load_s": 4.137616599997273,
+  "actual_session_providers": [
+    "CPUExecutionProvider"
+  ],
+  "status": "SYNTHESIS_AND_PCM_VALIDATED",
+  "peak_sampled_rss_bytes": 254664704,
+  "windows_peak_working_set_bytes": 255201280
+}

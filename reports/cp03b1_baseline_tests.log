@@ -1,0 +1,9 @@
+........................................................................ [ 69%]
+...............................                                          [100%]
+============================== warnings summary ===============================
+prototype/tests/test_audio_boundary.py::test_merge_applies_safe_trim_and_preserves_order
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\pydub\utils.py:14: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+103 passed, 1 warning in 2.92s

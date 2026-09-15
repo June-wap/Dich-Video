@@ -1,0 +1,157 @@
+MASTER RULES
+
+PROJECT: LOCAL AI VOICE
+
+ROLE
+You are the Implementer + Tester.
+ChatGPT is the Architect + Reviewer/Gatekeeper.
+
+Do not redesign the product outside the checkpoint scope.
+
+PRODUCT GOAL
+
+Build a commercial desktop application for local/offline text-to-speech.
+
+Required V1 capabilities:
+- Text-to-Speech
+- Built-in voices
+- Vietnamese
+- English
+- Chinese
+- Japanese
+- Spanish
+- Portuguese
+- Italian
+- French
+- Hindi
+- Conversation mode
+- Voice cloning
+- WAV/MP3 export
+- Local processing
+- No paid TTS API dependency
+
+Translation is NOT in V1 scope.
+
+ARCHITECTURAL PRINCIPLES
+
+1. UI must not call AI engines directly.
+2. Application owns TTS Core.
+3. Engines are integrated through Provider interfaces.
+4. Provider != Model != Voice != VoiceProfile.
+5. SQLite stores metadata/state.
+6. Filesystem stores models/audio/artifacts.
+7. Do not hard-code a specific AI model into product architecture.
+8. Do not silently change selected voice/model during a job.
+9. Jobs must eventually support cancel/retry/resume/crash recovery.
+10. User text/audio/voice data must remain local by default.
+11. No production model may be approved without license evidence.
+12. Never commit secrets, private audio, downloaded model weights, generated audio, license keys, or machine-specific paths unless explicitly required.
+13. Do not claim something is VERIFIED unless it was actually tested.
+
+WORKFLOW
+
+Before implementation:
+1. Read AGENTS.md.
+2. Read Master Prompt.md if present.
+3. Read relevant docs/tasks/reports.
+4. Inspect repository.
+5. Record baseline.
+6. Identify existing architecture before changing code.
+
+During implementation:
+- Keep changes within checkpoint scope.
+- Add/update automated tests.
+- Preserve backward compatibility unless task explicitly changes it.
+- Do not suppress exceptions without diagnostics.
+- Do not introduce hidden network calls.
+
+After implementation:
+1. Run targeted tests.
+2. Run full regression tests where practical.
+3. Run compile/type/lint/build checks relevant to changed code.
+4. Inspect git diff.
+5. Check for secrets and accidental binary/model artifacts.
+6. Produce a checkpoint report.
+
+REPORT FORMAT
+1. Repository State
+2. Instructions Read
+3. Baseline
+4. Files Inspected
+5. Findings
+6. Implementation
+7. Tests Added/Changed
+8. Test Results
+9. Manual Verification
+10. Security/Privacy Review
+11. License Impact
+12. Known Limitations
+13. Files Changed
+14. Git Diff Summary
+15. Final Status
+
+Allowed final status:
+PASS
+PASS_WITH_LIMITATIONS
+BLOCKED
+FAILED
+
+Never mark PASS if a mandatory acceptance criterion remains unverified.
+
+
+CHECKPOINT 4 — STANDARD TTS END-TO-END
+
+OBJECTIVE
+Build the first production-style Text → Speech workflow.
+
+FLOW
+Text input
+→ validation
+→ text processing
+→ create job
+→ provider selection
+→ lock execution snapshot
+→ synthesize
+→ validate audio
+→ store artifact
+→ update database
+
+USE ONLY CP0-APPROVED MODEL CONFIGURATION.
+
+Do not add conversation mode.
+Do not add voice cloning here.
+
+API
+Implement minimum endpoints:
+GET /api/voices
+GET /api/models
+POST /api/tts/jobs
+GET /api/tts/jobs/{id}
+GET /api/health
+
+POST job should return 202 Accepted.
+
+Add idempotency mechanism so duplicate request retries do not accidentally create duplicate jobs.
+
+LOCAL API SECURITY
+Bind localhost only.
+
+Implement:
+session token
+Origin/Host validation where applicable
+restricted CORS
+request size limits
+safe filesystem paths
+
+TEST
+valid text
+empty text
+missing voice
+missing model
+provider failure
+valid output
+duplicate request
+restart
+
+OUTPUT
+reports/checkpoint_04_standard_tts.md

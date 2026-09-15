@@ -1,0 +1,143 @@
+[
+  {
+    "id": "vieneu_tree",
+    "url": "https://api.github.com/repos/pnnbao97/VieNeu-TTS/git/trees/3206ed960e317e69bfe09f9d553aecbf1090f32e?recursive=1",
+    "retrieved_at": "2026-09-11T16:21:06.172788+00:00",
+    "resolved_url": "https://api.github.com/repos/pnnbao97/VieNeu-TTS/git/trees/3206ed960e317e69bfe09f9d553aecbf1090f32e?recursive=1",
+    "status": "FETCHED",
+    "bytes": 36932,
+    "sha256": "2a0651f26520d3ea1c242b8c4e95612cbcc162e5b60e91688111b0ebd311f777",
+    "file": "reports/evidence/cp0_1/vieneu_tree.txt"
+  },
+  {
+    "id": "vieneu_init",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/__init__.py",
+    "retrieved_at": "2026-09-11T16:21:06.173951+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/__init__.py",
+    "status": "FETCHED",
+    "bytes": 50,
+    "sha256": "404060a9718835967be26ad022261dcd08d589605f0e24c0245637469b10439b",
+    "file": "reports/evidence/cp0_1/vieneu_init.txt"
+  },
+  {
+    "id": "vieneu_onnx",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/src/vieneu/_v3_turbo_engine/inference_v3_turbo_onnx.py",
+    "retrieved_at": "2026-09-11T16:21:06.174543+00:00",
+    "status": "ERROR",
+    "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+    "id": "vieneu_package",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/pyproject.toml",
+    "retrieved_at": "2026-09-11T16:21:06.175020+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/3206ed960e317e69bfe09f9d553aecbf1090f32e/pyproject.toml",
+    "status": "FETCHED",
+    "bytes": 6753,
+    "sha256": "7d7612ba70d99041a4f75c0a23db0148a6016fbf20b9eabcbc9625a9d2d6cc7d",
+    "file": "reports/evidence/cp0_1/vieneu_package.txt"
+  },
+  {
+    "id": "openjtalk_pypi",
+    "url": "https://pypi.org/pypi/pyopenjtalk-plus/json",
+    "retrieved_at": "2026-09-11T16:21:06.175580+00:00",
+    "resolved_url": "https://pypi.org/pypi/pyopenjtalk-plus/json",
+    "status": "FETCHED",
+    "bytes": 321342,
+    "sha256": "85e1ab51d29264a75b6a9a770a932f6795535866f30c703ec9b33ebe7e6043ce",
+    "file": "reports/evidence/cp0_1/openjtalk_pypi.txt"
+  },
+  {
+    "id": "openjtalk_repo",
+    "url": "https://api.github.com/repos/tsukumijima/pyopenjtalk-plus/commits/master",
+    "retrieved_at": "2026-09-11T16:21:06.176000+00:00",
+    "resolved_url": "https://api.github.com/repos/tsukumijima/pyopenjtalk-plus/commits/master",
+    "status": "FETCHED",
+    "bytes": 4191,
+    "sha256": "ec1413cc784959ec66f528295eab99a29c07292498384ba877ba01588da2e53b",
+    "file": "reports/evidence/cp0_1/openjtalk_repo.txt"
+  },
+  {
+    "id": "openjtalk_readme",
+    "url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/README.md",
+    "retrieved_at": "2026-09-11T16:21:06.832825+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/README.md",
+    "status": "FETCHED",
+    "bytes": 29081,
+    "sha256": "6ff8f0c03df81bfe5108e85a52b8554b402c380bad2ed4a594aa75e9cb9e500d",
+    "file": "reports/evidence/cp0_1/openjtalk_readme.txt"
+  },
+  {
+    "id": "openjtalk_license",
+    "url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/LICENSE.md",
+    "retrieved_at": "2026-09-11T16:21:06.880042+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/LICENSE.md",
+    "status": "FETCHED",
+    "bytes": 1177,
+    "sha256": "c38083a4d51c1ea86e08b3303a984d0c23718c5ac214058af705814d30f4bb5b",
+    "file": "reports/evidence/cp0_1/openjtalk_license.txt"
+  },
+  {
+    "id": "openjtalk_voice_license",
+    "url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/pyopenjtalk/htsvoice/README.md",
+    "retrieved_at": "2026-09-11T16:21:06.910166+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/tsukumijima/pyopenjtalk-plus/master/pyopenjtalk/htsvoice/README.md",
+    "status": "FETCHED",
+    "bytes": 100,
+    "sha256": "fb27c90b564d726a6e8c1e03c812753102c692b08e6c86e4a4edb97050e976dd",
+    "file": "reports/evidence/cp0_1/openjtalk_voice_license.txt"
+  },
+  {
+    "id": "sherpa_espeak_cmake",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/cmake/espeak-ng.cmake",
+    "retrieved_at": "2026-09-11T16:21:06.975625+00:00",
+    "status": "ERROR",
+    "error": "HTTPError: HTTP Error 404: Not Found"
+  },
+  {
+    "id": "sherpa_vits_impl",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/offline-tts-vits-impl.h",
+    "retrieved_at": "2026-09-11T16:21:06.991999+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/offline-tts-vits-impl.h",
+    "status": "FETCHED",
+    "bytes": 16488,
+    "sha256": "9cae0cb95da7de302fb3e21393290050a5c95ddaba4a016042a545921752d34c",
+    "file": "reports/evidence/cp0_1/sherpa_vits_impl.txt"
+  },
+  {
+    "id": "sherpa_phonemizer",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/offline-tts-frontend.cc",
+    "retrieved_at": "2026-09-11T16:21:07.359482+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/sherpa-onnx/csrc/offline-tts-frontend.cc",
+    "status": "FETCHED",
+    "bytes": 586,
+    "sha256": "1e67fa51e18a57987148a48b84b5eb1dd83d8104a2f0568e5ad33f733a7ddfd5",
+    "file": "reports/evidence/cp0_1/sherpa_phonemizer.txt"
+  },
+  {
+    "id": "lessac_license",
+    "url": "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/license.html",
+    "retrieved_at": "2026-09-11T16:21:07.370557+00:00",
+    "resolved_url": "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/license.html",
+    "status": "FETCHED",
+    "bytes": 31133,
+    "sha256": "b8f2341c399115650a50f0d66370bf5c8b3946909200469367b96e52486b7a51",
+    "file": "reports/evidence/cp0_1/lessac_license.txt"
+  },
+  {
+    "id": "mailabs_license",
+    "url": "https://www.caito.de/2019/01/03/the-m-ailabs-speech-dataset/",
+    "retrieved_at": "2026-09-11T16:21:07.497338+00:00",
+    "status": "ERROR",
+    "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+  },
+  {
+    "id": "cc_by_4",
+    "url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+    "retrieved_at": "2026-09-11T16:21:07.576836+00:00",
+    "resolved_url": "https://creativecommons.org/licenses/by/4.0/legalcode.txt",
+    "status": "FETCHED",
+    "bytes": 18657,
+    "sha256": "9ba9550ad48438d0836ddab3da480b3b69ffa0aac7b7878b5a0039e7ab429411",
+    "file": "reports/evidence/cp0_1/cc_by_4.txt"
+  }
+]

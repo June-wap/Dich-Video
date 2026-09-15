@@ -1,0 +1,222 @@
+[
+  {
+    "id": "nghi_repo",
+    "url": "https://api.github.com/repos/nghimestudio/nghitts/commits/main",
+    "retrieved_at": "2026-09-11T09:39:14.862456+00:00",
+    "resolved_url": "https://api.github.com/repos/nghimestudio/nghitts/commits/main",
+    "status": "FETCHED",
+    "bytes": 4655,
+    "sha256": "09f933958c13909036321ce525cc6107589bff95f94b821d42b355faead1d6fe",
+    "file": "reports/evidence/cp0/nghi_repo.txt"
+  },
+  {
+    "id": "nghi_readme",
+    "url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/README.md",
+    "retrieved_at": "2026-09-11T09:39:14.863259+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/README.md",
+    "status": "FETCHED",
+    "bytes": 18999,
+    "sha256": "9475e31436ecf729a8ff02484b2c0f7d3b5f2f047a8169f7e93a58aaffed4390",
+    "file": "reports/evidence/cp0/nghi_readme.txt"
+  },
+  {
+    "id": "nghi_license",
+    "url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/LICENSE",
+    "retrieved_at": "2026-09-11T09:39:14.863836+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/LICENSE",
+    "status": "FETCHED",
+    "bytes": 9605,
+    "sha256": "059d27280e34d13b9ef475bee802769fadc6198ced964ef6dfabfe9a0a10cded",
+    "file": "reports/evidence/cp0/nghi_license.txt"
+  },
+  {
+    "id": "nghi_packages",
+    "url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/package.json",
+    "retrieved_at": "2026-09-11T09:39:14.864178+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/nghimestudio/nghitts/main/package.json",
+    "status": "FETCHED",
+    "bytes": 794,
+    "sha256": "b089e8dc86e368e63172a2ebf6a6bc958bbc3856d5881c5474c726fe0ebd7a10",
+    "file": "reports/evidence/cp0/nghi_packages.txt"
+  },
+  {
+    "id": "piper_package",
+    "url": "https://pypi.org/pypi/piper-tts/json",
+    "retrieved_at": "2026-09-11T09:39:14.864512+00:00",
+    "resolved_url": "https://pypi.org/pypi/piper-tts/json",
+    "status": "FETCHED",
+    "bytes": 51769,
+    "sha256": "7c19e360b393b3f973737ac46f0b06b75cffee057fd616ae31ddabdad0cb1398",
+    "file": "reports/evidence/cp0/piper_package.txt"
+  },
+  {
+    "id": "piper_repo",
+    "url": "https://api.github.com/repos/OHF-Voice/piper1-gpl/commits/main",
+    "retrieved_at": "2026-09-11T09:39:14.864838+00:00",
+    "resolved_url": "https://api.github.com/repos/OHF-Voice/piper1-gpl/commits/main",
+    "status": "FETCHED",
+    "bytes": 5996,
+    "sha256": "9256872daea882d519d1e1e30770aaa3b954e1d0829dfb6cfe43634913ba8b22",
+    "file": "reports/evidence/cp0/piper_repo.txt"
+  },
+  {
+    "id": "piper_voices_metadata",
+    "url": "https://huggingface.co/api/models/rhasspy/piper-voices",
+    "retrieved_at": "2026-09-11T09:39:15.639807+00:00",
+    "resolved_url": "https://huggingface.co/api/models/rhasspy/piper-voices",
+    "status": "FETCHED",
+    "bytes": 210600,
+    "sha256": "50c3dbdddc6e687ff20622231bc9d5ff2f54dbb40f235811090b34447adf43db",
+    "file": "reports/evidence/cp0/piper_voices_metadata.txt"
+  },
+  {
+    "id": "piper_voices",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json",
+    "retrieved_at": "2026-09-11T09:39:15.775551+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json",
+    "status": "FETCHED",
+    "bytes": 244760,
+    "sha256": "5eecddd4c9804c01d8734eb0005de0b4fb3a8166063084717aae88d85cdeea3e",
+    "file": "reports/evidence/cp0/piper_voices.txt"
+  },
+  {
+    "id": "vais_card",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/main/vi/vi_VN/vais1000/medium/MODEL_CARD",
+    "retrieved_at": "2026-09-11T09:39:16.222960+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/main/vi/vi_VN/vais1000/medium/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 361,
+    "sha256": "302db8a930ffc2b1c2181db26deaf8272116eca2b08b8f80da6375b0a994af7b",
+    "file": "reports/evidence/cp0/vais_card.txt"
+  },
+  {
+    "id": "vivos_card",
+    "url": "https://huggingface.co/rhasspy/piper-voices/raw/main/vi/vi_VN/vivos/x_low/MODEL_CARD",
+    "retrieved_at": "2026-09-11T09:39:16.537624+00:00",
+    "resolved_url": "https://huggingface.co/rhasspy/piper-voices/raw/main/vi/vi_VN/vivos/x_low/MODEL_CARD",
+    "status": "FETCHED",
+    "bytes": 272,
+    "sha256": "175c37c171f7f4a66ee2e37546775cb366bd1e00d027d10b18918b5cc1484c86",
+    "file": "reports/evidence/cp0/vivos_card.txt"
+  },
+  {
+    "id": "coqui_repo",
+    "url": "https://api.github.com/repos/coqui-ai/TTS/commits/dev",
+    "retrieved_at": "2026-09-11T09:39:16.589909+00:00",
+    "resolved_url": "https://api.github.com/repos/coqui-ai/TTS/commits/dev",
+    "status": "FETCHED",
+    "bytes": 4611,
+    "sha256": "482a1d8072dd16f5a8cd3c4fd672d0ae1f5d2d327c5673b78065ad76c5ce4a50",
+    "file": "reports/evidence/cp0/coqui_repo.txt"
+  },
+  {
+    "id": "coqui_readme",
+    "url": "https://raw.githubusercontent.com/coqui-ai/TTS/dev/README.md",
+    "retrieved_at": "2026-09-11T09:39:16.828761+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/coqui-ai/TTS/dev/README.md",
+    "status": "FETCHED",
+    "bytes": 17429,
+    "sha256": "3be56d1fa633aa71947b8f52788ac85a3603f0ad52abad4fe6710d60a5aa8314",
+    "file": "reports/evidence/cp0/coqui_readme.txt"
+  },
+  {
+    "id": "xtts_metadata",
+    "url": "https://huggingface.co/api/models/coqui/XTTS-v2",
+    "retrieved_at": "2026-09-11T09:39:17.098464+00:00",
+    "resolved_url": "https://huggingface.co/api/models/coqui/XTTS-v2",
+    "status": "FETCHED",
+    "bytes": 4062,
+    "sha256": "a3c1db9289aeefbad2aaf08183b3bab727208a0eed2350540461f55fae06defa",
+    "file": "reports/evidence/cp0/xtts_metadata.txt"
+  },
+  {
+    "id": "xtts_license",
+    "url": "https://huggingface.co/coqui/XTTS-v2/raw/main/LICENSE.txt",
+    "retrieved_at": "2026-09-11T09:39:17.421189+00:00",
+    "resolved_url": "https://huggingface.co/coqui/XTTS-v2/raw/main/LICENSE.txt",
+    "status": "FETCHED",
+    "bytes": 4014,
+    "sha256": "190f6d7c19b8984f91b97712b94ce92d2b2e640fc677dacab966e955ece9d043",
+    "file": "reports/evidence/cp0/xtts_license.txt"
+  },
+  {
+    "id": "xtts_readme",
+    "url": "https://huggingface.co/coqui/XTTS-v2/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:39:17.707264+00:00",
+    "resolved_url": "https://huggingface.co/coqui/XTTS-v2/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 4263,
+    "sha256": "1cfa85b3293f685b3a6537f8da3d94820fd111270e553589073885dea3facfb7",
+    "file": "reports/evidence/cp0/xtts_readme.txt"
+  },
+  {
+    "id": "vieneu_repo",
+    "url": "https://api.github.com/repos/pnnbao97/VieNeu-TTS/commits/main",
+    "retrieved_at": "2026-09-11T09:39:17.953425+00:00",
+    "resolved_url": "https://api.github.com/repos/pnnbao97/VieNeu-TTS/commits/main",
+    "status": "FETCHED",
+    "bytes": 5366,
+    "sha256": "b6195f6a92ea228cb2d8774c1cdd8d175058e53c742cad97d49d64b3b5808e92",
+    "file": "reports/evidence/cp0/vieneu_repo.txt"
+  },
+  {
+    "id": "vieneu_readme",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/main/README.md",
+    "retrieved_at": "2026-09-11T09:39:18.006220+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/main/README.md",
+    "status": "FETCHED",
+    "bytes": 26883,
+    "sha256": "91b36ba49c8bb3019e8026cea4122e2a3e1e124ae7243bb772594732a8a37f37",
+    "file": "reports/evidence/cp0/vieneu_readme.txt"
+  },
+  {
+    "id": "vieneu_package",
+    "url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/main/pyproject.toml",
+    "retrieved_at": "2026-09-11T09:39:18.487066+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/pnnbao97/VieNeu-TTS/main/pyproject.toml",
+    "status": "FETCHED",
+    "bytes": 6753,
+    "sha256": "7d7612ba70d99041a4f75c0a23db0148a6016fbf20b9eabcbc9625a9d2d6cc7d",
+    "file": "reports/evidence/cp0/vieneu_package.txt"
+  },
+  {
+    "id": "vieneu_model",
+    "url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS",
+    "retrieved_at": "2026-09-11T09:39:20.189682+00:00",
+    "resolved_url": "https://huggingface.co/api/models/pnnbao-ump/VieNeu-TTS",
+    "status": "FETCHED",
+    "bytes": 1986,
+    "sha256": "6963efc357c5d0ae5a664fff692ef64512167dbc768dafab7815608d64dcd6f4",
+    "file": "reports/evidence/cp0/vieneu_model.txt"
+  },
+  {
+    "id": "vieneu_model_readme",
+    "url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:39:20.483237+00:00",
+    "resolved_url": "https://huggingface.co/pnnbao-ump/VieNeu-TTS/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 8837,
+    "sha256": "54e595983789bd7cafd25a4c9fc18d53adce3e1dfd1450b022a09b927ba809b1",
+    "file": "reports/evidence/cp0/vieneu_model_readme.txt"
+  },
+  {
+    "id": "kokoro_model",
+    "url": "https://huggingface.co/api/models/hexgrad/Kokoro-82M",
+    "retrieved_at": "2026-09-11T09:39:20.691275+00:00",
+    "resolved_url": "https://huggingface.co/api/models/hexgrad/Kokoro-82M",
+    "status": "FETCHED",
+    "bytes": 6212,
+    "sha256": "bfc551b9955b05648b2a98b9785f51a4e2fb5a26f1e3b42637ee0f78323434bf",
+    "file": "reports/evidence/cp0/kokoro_model.txt"
+  },
+  {
+    "id": "kokoro_readme",
+    "url": "https://huggingface.co/hexgrad/Kokoro-82M/raw/main/README.md",
+    "retrieved_at": "2026-09-11T09:39:20.778479+00:00",
+    "resolved_url": "https://huggingface.co/hexgrad/Kokoro-82M/raw/main/README.md",
+    "status": "FETCHED",
+    "bytes": 6348,
+    "sha256": "91dcabced89db6f109b8786642f50402d3ee87450e8189589b6f85520e7f4d78",
+    "file": "reports/evidence/cp0/kokoro_readme.txt"
+  }
+]

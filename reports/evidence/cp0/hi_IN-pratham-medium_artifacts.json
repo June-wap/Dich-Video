@@ -1,0 +1,29 @@
+{
+  "model_id": "hi_IN-pratham-medium",
+  "repository": "rhasspy/piper-voices",
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "artifacts": [
+    {
+      "path": ".cp0/models/piper/hi_IN-pratham-medium/hi_IN-pratham-medium.onnx",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx",
+      "size_bytes": 63516050,
+      "sha256": "169964b0871667f6793416d4b35e97357a68ba1ad01df8580c28048989ee7693",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/hi_IN-pratham-medium/hi_IN-pratham-medium.onnx.json",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/hi/hi_IN/pratham/medium/hi_IN-pratham-medium.onnx.json",
+      "size_bytes": 4970,
+      "sha256": "b68edd2cd7950dd436314013b7cd12e9699e5a3f6fe5af5af94294cf6aa7b9fd",
+      "catalog_md5_match": true
+    },
+    {
+      "path": ".cp0/models/piper/hi_IN-pratham-medium/MODEL_CARD",
+      "url": "https://huggingface.co/rhasspy/piper-voices/resolve/1162a9173d0ce503555aed757976b7a9912eae4c/hi/hi_IN/pratham/medium/MODEL_CARD",
+      "size_bytes": 304,
+      "sha256": "89cf491ea99e69b27c94599cecea3f0fc6aeacb30f4ccdb12897f659868df29e",
+      "catalog_md5_match": true
+    }
+  ],
+  "status": "DOWNLOADED_NOT_PRODUCTION_APPROVED"
+}

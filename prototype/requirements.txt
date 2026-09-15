@@ -1,0 +1,13 @@
+# Historical CP0 legacy-provider snapshot, not the official backend installer.
+# CP0.3B-0: use ../requirements-backend.txt and ../docs/backend_runtime.md.
+# Do not merge this snapshot into the official OmniVoice environment blindly.
+gradio==6.27.0
+sherpa-onnx==1.12.26
+onnxruntime==1.30.0
+vieneu==3.6.4
+pyopenjtalk-plus==0.4.1.post9
+soundfile==0.14.0
+pydub==0.25.1
+psutil==7.2.2
+numpy==2.5.3
+onnx==1.22.0

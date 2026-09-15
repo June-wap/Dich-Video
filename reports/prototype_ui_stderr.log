@@ -1,0 +1,31 @@
+2026-09-12 11:00:46,890 prototype INFO SherpaPiper: 8 languages: ['vi', 'en', 'zh', 'es', 'pt', 'it', 'fr', 'hi']
+2026-09-12 11:00:46,901 prototype INFO Starting Local AI Voice Prototype...
+2026-09-12 11:00:47,739 httpx INFO HTTP Request: GET http://127.0.0.1:7860/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-09-12 11:00:47,913 httpx INFO HTTP Request: HEAD http://127.0.0.1:7860/ "HTTP/1.1 200 OK"
+2026-09-12 11:01:21,307 prototype INFO Loaded Sherpa for vi in 2.46s (sr=22050)
+2026-09-12 11:01:21,696 prototype INFO WAV written: tts_vi_1789185678512.wav (69632 samples, 22050 Hz)
+2026-09-12 11:01:21,862 prototype INFO MP3 exported: tts_vi_1789185678512.mp3
+2026-09-12 11:01:21,864 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185678512.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\tts_vi_1789185678512.mp3", "export_error": null, "load_time": 2.796130500000345, "preparation_time": 0.0, "text_length": 72, "sample_rate": 22050, "duration": 3.158, "gen_time": 0.376, "rtf": 0.119, "provider": "Sherpa-ONNX + Piper VITS", "model": "vi_VN-vais1000-medium", "language": "vi", "voice": "vi_vais1000", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:01:21,864 prototype INFO TTS Sherpa-ONNX + Piper VITS | lang=vi voice=vi_vais1000 | 0.376s gen, 3.158s dur, RTF=0.1190 | PASS
+2026-09-12 11:01:38,805 Vieneu.V3Turbo INFO ⏳ Loading VieNeu-TTS v3 Turbo (ONNX/CPU) from: pnnbao-ump/VieNeu-TTS-v3-Turbo/onnx_update ...
+2026-09-12 11:01:50,345 Vieneu.V3Turbo INFO ✅ VieNeu-TTS v3 Turbo ready (backend=onnx)
+2026-09-12 11:01:50,355 Vieneu.V3Turbo INFO 📢 Loaded 23 preset voices (default: Minh Quân)
+2026-09-12 11:01:50,360 prototype INFO VieNeu loaded in 11.59s (sr=48000)
+2026-09-12 11:01:52,264 prototype INFO WAV written: conv_turn0_1789185698773.wav (88320 samples, 48000 Hz)
+2026-09-12 11:01:52,397 prototype INFO MP3 exported: conv_turn0_1789185698773.mp3
+2026-09-12 11:01:52,398 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn0_1789185698773.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn0_1789185698773.mp3", "export_error": null, "load_time": 11.586200499999904, "preparation_time": 0.0, "text_length": 28, "sample_rate": 48000, "duration": 1.84, "gen_time": 1.901, "rtf": 1.0332, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Trúc Ly", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:01:52,398 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Trúc Ly | 1.901s gen, 1.840s dur, RTF=1.0332 | PASS
+2026-09-12 11:01:53,933 prototype INFO WAV written: conv_turn1_1789185712398.wav (103680 samples, 48000 Hz)
+2026-09-12 11:01:54,063 prototype INFO MP3 exported: conv_turn1_1789185712398.mp3
+2026-09-12 11:01:54,064 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn1_1789185712398.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn1_1789185712398.mp3", "export_error": null, "load_time": 3.499999820633093e-06, "preparation_time": 0.0, "text_length": 31, "sample_rate": 48000, "duration": 2.16, "gen_time": 1.531, "rtf": 0.709, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Minh Đức", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:01:54,064 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Minh Đức | 1.531s gen, 2.160s dur, RTF=0.7090 | PASS
+2026-09-12 11:01:55,746 prototype INFO WAV written: conv_turn2_1789185714065.wav (99840 samples, 48000 Hz)
+2026-09-12 11:01:55,875 prototype INFO MP3 exported: conv_turn2_1789185714065.mp3
+2026-09-12 11:01:55,876 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn2_1789185714065.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn2_1789185714065.mp3", "export_error": null, "load_time": 1.600000359758269e-06, "preparation_time": 0.0, "text_length": 30, "sample_rate": 48000, "duration": 2.08, "gen_time": 1.679, "rtf": 0.8073, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Trúc Ly", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:01:55,877 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Trúc Ly | 1.679s gen, 2.080s dur, RTF=0.8073 | PASS
+2026-09-12 11:01:58,494 prototype INFO WAV written: conv_turn3_1789185715877.wav (130560 samples, 48000 Hz)
+2026-09-12 11:01:58,609 prototype INFO MP3 exported: conv_turn3_1789185715877.mp3
+2026-09-12 11:01:58,610 prototype INFO {"wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn3_1789185715877.wav", "mp3_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\conv_turn3_1789185715877.mp3", "export_error": null, "load_time": 1.2000000424450263e-06, "preparation_time": 0.0, "text_length": 39, "sample_rate": 48000, "duration": 2.72, "gen_time": 2.615, "rtf": 0.9614, "provider": "VieNeu v3 Turbo (Clone)", "model": "VieNeu-TTS-v3-Turbo", "language": "vi", "voice": "vieneu:Minh Đức", "device": "cpu", "error": null, "status": "PASS"}
+2026-09-12 11:01:58,610 prototype INFO TTS VieNeu v3 Turbo (Clone) | lang=vi voice=vieneu:Minh Đức | 2.615s gen, 2.720s dur, RTF=0.9614 | PASS
+2026-09-12 11:01:58,616 prototype INFO Merged 4 segments -> conversation_1789185718611.wav (10.8s)
+2026-09-12 11:01:58,783 prototype INFO MP3 exported: conversation_1789185718611.mp3

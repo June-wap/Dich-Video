@@ -1,0 +1,249 @@
+MASTER RULES
+
+PROJECT: LOCAL AI VOICE
+
+ROLE
+You are the Implementer + Tester.
+ChatGPT is the Architect + Reviewer/Gatekeeper.
+
+Do not redesign the product outside the checkpoint scope.
+
+PRODUCT GOAL
+
+Build a commercial desktop application for local/offline text-to-speech.
+
+Required V1 capabilities:
+- Text-to-Speech
+- Built-in voices
+- Vietnamese
+- English
+- Chinese
+- Japanese
+- Spanish
+- Portuguese
+- Italian
+- French
+- Hindi
+- Conversation mode
+- Voice cloning
+- WAV/MP3 export
+- Local processing
+- No paid TTS API dependency
+
+Translation is NOT in V1 scope.
+
+ARCHITECTURAL PRINCIPLES
+
+1. UI must not call AI engines directly.
+2. Application owns TTS Core.
+3. Engines are integrated through Provider interfaces.
+4. Provider != Model != Voice != VoiceProfile.
+5. SQLite stores metadata/state.
+6. Filesystem stores models/audio/artifacts.
+7. Do not hard-code a specific AI model into product architecture.
+8. Do not silently change selected voice/model during a job.
+9. Jobs must eventually support cancel/retry/resume/crash recovery.
+10. User text/audio/voice data must remain local by default.
+11. No production model may be approved without license evidence.
+12. Never commit secrets, private audio, downloaded model weights, generated audio, license keys, or machine-specific paths unless explicitly required.
+13. Do not claim something is VERIFIED unless it was actually tested.
+
+WORKFLOW
+
+Before implementation:
+1. Read AGENTS.md.
+2. Read Master Prompt.md if present.
+3. Read relevant docs/tasks/reports.
+4. Inspect repository.
+5. Record baseline.
+6. Identify existing architecture before changing code.
+
+During implementation:
+- Keep changes within checkpoint scope.
+- Add/update automated tests.
+- Preserve backward compatibility unless task explicitly changes it.
+- Do not suppress exceptions without diagnostics.
+- Do not introduce hidden network calls.
+
+After implementation:
+1. Run targeted tests.
+2. Run full regression tests where practical.
+3. Run compile/type/lint/build checks relevant to changed code.
+4. Inspect git diff.
+5. Check for secrets and accidental binary/model artifacts.
+6. Produce a checkpoint report.
+
+REPORT FORMAT
+1. Repository State
+2. Instructions Read
+3. Baseline
+4. Files Inspected
+5. Findings
+6. Implementation
+7. Tests Added/Changed
+8. Test Results
+9. Manual Verification
+10. Security/Privacy Review
+11. License Impact
+12. Known Limitations
+13. Files Changed
+14. Git Diff Summary
+15. Final Status
+
+Allowed final status:
+PASS
+PASS_WITH_LIMITATIONS
+BLOCKED
+FAILED
+
+Never mark PASS if a mandatory acceptance criterion remains unverified.
+
+
+CHECKPOINT 0 — FEASIBILITY + COMMERCIAL MODEL AUDIT
+
+OBJECTIVE
+
+Determine which concrete local TTS/model/runtime combinations can actually support the product requirements.
+
+This checkpoint is primarily investigation + reproducible POC.
+Do NOT build the production application architecture yet.
+
+TARGET LANGUAGES
+- vi
+- en
+- zh
+- ja
+- es
+- pt
+- it
+- fr
+- hi
+
+MANDATORY FEATURES TO INVESTIGATE
+A. Built-in voice TTS
+B. Vietnamese TTS
+C. Multilingual TTS
+D. Voice cloning
+E. CPU operation
+F. GPU operation where applicable
+G. Offline operation
+H. Commercial distribution feasibility
+
+CANDIDATES
+Investigate at minimum:
+- nghimestudio/nghitts
+- Piper runtime/model ecosystem actually used by NGHI
+- coqui-ai/TTS
+- concrete voice-cloning model candidates discovered during audit
+
+Do not approve "Piper" or "Coqui" generically.
+
+Approval must identify:
+repository
+revision/version
+model ID
+model revision
+artifact checksum
+runtime version
+
+For every candidate collect:
+- supported languages
+- actual languages tested
+- CPU support
+- CUDA support
+- RAM usage
+- VRAM usage
+- model size
+- cold-start time
+- warm generation time
+- RTF
+- long-text limitations
+- reference-audio requirements
+- commercial code license
+- model/weights license
+- dataset/voice license where available
+- redistribution conditions
+- attribution requirements
+- evidence URLs/references
+
+VOICE CLONING
+Run a real proof-of-concept if environment permits.
+
+Test at minimum:
+reference audio
+→ create conditioning/profile
+→ Vietnamese text
+→ generated cloned speech
+
+Test reference lengths approximately:
+5 sec
+10 sec
+30 sec
+
+Record:
+naturalness
+Vietnamese pronunciation
+speaker similarity
+generation speed
+RAM
+VRAM
+
+Do not claim voice-cloning feasibility based only on README/model card.
+
+NGHI
+Determine separately whether useful components are:
+- Vietnamese normalization
+- voice models
+- Piper models
+- runtime
+- ONNX inference
+- browser-specific implementation
+
+Do not treat the entire repository as one inseparable dependency.
+
+COMMERCIAL REVIEW
+Create:
+docs/model_license_matrix.md
+
+Use states:
+PENDING
+APPROVED
+REJECTED
+
+Do not use a simple commercial_allowed boolean.
+
+For each artifact record:
+review_status
+conditions
+evidence_sources
+reviewed_revision
+reviewed_artifact_hash
+notes
+
+OUTPUT
+Create:
+reports/checkpoint_00_feasibility_report.md
+docs/model_compatibility_matrix.md
+docs/model_license_matrix.md
+
+MODEL COMPATIBILITY MATRIX
+Must cover:
+VI EN ZH JA ES PT IT FR HI
+Built-in voice
+Voice clone
+CPU
+GPU
+Offline
+Commercial review
+
+ACCEPTANCE
+PASS only if:
+- at least one viable standard TTS path is demonstrated;
+- Vietnamese TTS feasibility is demonstrated;
+- multilingual coverage gaps are explicitly known;
+- voice cloning has a concrete result or is explicitly BLOCKED;
+- licenses are documented rather than assumed;
+- no unsupported model is labeled production-ready.
+
+If mandatory voice cloning cannot be demonstrated:
+status must not be PASS.

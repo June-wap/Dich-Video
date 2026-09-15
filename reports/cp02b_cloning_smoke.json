@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "reference_container": "MP4/M4A AAC with .mp3 extension (ffprobe verified)",
+  "runs": [
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02b_vi_clone_1.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 60,
+      "sample_rate": 24000,
+      "duration": 3.43,
+      "gen_time": 281.2878777000001,
+      "rtf": 82.00812760932946,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "vi",
+      "voice": "e2478e08e96740bda8ead940afb23a14",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true
+      }
+    },
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02b_vi_clone_2.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 54,
+      "sample_rate": 24000,
+      "duration": 2.94,
+      "gen_time": 0.9980367999999089,
+      "rtf": 0.3394682993196969,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "vi",
+      "voice": "e2478e08e96740bda8ead940afb23a14",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true
+      }
+    }
+  ],
+  "reference_duration": 4.864,
+  "prompt_creation_count": 1,
+  "model_load_count": 1,
+  "unloaded": true
+}

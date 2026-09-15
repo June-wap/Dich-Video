@@ -1,0 +1,28 @@
+{
+  "model_id": "ja_JA-hi_fi_captain-medium",
+  "python_network_guard": true,
+  "os_firewall_verified": false,
+  "subjective_quality": "NOT VERIFIED",
+  "gpu_inference": "NOT VERIFIED",
+  "runs": [],
+  "runtime": {
+    "piper-tts": "1.8.0",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.5.3"
+  },
+  "available_ort_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "model_load_s": 1.9315065000009781,
+  "import_verify_load_s": 2.2795035999988613,
+  "actual_session_providers": [
+    "CPUExecutionProvider"
+  ],
+  "status": "FAILED",
+  "error": "ModuleNotFoundError: No module named 'pyopenjtalk'",
+  "traceback": "Traceback (most recent call last):\n  File \"D:\\Tool Dich Cho Khach\\scripts\\cp0_benchmark.py\", line 111, in main\n    voice.synthesize_wav(text, stream, syn_config=SynthesisConfig(speaker_id=0))\n  File \"D:\\Tool Dich Cho Khach\\.cp0\\venv\\Lib\\site-packages\\piper\\voice.py\", line 465, in synthesize_wav\n    for audio_chunk in self.synthesize(\n                       ^^^^^^^^^^^^^^^^\n  File \"D:\\Tool Dich Cho Khach\\.cp0\\venv\\Lib\\site-packages\\piper\\voice.py\", line 349, in synthesize\n    sentence_phonemes = self.phonemize(text)\n                        ^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Tool Dich Cho Khach\\.cp0\\venv\\Lib\\site-packages\\piper\\voice.py\", line 243, in phonemize\n    phonemizer = JapanesePhonemizer()\n                 ^^^^^^^^^^^^^^^^^^^^\n  File \"D:\\Tool Dich Cho Khach\\.cp0\\venv\\Lib\\site-packages\\piper\\phonemize_japanese.py\", line 141, in __init__\n    import pyopenjtalk\nModuleNotFoundError: No module named 'pyopenjtalk'\n",
+  "peak_sampled_rss_bytes": 164225024,
+  "windows_peak_working_set_bytes": 165552128
+}

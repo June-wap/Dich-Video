@@ -1,0 +1,107 @@
+{
+  "status": "PASS",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "torch": "2.8.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "capabilities": {
+    "provider_id": "omnivoice",
+    "languages": [
+      "vi",
+      "en",
+      "zh",
+      "ja",
+      "es",
+      "pt",
+      "it",
+      "fr",
+      "hi"
+    ],
+    "verified_languages": [
+      "vi",
+      "en",
+      "zh",
+      "ja",
+      "es",
+      "pt",
+      "it",
+      "fr",
+      "hi"
+    ],
+    "verification_source": "external/OmniVoice/benchmark_results.json",
+    "verification_scope": "Existing CUDA short-TTS baseline; not production certification",
+    "sample_rate": 24000,
+    "channels": 1,
+    "short_tts": true,
+    "voice_cloning": false,
+    "long_text": false,
+    "voice_selection": "auto",
+    "cpu_verified": false,
+    "production_ready": false
+  },
+  "runs": [
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02a_vi_1.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 56,
+      "sample_rate": 24000,
+      "duration": 3.46,
+      "gen_time": 8.367274099997303,
+      "rtf": 2.4182873121379487,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "vi",
+      "voice": "omnivoice_auto",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true
+      }
+    },
+    {
+      "wav_path": "D:\\Tool Dich Cho Khach\\prototype\\outputs\\cp02a_vi_2.wav",
+      "mp3_path": null,
+      "export_error": null,
+      "load_time": 0.0,
+      "preparation_time": 0.0,
+      "text_length": 51,
+      "sample_rate": 24000,
+      "duration": 3.01,
+      "gen_time": 4.9281450000016775,
+      "rtf": 1.637257475083614,
+      "provider": "omnivoice",
+      "model": "k2-fsa/OmniVoice",
+      "language": "vi",
+      "voice": "omnivoice_auto",
+      "device": "cuda:0",
+      "error": null,
+      "status": "PASS",
+      "metadata": {
+        "num_step": 16,
+        "channels": 1,
+        "dtype": "float32",
+        "load_count": 1,
+        "cpu_verified": false,
+        "model_reused": true
+      }
+    }
+  ],
+  "loaded_health": {
+    "provider": "omnivoice",
+    "model_path": "k2-fsa/OmniVoice",
+    "device": "cuda:0",
+    "loaded": true,
+    "status": "LOADED",
+    "load_count": 1,
+    "cpu_verified": false
+  },
+  "unload": "PASS"
+}

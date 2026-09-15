@@ -1,0 +1,433 @@
+2026-09-12 11:02:48,295 prototype INFO SherpaPiper: 8 languages: ['vi', 'en', 'zh', 'es', 'pt', 'it', 'fr', 'hi']
+prepare start
+2026-09-12 11:02:48,339 Vieneu.V3Turbo INFO ⏳ Loading VieNeu-TTS v3 Turbo (ONNX/CPU) from: pnnbao-ump/VieNeu-TTS-v3-Turbo/onnx_update ...
+2026-09-12 11:03:00,443 Vieneu.V3Turbo INFO ✅ VieNeu-TTS v3 Turbo ready (backend=onnx)
+2026-09-12 11:03:00,452 Vieneu.V3Turbo INFO 📢 Loaded 23 preset voices (default: Minh Quân)
+2026-09-12 11:03:00,454 prototype INFO VieNeu loaded in 12.15s (sr=48000)
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 251 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 263 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 263 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 263 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 263 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 262 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 257 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 256 in _mkstemp_inner
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\tempfile.py", line 357 in mkstemp
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 96 in _preclean_reference_audio
+  File "D:\Tool Dich Cho Khach\.cp0\venv\Lib\site-packages\vieneu\v3turbo.py", line 267 in encode_reference
+  File "D:\Tool Dich Cho Khach\prototype\providers\voice_clone.py", line 88 in prepare_voice_profile
+  File "D:\Tool Dich Cho Khach\prototype\core\tts_manager.py", line 112 in prepare_clone_profile
+  File "<string>", line 1 in <module>
+Timeout (0:00:40)!
+Thread 0x000005e0 (most recent call first):
+  File "C:\Users\GIGABUYTE\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\random.py", line 467 in choices
+  File 

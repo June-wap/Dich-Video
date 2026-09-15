@@ -1,0 +1,27 @@
+{
+  "model_id": "ja_JA-hi_fi_captain-medium",
+  "python_network_guard": true,
+  "os_firewall_verified": false,
+  "subjective_quality": "NOT VERIFIED",
+  "gpu_inference": "NOT VERIFIED",
+  "runs": [],
+  "runtime": {
+    "piper-tts": "1.8.0",
+    "onnxruntime": "1.30.0",
+    "numpy": "2.5.3"
+  },
+  "available_ort_providers": [
+    "AzureExecutionProvider",
+    "CPUExecutionProvider"
+  ],
+  "revision": "1162a9173d0ce503555aed757976b7a9912eae4c",
+  "model_load_s": 1.8541384999989532,
+  "import_verify_load_s": 2.409998800001631,
+  "actual_session_providers": [
+    "CPUExecutionProvider"
+  ],
+  "status": "FAILED",
+  "error": "Error: # channels not specified",
+  "peak_sampled_rss_bytes": 163876864,
+  "windows_peak_working_set_bytes": 165318656
+}

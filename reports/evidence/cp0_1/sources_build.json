@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sherpa_espeak_build",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/cmake/espeak-ng-for-piper.cmake",
+    "retrieved_at": "2026-09-11T16:23:42.102706+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/cmake/espeak-ng-for-piper.cmake",
+    "status": "FETCHED",
+    "bytes": 3801,
+    "sha256": "44c91da8824302d5e7dd454119c6e644af8afede823b343b7e15536752d919d6",
+    "file": "reports/evidence/cp0_1/sherpa_espeak_build.txt"
+  },
+  {
+    "id": "sherpa_piper_build",
+    "url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/cmake/piper-phonemize.cmake",
+    "retrieved_at": "2026-09-11T16:23:42.633938+00:00",
+    "resolved_url": "https://raw.githubusercontent.com/k2-fsa/sherpa-onnx/v1.12.26/cmake/piper-phonemize.cmake",
+    "status": "FETCHED",
+    "bytes": 2679,
+    "sha256": "20b00c6e51cb6f5cf70d1f6ffbbe7b695a03fdd05935189d479d9dfd4d6ff738",
+    "file": "reports/evidence/cp0_1/sherpa_piper_build.txt"
+  }
+]

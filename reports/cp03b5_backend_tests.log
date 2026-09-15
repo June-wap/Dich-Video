@@ -1,0 +1,18 @@
+........................................................................ [ 49%]
+........................................................................ [ 99%]
+.                                                                        [100%]
+============================== warnings summary ===============================
+external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+backend/tests/test_long_form.py::test_create_order_identity_merge_and_artifact
+  D:\Tool Dich Cho Khach\external\OmniVoice\.venv312\Lib\site-packages\pydub\utils.py:14: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+145 passed, 3 warnings in 9.20s

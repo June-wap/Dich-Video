@@ -1,0 +1,45 @@
+INFO:     Started server process [21028]
+INFO:     Waiting for application startup.
+2026-09-14 14:15:55,466 INFO backend.lifecycle backend_start version=0.3.0-dev
+INFO:     Application startup complete.
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-09-14 14:16:13,421 INFO backend.lifecycle backend_stop
+INFO:     Application shutdown complete.
+INFO:     Finished server process [21028]
+{
+  "status": "PASS",
+  "python": "3.12.10",
+  "interpreter": "D:\\Tool Dich Cho Khach\\external\\OmniVoice\\.venv312\\Scripts\\python.exe",
+  "fastapi": "0.141.1",
+  "uvicorn": "0.52.4",
+  "startup_no_ai_imports": true,
+  "health": {
+    "status": "ok",
+    "service": "local-ai-voice-api",
+    "version": "0.3.0-dev"
+  },
+  "health_no_ai_imports": true,
+  "system": {
+    "status": "ready",
+    "python_version": "3.12.10",
+    "torch_version": "2.8.0+cu128",
+    "cuda_available": true,
+    "gpu_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "omnivoice_available": true,
+    "omnivoice_model_loaded": false,
+    "audio": {
+      "sample_rate": 24000,
+      "channels": 1
+    },
+    "runtime_mode": "local"
+  },
+  "openapi_paths": [
+    "/api/health",
+    "/api/system/status"
+  ],
+  "cuda_allocated_bytes": 0,
+  "no_provider_or_manager_imports": true,
+  "server_stopped": true,
+  "service_released": true
+}

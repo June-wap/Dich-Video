@@ -1,0 +1,1052 @@
+LOCAL AI VOICE — PROJECT RULES
+Version: 1.0
+
+============================================================
+1. PURPOSE
+============================================================
+
+This file defines mandatory rules for every AI Agent, developer, reviewer,
+and checkpoint working on the Local AI Voice project.
+
+Read this file BEFORE:
+- analyzing the repository;
+- designing a solution;
+- modifying code;
+- running migrations;
+- adding dependencies;
+- integrating models;
+- changing architecture;
+- producing a checkpoint report.
+
+If a checkpoint task conflicts with these rules, STOP and report the conflict.
+Do not silently override project rules.
+
+
+============================================================
+2. PRODUCT SCOPE
+============================================================
+
+The product is a commercial desktop application for LOCAL/OFFLINE
+text-to-speech.
+
+V1 REQUIRED CAPABILITIES:
+
+- Text-to-Speech
+- Built-in voices
+- Vietnamese
+- English
+- Chinese
+- Japanese
+- Spanish
+- Portuguese
+- Italian
+- French
+- Hindi
+- Conversation mode
+- Voice cloning
+- WAV export
+- MP3 export
+- Local processing
+- Model/voice management
+- Job/history management
+
+V1 DOES NOT INCLUDE:
+
+- Automatic translation
+- Speech-to-Text
+- Video dubbing
+- AI script writing
+- Cloud TTS as a required dependency
+- Paid TTS API dependency
+
+Do not add out-of-scope features unless explicitly approved.
+
+
+============================================================
+3. DEVELOPMENT ROLES
+============================================================
+
+ChatGPT:
+- Architect
+- Planner
+- Reviewer
+- Gatekeeper
+
+Codex / AI Agent:
+- Repository investigator
+- Implementer
+- Tester
+- Fixer
+- Report author
+
+Required workflow:
+
+User Requirement
+      ↓
+ChatGPT Analysis
+      ↓
+Architecture / Task / Test Plan
+      ↓
+Codex / AI Agent
+      ↓
+Read Repository
+      ↓
+Implement
+      ↓
+Run Tests
+      ↓
+Fix
+      ↓
+Inspect Git Diff
+      ↓
+Produce Report
+      ↓
+ChatGPT Review
+      ↓
+PASS / FIX / BLOCKED
+
+The implementation agent must not declare a checkpoint approved for the
+project. It reports evidence. The reviewer/gatekeeper decides acceptance.
+
+
+============================================================
+4. CHECKPOINT GOVERNANCE
+============================================================
+
+Checkpoints must be executed sequentially unless explicitly authorized.
+
+Do NOT implement future checkpoint features early merely because they are
+convenient.
+
+Before starting a checkpoint:
+
+1. Read RULES.txt.
+2. Read AGENTS.md if present.
+3. Read Master Prompt.md if present.
+4. Read the current checkpoint task.
+5. Read relevant previous checkpoint reports.
+6. Inspect repository state.
+7. Record baseline tests/build status.
+8. Identify affected architecture.
+
+A checkpoint must not be marked PASS if a mandatory acceptance criterion is
+unverified.
+
+Allowed implementation report states:
+
+PASS
+PASS_WITH_LIMITATIONS
+BLOCKED
+FAILED
+
+"Not tested", "assumed", "should work", and README claims are not verification.
+
+
+============================================================
+5. ARCHITECTURAL INVARIANTS
+============================================================
+
+The application owns the architecture.
+
+AI engines/models are replaceable implementation components.
+
+Required architecture:
+
+Desktop UI
+    ↓
+Local Application/API Layer
+    ↓
+TTS Core
+    ↓
+Provider Registry / Router
+    ↓
+Provider Adapters
+    ↓
+Concrete Runtime + Model
+    ↓
+Audio Pipeline
+
+MANDATORY:
+
+1. UI must NOT call Piper, Coqui, ONNX, PyTorch, or any AI model directly.
+2. AI engines must be integrated through provider contracts.
+3. Provider, Model, Voice, and VoiceProfile are different domain concepts.
+4. Do not hard-code the product around one AI model.
+5. SQLite stores metadata and durable state.
+6. Filesystem stores large artifacts such as models and audio.
+7. Long-running AI work must not block the UI thread.
+8. Provider-specific behavior must not leak unnecessarily into UI/business logic.
+9. Model replacement must not require redesigning the entire application.
+10. Translation must remain outside V1 TTS architecture unless explicitly approved.
+
+
+============================================================
+6. PROVIDER RULES
+============================================================
+
+A provider represents an engine/runtime adapter.
+
+Examples may include:
+- NGHI/Piper-related provider
+- Coqui-related provider
+- Dedicated voice-cloning provider
+- Future provider
+
+Do not assume any named framework is automatically approved.
+
+Provider contracts should support capabilities rather than fake unsupported
+features.
+
+Typical capabilities:
+
+- supported languages
+- fixed voices
+- multi-speaker
+- voice cloning
+- CPU
+- CUDA/GPU
+- streaming
+- speed control
+- model loading/unloading
+
+A fixed-voice provider must not pretend to support cloning.
+
+Provider errors must be structured and diagnosable.
+
+
+============================================================
+7. MODEL / VOICE / PROFILE RULES
+============================================================
+
+Provider != Model != Voice != VoiceProfile.
+
+Provider:
+runtime/engine adapter.
+
+Model:
+specific weights/configuration/revision.
+
+Voice:
+user-selectable speaking identity available from a model/provider.
+
+VoiceProfile:
+user-created or provider-specific conditioning data used for cloning.
+
+Never approve "Coqui", "Piper", or another framework generically for production.
+
+Production approval must identify concrete artifacts, including where
+applicable:
+
+- repository/source
+- runtime version
+- model ID
+- model revision
+- artifact hash/checksum
+- license review status
+
+
+============================================================
+8. ROUTING RULES
+============================================================
+
+The user's selected voice identity must never be silently replaced.
+
+Routing should conceptually follow:
+
+Selected Voice / VoiceProfile
+        ↓
+Compatible Model
+        ↓
+Language / Feature Requirements
+        ↓
+Available Runtime / Hardware
+        ↓
+Quality Settings
+        ↓
+Locked Execution Configuration
+
+Once a job begins, create an immutable execution snapshot.
+
+Do not silently switch voice/model/provider between chunks.
+
+Fallback is allowed only when it preserves the user's requested identity and
+the product contract explicitly permits the fallback.
+
+If identity cannot be preserved, fail clearly instead of silently changing it.
+
+
+============================================================
+9. TARGET LANGUAGES
+============================================================
+
+V1 target languages:
+
+vi — Vietnamese
+en — English
+zh — Chinese
+ja — Japanese
+es — Spanish
+pt — Portuguese
+it — Italian
+fr — French
+hi — Hindi
+
+Multi-language TTS does NOT mean automatic translation.
+
+Example:
+
+English text
+→ English voice
+→ English audio
+
+The application must not silently translate user text.
+
+Unsupported language/model combinations must be shown explicitly.
+
+
+============================================================
+10. VIETNAMESE TEXT PROCESSING
+============================================================
+
+Vietnamese preprocessing is a first-class component.
+
+It should be versioned and independently testable.
+
+Consider:
+
+- Unicode normalization
+- numbers
+- dates
+- time
+- currency
+- percentages
+- decimals
+- phone numbers
+- units
+- ranges
+- Roman numerals
+- abbreviations
+- punctuation
+- mixed Vietnamese/English text
+
+Do not perform destructive normalization without preserving the original text.
+
+Persist where relevant:
+
+original_text
+normalized_text
+normalizer_version
+
+Protect special expressions before generic transformations when necessary.
+
+
+============================================================
+11. VOICE CLONING RULES
+============================================================
+
+Voice cloning is a required product capability but must remain provider-driven.
+
+Do NOT assume every cloning model uses:
+
+reference_audio → speaker_embedding
+
+A provider may require:
+
+- one or more reference audio files
+- reference transcript
+- speaker embedding
+- acoustic tokens
+- conditioning latents
+- other provider-specific artifacts
+
+VoiceProfile must therefore support provider-specific conditioning artifacts.
+
+Before creating a profile, validate reference audio as appropriate:
+
+- readable file
+- supported format
+- duration
+- speech presence
+- silence
+- clipping
+- noise
+- multiple speakers
+- engine-specific limits
+
+Separate:
+
+BLOCKING ERROR
+WARNING
+RECOMMENDATION
+
+Do not reject usable samples merely because they are not ideal unless the
+engine or product requirement makes the issue blocking.
+
+
+============================================================
+12. VOICE CONSENT AND SAFETY
+============================================================
+
+Voice cloning requires explicit user confirmation that they have permission
+to use the supplied voice.
+
+Persist a consent record with suitable metadata, such as:
+
+- consent text/version
+- confirmation timestamp
+- reference hash
+- related VoiceProfile
+
+Do not ship cloned celebrity/public-figure voices unless commercial and legal
+rights have been explicitly established.
+
+Do not infer that an open-source code license grants rights to a person's
+voice or the dataset used to create a voice model.
+
+
+============================================================
+13. COMMERCIAL LICENSE RULES
+============================================================
+
+This is a commercial product.
+
+Code license, runtime license, model license, dataset license, and voice rights
+must be reviewed separately.
+
+Do not assume:
+
+open source code
+=
+commercially distributable model/voice.
+
+License review states:
+
+PENDING
+APPROVED
+REJECTED
+
+Production catalog must not contain PENDING or REJECTED artifacts.
+
+For reviewed artifacts record where applicable:
+
+- review status
+- conditions
+- evidence source
+- reviewed revision
+- artifact hash
+- attribution requirement
+- redistribution requirement
+- notes
+
+Do not claim that process separation automatically resolves copyleft or other
+license obligations.
+
+If license evidence is incomplete, report it as incomplete.
+
+
+============================================================
+14. LOCAL / OFFLINE REQUIREMENTS
+============================================================
+
+Core TTS features must work locally after required models are installed.
+
+Core user data should remain on the device by default:
+
+- text
+- scripts
+- voice references
+- cloned voice artifacts
+- generated audio
+- projects
+- history
+
+Network access may be used only for explicitly designed features such as:
+
+- model download/update
+- application update
+- software activation
+
+Libraries must not silently download runtime/model dependencies during offline
+inference.
+
+Offline claims require testing with network access blocked.
+
+
+============================================================
+15. DATABASE RULES
+============================================================
+
+Use SQLite for local durable metadata/state unless architecture is explicitly
+changed.
+
+Do NOT store large model or audio binaries directly in SQLite.
+
+Filesystem:
+- model weights
+- voice reference files
+- conditioning artifacts
+- temporary audio
+- generated audio
+
+SQLite:
+- metadata
+- paths
+- hashes
+- state
+- relationships
+- job progress
+- history
+
+Use schema migrations.
+
+Use foreign keys and indexes where appropriate.
+
+Do not rely only on boolean model state such as installed=true.
+
+Model lifecycle should support states such as:
+
+NOT_INSTALLED
+DOWNLOADING
+VERIFYING
+INSTALLED
+BROKEN
+
+
+============================================================
+16. JOB ENGINE RULES
+============================================================
+
+TTS generation must be represented as durable jobs.
+
+Expected states may include:
+
+QUEUED
+PREPROCESSING
+LOADING_MODEL
+GENERATING
+MERGING_AUDIO
+EXPORTING
+CANCELLING
+CANCELLED
+INTERRUPTED
+FAILED
+COMPLETED
+
+Define allowed transitions.
+
+Do not perform long-running generation directly in request/UI handlers.
+
+Jobs should support where applicable:
+
+- progress
+- cancellation
+- retry
+- resume
+- crash recovery
+
+
+============================================================
+17. CHUNKING RULES
+============================================================
+
+Long text must be chunked safely.
+
+Do not split solely by fixed character count.
+
+Prefer:
+
+paragraph
+→ sentence
+→ clause/word fallback
+
+Respect provider-specific limits such as:
+
+- characters
+- tokens
+- phonemes
+- model context limits
+
+Persist chunk state.
+
+A chunk should have enough metadata for deterministic resume, including where
+applicable:
+
+- chunk index
+- source range
+- normalized text
+- input hash
+- status
+- attempt count
+- artifact path
+- artifact checksum
+- duration
+- error
+- timestamps
+
+Never unnecessarily regenerate completed chunks.
+
+
+============================================================
+18. EXECUTION SNAPSHOT / REPRODUCIBILITY
+============================================================
+
+A job must record the configuration needed to understand/reproduce its output.
+
+Persist where applicable:
+
+- provider version
+- model ID/revision
+- voice revision
+- VoiceProfile revision
+- normalizer version
+- chunker version
+- generation parameters
+- audio parameters
+- random seed if supported
+
+Completed chunks may be reused only when their execution fingerprint remains
+compatible.
+
+A model update must not silently alter an interrupted job.
+
+
+============================================================
+19. CONVERSATION MODE RULES
+============================================================
+
+Conversation mode is scripted multi-speaker TTS, not translation.
+
+Each turn should identify:
+
+- order
+- speaker
+- voice or VoiceProfile
+- language
+- text
+- pause/timing
+- allowed generation parameters
+
+Different turns may use different languages if compatible voices/providers
+exist.
+
+Generation may run concurrently internally, but final output ordering must be
+deterministic.
+
+A failed turn must be traceable to its conversation and turn index.
+
+
+============================================================
+20. AUDIO PIPELINE RULES
+============================================================
+
+Audio processing must be deterministic and recoverable.
+
+Conceptual pipeline:
+
+TTS Segments
+→ Validate
+→ Standardize when needed
+→ Boundary/Pause Processing
+→ Ordered Merge
+→ Whole-program Loudness Processing
+→ Encode
+→ Validate Output
+
+Required V1 formats:
+
+WAV
+MP3
+
+Do not claim that upsampling increases source quality.
+
+Do not regenerate TTS merely because MP3 encoding failed if valid intermediate
+audio remains available.
+
+Temporary output should use safe write patterns such as:
+
+temporary file
+→ close
+→ validate
+→ atomic rename where possible
+→ database update
+
+
+============================================================
+21. MODEL MANAGER RULES
+============================================================
+
+Model installation must be transactional.
+
+Conceptual flow:
+
+Download
+→ Staging
+→ Verify
+→ Safe Extract
+→ Validate Required Artifacts
+→ Load Test
+→ Activate
+→ Database Update
+
+On failure:
+rollback or retain a clearly recoverable staging state.
+
+Prevent archive path traversal.
+
+Verify required artifact hashes.
+
+A SHA256 hash proves integrity against a known trusted hash; it does not by
+itself prove authenticity of an untrusted manifest.
+
+Do not delete a model revision still referenced by jobs or VoiceProfiles.
+
+
+============================================================
+22. HARDWARE RULES
+============================================================
+
+The application should detect relevant local hardware without assuming GPU
+availability.
+
+Support CPU-first operation where the selected model allows it.
+
+GPU acceleration is optional unless a specific approved feature/model requires
+it.
+
+Do not advertise unsupported hardware paths.
+
+Where relevant detect:
+
+- CPU
+- RAM
+- NVIDIA GPU
+- CUDA availability
+- VRAM
+
+Hardware routing must never override voice identity silently.
+
+
+============================================================
+23. LOCAL API SECURITY
+============================================================
+
+If a local HTTP API is used:
+
+- bind to 127.0.0.1 / localhost by default;
+- do not expose 0.0.0.0 by default;
+- use a per-session authentication mechanism;
+- validate Host/Origin where applicable;
+- restrict CORS;
+- limit request/upload sizes;
+- use safe artifact identifiers;
+- prevent path traversal;
+- never build shell commands directly from user input.
+
+Treat localhost as a network boundary, not as automatically trusted.
+
+
+============================================================
+24. FILESYSTEM SAFETY
+============================================================
+
+Never trust user-provided filenames or archive paths.
+
+Prevent:
+
+../
+absolute path escape
+drive escape
+unsafe symlink behavior where relevant
+
+Use application-controlled directories.
+
+Do not overwrite arbitrary user files.
+
+Use collision-safe output naming.
+
+Test paths containing Vietnamese and Unicode characters.
+
+
+============================================================
+25. PRIVACY AND LOGGING
+============================================================
+
+Do not unnecessarily log:
+
+- full user scripts
+- voice samples
+- cloned conditioning data
+- authentication/session tokens
+- software license secrets
+- sensitive local paths
+
+Logs should contain enough diagnostic information to debug failures without
+leaking user content.
+
+No telemetry/network reporting should be added without explicit product
+approval.
+
+
+============================================================
+26. SECRETS
+============================================================
+
+Never commit:
+
+- API keys
+- tokens
+- passwords
+- private keys
+- activation secrets
+- customer data
+- personal voice samples
+
+Use environment/configuration mechanisms appropriate to the project.
+
+If a secret is discovered in repository history/current files, report it.
+Do not reproduce it unnecessarily in reports.
+
+
+============================================================
+27. DEPENDENCY RULES
+============================================================
+
+Do not add dependencies casually.
+
+Before adding a dependency evaluate:
+
+- purpose
+- maintenance status
+- license
+- binary size
+- transitive dependencies
+- Windows compatibility
+- offline behavior
+- packaging impact
+- security impact
+
+Prefer minimal runtime dependencies.
+
+Do not install an entire AI ecosystem if only a small runtime subset is needed.
+
+
+============================================================
+28. TESTING RULES
+============================================================
+
+Every checkpoint must add/update tests appropriate to its scope.
+
+Testing layers may include:
+
+- unit
+- integration
+- provider contract
+- database
+- API
+- audio
+- UI
+- packaging
+- manual verification
+
+Do not replace real provider verification entirely with mocks.
+
+Mocks are for deterministic contract tests.
+
+Real model tests are required when claiming actual TTS/model feasibility.
+
+When environment prevents live verification, state:
+
+NOT VERIFIED
+
+and explain why.
+
+
+============================================================
+29. BASELINE / REGRESSION RULES
+============================================================
+
+Before changing code:
+
+- run relevant baseline tests when practical;
+- record failures that already exist;
+- distinguish pre-existing failures from regressions.
+
+After implementation:
+
+- run targeted tests;
+- run broader regression suite where practical;
+- run compile/type/lint/build checks relevant to changed files.
+
+Do not hide failing tests.
+
+Do not delete tests merely to obtain a green result.
+
+
+============================================================
+30. ERROR HANDLING
+============================================================
+
+Do not swallow exceptions.
+
+Errors should be structured where appropriate.
+
+Provider errors should include useful fields such as:
+
+code
+message
+retryable
+provider
+model
+recovery_hint
+
+User-facing messages should be understandable.
+
+Internal diagnostics should preserve enough context to investigate the failure.
+
+Do not expose stack traces or sensitive internal information to ordinary users.
+
+
+============================================================
+31. GIT RULES
+============================================================
+
+Before implementation:
+
+- inspect git status;
+- identify branch/commit when repository supports Git.
+
+During work:
+
+- keep scope focused;
+- do not modify unrelated files;
+- do not commit generated models/audio;
+- do not rewrite Git history;
+- do not force-push;
+- do not delete unrelated user changes.
+
+After work:
+
+- inspect git status;
+- inspect git diff;
+- check accidental binaries;
+- check secrets;
+- summarize changed files.
+
+If the workspace is not a Git repository, report:
+
+NOT A GIT REPOSITORY
+
+Do not fabricate diff/commit information.
+
+
+============================================================
+32. REPORTING RULES
+============================================================
+
+Every checkpoint report should contain:
+
+1. Repository State
+2. Instructions Read
+3. Baseline
+4. Files Inspected
+5. Findings
+6. Implementation
+7. Tests Added/Changed
+8. Test Results
+9. Manual Verification
+10. Security/Privacy Review
+11. License Impact
+12. Known Limitations
+13. Files Changed
+14. Git Diff Summary
+15. Final Status
+
+Claims must be evidence-based.
+
+Use:
+
+VERIFIED
+NOT VERIFIED
+BLOCKED
+
+precisely.
+
+
+============================================================
+33. PASS / BLOCKED POLICY
+============================================================
+
+PASS:
+All mandatory acceptance criteria have evidence.
+
+PASS_WITH_LIMITATIONS:
+Core checkpoint objective works, and remaining limitations are explicitly
+non-blocking under the checkpoint contract.
+
+BLOCKED:
+A required dependency, decision, license, environment, model capability, or
+mandatory verification prevents completion.
+
+FAILED:
+Implementation/testing demonstrates the checkpoint solution does not satisfy
+its requirements.
+
+Never convert BLOCKED into PASS by documenting the missing requirement.
+
+
+============================================================
+34. PRODUCTION RELEASE RULES
+============================================================
+
+A production release requires all relevant gates to pass.
+
+At minimum verify:
+
+- approved production models/artifacts
+- approved licenses
+- target language behavior
+- voice identity consistency
+- voice cloning where promised
+- offline operation
+- clean Windows packaging
+- WAV/MP3 output
+- job cancellation/recovery
+- security tests
+- privacy expectations
+- model integrity
+- installer lifecycle
+- regression suite
+
+Do not label the application production-ready based only on successful
+development-machine execution.
+
+
+============================================================
+35. FINAL PROJECT PRINCIPLE
+============================================================
+
+The product must own its architecture.
+
+Models are replaceable.
+
+Providers are replaceable.
+
+User voice identity must remain stable.
+
+User data stays local by default.
+
+Commercial/license evidence is mandatory.
+
+Verification must be real.
+
+Do not optimize for "it works on my machine."
+
+Optimize for:
+
+RELIABLE
+OFFLINE
+MAINTAINABLE
+COMMERCIAL-SAFE
+TESTABLE
+REPLACEABLE
+USER-FRIENDLY
