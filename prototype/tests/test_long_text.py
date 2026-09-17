@@ -483,3 +483,218 @@ def test_chunk_indexes_are_contiguous():
     ] == list(
         range(len(chunks))
     )
+
+# ============================================================
+# CP0.4-1 REGRESSION: minimum-length / short-orphan-fragment defects
+# ============================================================
+#
+# Two confirmed, reproducible real-world content-fidelity defects found via
+# CP0.4-1's benchmark of the one-sentence (100/160/1) chunk config against
+# long_audio_stability_test_vi.txt on real GPU hardware, with independent
+# human listening review:
+#
+#   - chunk 91: split_long_sentence()'s old greedy hard-split fallback left
+#     a 6-char orphan tail ("chỉnh.", split out of the compound word "hoàn
+#     chỉnh") which crashed generation outright in one of five runs.
+#   - chunk 5: a naturally short 9-char section header ("PHẦN MỘT.") shipped
+#     as its own standalone chunk and was confirmed (by listening to the
+#     isolated, pre-merge chunk file) to have missing/mispronounced content
+#     at the raw inference stage, in every completed run.
+#
+# Fix scope (both additive, off by default, LONG_FORM_CHUNK_CONFIG /
+# production untouched):
+#   1. split_long_sentence()'s hard-split fallback now balances cut points
+#      instead of greedily filling to max_chars, so it never leaves a tiny
+#      orphan tail -- this fires unconditionally, with no new config needed.
+#   2. ChunkingConfig gained an opt-in `min_chars` field (default 0 =
+#      disabled). When set, build_chunks() merges any fragment shorter than
+#      min_chars into an adjacent one rather than emitting it standalone,
+#      as long as the merge does not exceed max_chars.
+
+
+def _long_sentence_ending_in_hoan_chinh(max_chars: int) -> str:
+    """
+    Reproduces the exact shape of the real corpus sentence that produced
+    chunk 91: a long run of filler words ending in the compound word
+    "hoàn chỉnh", sized so the OLD greedy hard-split algorithm's cutoff
+    (rfind(" ", 0, max_chars + 1)) lands in the space between "hoàn" and
+    "chỉnh.", leaving "chỉnh." (6 chars) as an isolated trailing piece.
+    """
+    filler = "một " * 38
+    return (filler + "hoàn chỉnh.").strip()
+
+
+def test_hoan_chinh_hard_split_no_longer_produces_tiny_orphan_tail():
+    sentence = _long_sentence_ending_in_hoan_chinh(160)
+    assert len(sentence) > 160  # precondition: must actually force a hard split
+
+    pieces = split_long_sentence(sentence, max_chars=160)
+
+    assert len(pieces) > 1
+
+    for piece in pieces:
+        assert len(piece) <= 160
+
+    # The specific historical defect: "chỉnh." must never end up alone.
+    assert "chỉnh." not in pieces
+    assert not any(piece.strip() == "chỉnh." for piece in pieces)
+
+    # "hoàn" and "chỉnh." must stay in the same piece (they are one
+    # compound word/unit) rather than being split across two pieces.
+    hoan_piece = next(p for p in pieces if "hoàn" in p)
+    assert "chỉnh." in hoan_piece
+
+    # General robustness bound: no piece should be disproportionately
+    # small relative to the others (the actual root cause was an
+    # unbalanced split, not the word boundary itself).
+    lengths = [len(p) for p in pieces]
+    assert min(lengths) >= 0.4 * max(lengths)
+
+
+def test_hard_split_balances_piece_sizes_generally():
+    # A second, independent case: total length just over 2x max_chars,
+    # so a naive greedy fill would produce one near-full piece and one
+    # near-empty piece; balancing should produce two similarly sized ones.
+    sentence = ("từ " * 55 + "kết thúc.").strip()
+    max_chars = 160
+    assert max_chars < len(sentence) <= 2 * max_chars
+
+    pieces = split_long_sentence(sentence, max_chars=max_chars)
+
+    assert len(pieces) == 2
+    for piece in pieces:
+        assert len(piece) <= max_chars
+
+    lengths = [len(p) for p in pieces]
+    assert min(lengths) >= 0.6 * max(lengths)
+
+
+def test_long_sentence_hard_fallback_still_never_exceeds_limit_no_whitespace():
+    # Must still hold for text with no word boundaries at all (unchanged
+    # from test_long_sentence_hard_fallback_never_exceeds_limit above) --
+    # the balanced splitter must fall back to a pure hard cut in this case.
+    sentence = "a" * 1000
+
+    parts = split_long_sentence(sentence, max_chars=100)
+
+    assert len(parts) == 10
+    for part in parts:
+        assert len(part) <= 100
+
+
+def test_min_chars_disabled_by_default_preserves_old_behavior():
+    # Precondition / documents the bug: with min_chars at its default (0,
+    # disabled), a short header still ships standalone -- this test exists
+    # so a future change to the default is a deliberate, visible decision.
+    text = (
+        "PHẦN MỘT. "
+        "Chương này giới thiệu tổng quan về hệ thống và các thành phần "
+        "chính được sử dụng trong toàn bộ tài liệu."
+    )
+
+    config = ChunkingConfig(target_chars=100, max_chars=160, max_sentences_per_chunk=1)
+    chunks = build_chunks(text, config)
+
+    assert config.min_chars == 0
+    assert chunks[0].text == "PHẦN MỘT."
+
+
+def test_short_header_merges_into_next_sentence_when_min_chars_enabled():
+    text = (
+        "PHẦN MỘT. "
+        "Chương này giới thiệu tổng quan về hệ thống và các thành phần "
+        "chính được sử dụng trong toàn bộ tài liệu."
+    )
+
+    config = ChunkingConfig(
+        target_chars=100,
+        max_chars=160,
+        max_sentences_per_chunk=1,
+        min_chars=25,
+    )
+
+    chunks = build_chunks(text, config)
+
+    # No chunk below the configured minimum, when a legal merge exists.
+    assert all(len(c.text) >= config.min_chars for c in chunks)
+
+    # The header text is preserved, merged into the following chunk
+    # (never dropped, never standalone).
+    assert chunks[0].text.startswith("PHẦN MỘT.")
+    assert "Chương này" in chunks[0].text
+
+
+def test_short_trailing_sentence_merges_into_previous_when_no_next_exists():
+    text = (
+        "Đây là câu đầu tiên trong đoạn văn, chứa đủ nội dung để không "
+        "cần phải ghép với câu khác. "
+        "Hết."
+    )
+
+    config = ChunkingConfig(
+        target_chars=100,
+        max_chars=160,
+        max_sentences_per_chunk=1,
+        min_chars=10,
+    )
+
+    chunks = build_chunks(text, config)
+
+    assert all(len(c.text) >= config.min_chars for c in chunks)
+    assert chunks[-1].text.endswith("Hết.")
+
+
+def test_min_chars_merge_never_drops_or_duplicates_text():
+    text = (
+        "PHẦN MỘT. "
+        "Chương này giới thiệu tổng quan về hệ thống. "
+        "Chương hai. "
+        "Nội dung chi tiết hơn được trình bày ở phần sau của tài liệu này."
+    )
+
+    config = ChunkingConfig(
+        target_chars=100,
+        max_chars=160,
+        max_sentences_per_chunk=1,
+        min_chars=20,
+    )
+
+    chunks = build_chunks(text, config)
+
+    reconstructed = "".join("".join(c.text.split()) for c in chunks)
+    source_compact = "".join(text.split())
+
+    assert reconstructed == source_compact
+
+
+def test_min_chars_never_produces_chunk_above_max_chars():
+    text = (
+        "PHẦN MỘT. "
+        "Chương này giới thiệu tổng quan về hệ thống và các thành phần "
+        "chính được sử dụng trong toàn bộ tài liệu, cùng với một số ví dụ "
+        "minh họa cụ thể cho từng trường hợp sử dụng phổ biến nhất."
+    )
+
+    config = ChunkingConfig(
+        target_chars=100,
+        max_chars=160,
+        max_sentences_per_chunk=1,
+        min_chars=25,
+    )
+
+    chunks = build_chunks(text, config)
+
+    for c in chunks:
+        assert len(c.text) <= config.max_chars
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"min_chars": -1},
+        {"min_chars": 999, "max_chars": 160},
+    ],
+)
+def test_invalid_min_chars_config(kwargs):
+    with pytest.raises(ValueError):
+        ChunkingConfig(**kwargs)

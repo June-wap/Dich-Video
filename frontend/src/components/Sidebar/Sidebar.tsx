@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useT } from '../../i18n';
+import { systemService, type SystemStatus } from '../../services/systemService';
+import { healthService } from '../../services/healthService';
 
 interface NavItem {
   to: string;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
 }
 
 interface NavSection {
-  title: string;
+  titleKey: string;
   items: NavItem[];
 }
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'CREATE',
+    titleKey: 'nav.section.create',
     items: [
       {
         to: '/tts',
-        label: 'Text to Speech',
+        labelKey: 'nav.tts',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
@@ -28,18 +31,8 @@ const NAV_SECTIONS: NavSection[] = [
         ),
       },
       {
-        to: '/long-form',
-        label: 'Long-form Studio',
-        icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-        ),
-      },
-      {
         to: '/clone',
-        label: 'Voice Cloning',
+        labelKey: 'nav.clone',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
@@ -51,11 +44,11 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'LIBRARY',
+    titleKey: 'nav.section.library',
     items: [
       {
         to: '/voices',
-        label: 'Voices',
+        labelKey: 'nav.voices',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -65,23 +58,14 @@ const NAV_SECTIONS: NavSection[] = [
           </svg>
         ),
       },
-      {
-        to: '/projects',
-        label: 'Projects',
-        icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-          </svg>
-        ),
-      },
     ],
   },
   {
-    title: 'ACTIVITY',
+    titleKey: 'nav.section.activity',
     items: [
       {
         to: '/history',
-        label: 'History',
+        labelKey: 'nav.history',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
@@ -92,11 +76,11 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'SYSTEM',
+    titleKey: 'nav.section.system',
     items: [
       {
         to: '/settings',
-        label: 'Settings',
+        labelKey: 'nav.settings',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -106,7 +90,7 @@ const NAV_SECTIONS: NavSection[] = [
       },
       {
         to: '/diagnostics',
-        label: 'Diagnostics',
+        labelKey: 'nav.diagnostics',
         icon: (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
@@ -118,12 +102,41 @@ const NAV_SECTIONS: NavSection[] = [
 ];
 
 export const Sidebar: React.FC = () => {
+  const { t } = useT();
+  const [status, setStatus] = useState<SystemStatus | null>(null);
+  const [version, setVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    systemService
+      .status()
+      .then((data) => {
+        if (!cancelled) setStatus(data);
+      })
+      .catch(() => {
+        // Real status is a nice-to-have here (Diagnostics is the page of
+        // record for failures) - silently keep the "unknown" placeholder
+        // rather than showing an error state in the nav rail.
+      });
+    healthService
+      .get()
+      .then((data) => {
+        if (!cancelled) setVersion(data.version);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const omnivoiceReady = status?.omnivoice_available && status.omnivoice_model_loaded;
+
   return (
     <aside className="ds-sidebar">
       {/* Brand Header */}
       <NavLink to="/" className="ds-sidebar-brand" style={{ textDecoration: 'none' }}>
         <div className="ds-sidebar-brand-icon">V</div>
-        <span className="ds-sidebar-brand-text">Local AI Voice</span>
+        <span className="ds-sidebar-brand-text">{t('app.brand')}</span>
       </NavLink>
 
       {/* Navigation Sections */}
@@ -143,14 +156,14 @@ export const Sidebar: React.FC = () => {
                 <rect x="3" y="14" width="7" height="7" rx="1"></rect>
               </svg>
             </span>
-            <span>Dashboard</span>
+            <span>{t('nav.dashboard')}</span>
           </NavLink>
         </div>
 
         {/* Grouped Sections */}
         {NAV_SECTIONS.map((section) => (
-          <div key={section.title} className="ds-sidebar-section">
-            <span className="ds-sidebar-section-title">{section.title}</span>
+          <div key={section.titleKey} className="ds-sidebar-section">
+            <span className="ds-sidebar-section-title">{t(section.titleKey)}</span>
             {section.items.map((item) => (
               <NavLink
                 key={item.to}
@@ -158,29 +171,32 @@ export const Sidebar: React.FC = () => {
                 className={({ isActive }) => `ds-sidebar-link ${isActive ? 'ds-sidebar-link--active' : ''}`}
               >
                 <span className="ds-sidebar-item-icon">{item.icon}</span>
-                <span>{item.label}</span>
+                <span>{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </div>
         ))}
       </nav>
 
-      {/* BOTTOM STATUS */}
+      {/* BOTTOM STATUS - real data from GET /api/system/status (was
+          hardcoded "RTX 4050" / "Ready" / "Prototype" for every machine). */}
       <div className="ds-sidebar-status-panel">
         <div className="ds-sidebar-status-row">
-          <span>OmniVoice</span>
+          <span>{t('sidebar.status.omnivoice')}</span>
           <span className="ds-sidebar-status-value">
             <span className="ds-sidebar-status-dot" aria-hidden="true" />
-            Ready
+            {status == null ? t('sidebar.status.unknown') : omnivoiceReady ? t('sidebar.status.ready') : t('sidebar.status.notReady')}
           </span>
         </div>
         <div className="ds-sidebar-status-row">
-          <span>GPU</span>
-          <span className="ds-sidebar-status-value">RTX 4050</span>
+          <span>{t('sidebar.status.gpu')}</span>
+          <span className="ds-sidebar-status-value">
+            {status == null ? '—' : status.gpu_name ?? t('sidebar.status.notDetected')}
+          </span>
         </div>
         <div className="ds-sidebar-status-row">
-          <span>Version</span>
-          <span className="ds-sidebar-status-value">Prototype</span>
+          <span>{t('sidebar.status.version')}</span>
+          <span className="ds-sidebar-status-value">{version ? `v${version}` : '—'}</span>
         </div>
       </div>
     </aside>

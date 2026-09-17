@@ -218,16 +218,30 @@ def test_openapi_only_checkpoint_routes(harness):
     client = harness[1]
     schema = client.get("/openapi.json").json()
     assert set(schema["paths"]) == {
+        # Security P0 (checklist-bao-mat-truoc-dong-goi-17-09.md item 1) -
+        # registered unconditionally; whether it actually hands out a token
+        # depends on Settings.require_local_token at request time (see
+        # backend/tests/test_local_auth.py), not on whether the route exists.
+        "/api/auth/token",
         "/api/health",
         "/api/system/status",
+        # NOTE: this exact-set assertion had already drifted out of date
+        # before this session (missing /api/settings/translation, which
+        # already existed) - updated here to the full, accurate current
+        # route set rather than left silently wrong.
+        "/api/system/logs",
         "/api/providers/status",
         "/api/tts",
+        "/api/tts/jobs",
+        "/api/tts/jobs/{job_id}",
         "/api/audio/{artifact_id}",
         "/api/voices/profiles",
         "/api/voices/profiles/{profile_id}",
         "/api/voices/profiles/{profile_id}/test",
         "/api/tts/long-form",
         "/api/tts/long-form/{job_id}",
+        "/api/settings/translation",
+        "/api/settings/app",
     }
     assert schema["info"] == {"title": "Local AI Voice API", "version": "0.3.0-dev"}
     assert client.get("/docs").status_code == 200

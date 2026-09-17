@@ -22,3 +22,22 @@ fastapi==0.141.1
 uvicorn==0.52.4
 pydantic==2.13.5
 pytest==9.1.1
+
+# Secondary TTS provider (prototype/providers/piper.py): fixed per-language
+# voices for the six languages whose candidate voice package is PENDING (not
+# REJECTED) in docs/model_license_matrix.md. piper-tts is GPL-3.0-or-later
+# and NOT yet cleared for commercial distribution - see that doc before
+# shipping this to a paying customer. Not installed automatically; run
+# `pip install -r requirements-backend.txt` again after pulling this change.
+piper-tts==1.8.0
+onnxruntime==1.30.0
+
+# Optional BYOK machine-translation step (backend/services/translation_service.py).
+# Only imported once a customer saves their own Gemini API key in Settings -
+# this app never ships or embeds a shared key. See
+# claude/nghien-cuu-dich-may-mt-16-09.md for the tradeoffs of this path.
+# Not exact-pinned like the packages above (unlike them, this one was not
+# fully audited against constraints-backend.txt) - verify against the
+# then-current release at https://pypi.org/project/google-genai/ before
+# installing, and pin an exact version here once confirmed.
+google-genai>=2.0.0

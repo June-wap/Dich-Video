@@ -176,3 +176,58 @@
   --topbar-height: 56px;
   --content-max-width: 1440px;
 }
+
+/* ==========================================================================
+   DARK THEME (Settings > General > Theme > "Dark Navy")
+   Real, applied via [data-theme="dark"] on <html> (see
+   frontend/src/context/AppSettingsContext.tsx). Overrides only the semantic/
+   surface tokens every ds-* component and page already reads through
+   var(--...) - the sidebar's own dedicated --sidebar-* tokens are already
+   dark by default in both themes, so they are left as-is. Brand/feedback hue
+   tokens (--color-primary-*, success/warning/danger/info) are intentionally
+   left unchanged in this first pass - they still have enough contrast on the
+   new dark surfaces, exact per-token dark tuning can follow later.
+   ========================================================================== */
+:root[data-theme="dark"] {
+  --workspace-bg: #0b1220;
+  --workspace-bg-alt: #0f1729;
+  --surface-white: #111a2e;
+  --surface-raised: #131d33;
+  --surface-subtle: #0f1729;
+  --surface-muted: #1a2540;
+
+  /* Neutral scale reversed: code that reads --neutral-900 for "strong text"
+     and --neutral-50 for "faint background" gets correct dark-mode values
+     without every component needing its own dark-mode branch. */
+  --neutral-50: #0f1729;
+  --neutral-100: #16213a;
+  --neutral-200: #1e293f;
+  --neutral-300: #2a3752;
+  --neutral-400: #48557a;
+  --neutral-500: #8b98b8;
+  --neutral-600: #aab4cc;
+  --neutral-700: #c7cfe2;
+  --neutral-800: #e2e7f2;
+  --neutral-900: #f4f6fb;
+  --neutral-950: #ffffff;
+
+  --border-subtle: #1a2540;
+  --border-default: #263355;
+  --border-strong: #384a75;
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+}
+
+/* Belt-and-suspenders for a first paint before AppSettingsContext resolves
+   the saved theme (no flash of the wrong palette when the OS is in dark
+   mode and no explicit choice has loaded yet). Once data-theme is set
+   explicitly by the app, the rule above takes precedence. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: dark;
+  }
+}

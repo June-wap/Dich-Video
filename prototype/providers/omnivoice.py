@@ -20,6 +20,35 @@ from core.languages import (VERIFIED_LANGUAGE_IDS, EXPERIMENTAL_LANGUAGE_IDS,
 from .base import AudioSynthResult, ManagedTTSProvider, VoiceInfo
 
 
+def _trim_silence(audio: np.ndarray, sample_rate: int, threshold_dbfs: float = -48.0,
+                   preserve_ms: int = 35, max_trim_ms: int = 250) -> np.ndarray:
+    """Trim only confidently-silent leading/trailing samples, capped and padded.
+
+    Deliberately conservative and self-contained (no pydub/ffmpeg dependency,
+    since `audio` here is already a raw float32 numpy array, not a file) -
+    mirrors the defaults of core/audio_utils.py's BoundaryDSPConfig, which
+    does the equivalent job for long-form segment boundaries via pydub. Never
+    trims more than max_trim_ms from either edge, and always leaves
+    preserve_ms of near-silence in place, so a quiet intake breath or the
+    natural decay of the last word can never be clipped.
+    """
+    if audio.size == 0:
+        return audio
+    threshold_amplitude = 10 ** (threshold_dbfs / 20.0)
+    above_threshold = np.flatnonzero(np.abs(audio) > threshold_amplitude)
+    if above_threshold.size == 0:
+        # Entire clip reads as silence - nothing safe to trim from either end.
+        return audio
+    preserve_samples = int(sample_rate * preserve_ms / 1000)
+    max_trim_samples = int(sample_rate * max_trim_ms / 1000)
+    leading = max(0, min(max_trim_samples, int(above_threshold[0]) - preserve_samples))
+    trailing = max(0, min(max_trim_samples, (audio.size - 1 - int(above_threshold[-1])) - preserve_samples))
+    end = audio.size - trailing
+    if end <= leading:
+        return audio
+    return audio[leading:end]
+
+
 class OmniVoiceError(RuntimeError):
     def __init__(self, code, message):
         self.code = code
@@ -201,16 +230,17 @@ class OmniVoiceProvider(ManagedTTSProvider):
     DEFAULT_CLONE_NUM_STEP = 24
     DEFAULT_NORMAL_NUM_STEP = 16
 
-    def synthesize_cloned(self, text, language, profile, output_path=None, num_step=DEFAULT_CLONE_NUM_STEP):
+    def synthesize_cloned(self, text, language, profile, output_path=None, num_step=DEFAULT_CLONE_NUM_STEP,
+                          trim_silence=False):
         return self._synthesize(text, language, output_path=output_path, profile=profile,
-                                cloned=True, num_step=num_step)
+                                cloned=True, num_step=num_step, trim_silence=trim_silence)
 
     def synthesize(self, text, language, voice="omnivoice_auto", output_path=None,
                    speed=1.0, **options):
         return self._synthesize(text, language, voice, output_path, speed, **options)
 
     def _synthesize(self, text, language, voice="omnivoice_auto", output_path=None,
-                    speed=1.0, *, profile=None, cloned=False, num_step=None, **options):
+                    speed=1.0, *, profile=None, cloned=False, num_step=None, trim_silence=False, **options):
         result = AudioSynthResult(provider=self.PROVIDER_ID, model=self.model_id,
                                   language=language if isinstance(language, str) else "", voice=voice, device=self.device)
         inference_dtype = None
@@ -254,6 +284,14 @@ class OmniVoiceProvider(ManagedTTSProvider):
                     if audio.ndim != 1 or not audio.size or not np.isfinite(audio).all():
                         raise ValueError("Expected non-empty finite mono audio")
                     audio = np.ascontiguousarray(audio)
+                    if trim_silence:
+                        trimmed = _trim_silence(audio, self.SAMPLE_RATE)
+                        if trimmed.size:
+                            audio = np.ascontiguousarray(trimmed)
+                        # else: trimming would have removed the entire clip
+                        # (shouldn't happen given _trim_silence's own guards,
+                        # but never ship an empty file) - keep the untrimmed
+                        # audio rather than fail an otherwise-successful job.
                 except Exception as exc:
                     raise OmniVoiceError("GENERATION_FAILED", "Cloned synthesis failed" if cloned else str(exc)) from None
                 result.gen_time = time.perf_counter() - started
@@ -263,7 +301,7 @@ class OmniVoiceProvider(ManagedTTSProvider):
                 result.rtf = result.gen_time / result.duration
                 result.text_length = len(text.strip())
                 result.metadata = {"num_step": step_val, "channels": 1, "dtype": "float32",
-                                   "load_count": self._load_count,
+                                   "load_count": self._load_count, "silence_trim_applied": bool(trim_silence),
                                    "cpu_verified": False, "model_reused": already_loaded}
                 if output_path is not None:
                     try:

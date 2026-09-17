@@ -5,32 +5,16 @@ import { Sidebar } from '../Sidebar/Sidebar';
 const ROUTE_NAMES: Record<string, string> = {
   '/': 'Dashboard',
   '/tts': 'Text to Speech',
-  '/long-form': 'Long-form Studio',
   '/clone': 'Voice Cloning',
   '/voices': 'Voice Library',
-  '/projects': 'Projects',
   '/history': 'History',
   '/settings': 'Settings',
   '/diagnostics': 'Diagnostics',
-  '/showcase': 'Design System Showcase',
 };
 
 export const AppShell: React.FC = () => {
   const location = useLocation();
-
-  // Handle dynamic route matching for /long-form/:id
-  const getPageTitle = (pathname: string): string => {
-    if (ROUTE_NAMES[pathname]) {
-      return ROUTE_NAMES[pathname];
-    }
-    if (pathname.startsWith('/long-form/')) {
-      const id = pathname.replace('/long-form/', '');
-      return `Project Detail: ${id}`;
-    }
-    return 'Workspace';
-  };
-
-  const pageTitle = getPageTitle(location.pathname);
+  const pageTitle = ROUTE_NAMES[location.pathname] ?? 'Workspace';
 
   return (
     <div className="ds-app-layout">

@@ -1,42 +1,43 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components';
+import { AppSettingsProvider } from './context/AppSettingsContext';
 import {
   DashboardPage,
   TTSPage,
-  LongFormPage,
-  ProjectDetailPage,
   VoiceCloningPage,
   VoicesPage,
-  ProjectsPage,
   HistoryPage,
   SettingsPage,
   DiagnosticsPage,
-  ShowcasePage,
 } from './pages';
 
 export function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppShell />}>
-          {/* Main Navigation Routes */}
-          <Route index element={<DashboardPage />} />
-          <Route path="tts" element={<TTSPage />} />
-          <Route path="long-form" element={<LongFormPage />} />
-          <Route path="long-form/:id" element={<ProjectDetailPage />} />
-          <Route path="clone" element={<VoiceCloningPage />} />
-          <Route path="voices" element={<VoicesPage />} />
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="history" element={<HistoryPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="diagnostics" element={<DiagnosticsPage />} />
-          <Route path="showcase" element={<ShowcasePage />} />
+    <AppSettingsProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AppShell />}>
+            {/* Main Navigation Routes */}
+            <Route index element={<DashboardPage />} />
+            <Route path="tts" element={<TTSPage />} />
+            <Route path="clone" element={<VoiceCloningPage />} />
+            <Route path="voices" element={<VoicesPage />} />
+            <Route path="history" element={<HistoryPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="diagnostics" element={<DiagnosticsPage />} />
+            {/* /showcase (internal design-system demo) and /long-form,
+                /projects, /projects/:id (dead since the Short-only scope
+                decision - see pages/index.ts) were removed here: none of
+                them had a Sidebar entry any more, so a customer landing on
+                one only by guessing the URL saw an internal/unfinished page
+                with no way back except the browser's own Back button. */}
 
-          {/* Catch-all fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+            {/* Catch-all fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AppSettingsProvider>
   );
 }
 

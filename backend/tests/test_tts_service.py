@@ -16,7 +16,9 @@ from backend.errors import ErrorCode
 from backend.main import create_app
 from backend.services.provider_service import ProviderService
 from backend.services.system_service import RuntimeInfo, SystemService
+from backend.services.translation_service import TranslationService
 from backend.services.tts_service import TTSService
+from backend.services.voice_profile_service import VoiceProfileService
 from backend.tests.provider_fakes import FakeProvider
 from providers.base import AudioSynthResult
 
@@ -75,13 +77,25 @@ def tts_app_env(tmp_path):
         cuda_available=True, gpu_name="test GPU",
     ))
     sys_service = SystemService(provider_service, probe)
-    tts_service = TTSService(settings, provider_service)
+    # TTSService.__init__ has needed translation_service/voice_profile_service
+    # since a Short TTS job's voice_id can also name a cloned voice profile
+    # (see main.py's lifespan) - real, cheap-to-construct services here (no
+    # network call happens unless translate()/create_voice_profile() is
+    # actually invoked, and this fixture's requests are all Vietnamese, so
+    # neither is).
+    translation_service = TranslationService(settings)
+    voice_profile_service = VoiceProfileService(settings, provider_service)
+    tts_service = TTSService(settings, provider_service, translation_service, voice_profile_service)
 
     app = create_app(
         settings=settings,
         service_factory=lambda _: sys_service,
         provider_service_factory=lambda _: provider_service,
-        tts_service_factory=lambda s, p: tts_service,
+        # create_app()'s lifespan always calls this with all 5 positional
+        # args (settings, providers, translation_service, voice_profile_service,
+        # app_settings_service) - accept and ignore the extra ones since this
+        # fixture already has its own pre-built tts_service to return.
+        tts_service_factory=lambda *args: tts_service,
     )
 
     with TestClient(app, base_url="http://127.0.0.1") as client:
@@ -316,11 +330,12 @@ def test_concurrent_first_requests_do_not_double_load(tmp_path):
     provider_service = ProviderService()
     provider_service.register(provider, device=provider.device, available=True)
     provider_service.select_primary(OMNIVOICE_PROVIDER_ID)
-    tts_service = TTSService(settings, provider_service)
+    tts_service = TTSService(settings, provider_service, TranslationService(settings),
+                              VoiceProfileService(settings, provider_service))
     sys_service = SystemService(provider_service, Mock(return_value=RuntimeInfo("3.12.10", "2.8.0+cu128", True, "GPU")))
     app = create_app(settings=settings, service_factory=lambda _: sys_service,
                      provider_service_factory=lambda _: provider_service,
-                     tts_service_factory=lambda s, p: tts_service)
+                     tts_service_factory=lambda *args: tts_service)
 
     with TestClient(app, base_url="http://127.0.0.1") as client:
         with ThreadPoolExecutor(max_workers=4) as executor:

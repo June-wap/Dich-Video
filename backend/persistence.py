@@ -106,7 +106,11 @@ def checksum(path):
 
 class Repository:
     def __init__(self, settings):
-        self.path = Path(settings.database_path or (Path(settings.output_dir) / "metadata.sqlite3"))
+        # Keep durable metadata outside the audio directory.  This means a
+        # customer can clean generated audio without accidentally deleting the
+        # profile/job database, and gives the desktop host one predictable
+        # per-user directory to back up or erase.
+        self.path = Path(settings.database_path or (Path(settings.app_data_dir) / "data" / "metadata.sqlite3"))
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.connect() as db:
             db.execute("PRAGMA journal_mode=WAL")
@@ -271,6 +275,37 @@ class Repository:
                     "SELECT snapshot,diagnostics FROM tts_jobs WHERE kind=? ORDER BY created_at", (kind,)
                 )
             ]
+
+    def find_job_by_idempotency_key(self, kind, idempotency_key):
+        """Best-effort dedup lookup: the key lives inside execution_snapshot
+        JSON (no schema migration), so this is a bounded scan over one kind's
+        jobs rather than an indexed/unique-constrained lookup. Callers are
+        expected to also serialize concurrent submits in-process (see
+        TTSService._lock); this alone does not guarantee cross-process
+        atomicity, consistent with this MVP's single-process assumption.
+
+        Returns (job_id, idempotency_fingerprint) for the oldest job created
+        with this key, or None if no job has used this key yet. Returning the
+        stored fingerprint (rather than just the job id) lets the caller
+        decide whether this is a true retry (same request payload -> replay
+        the existing job) or a conflicting reuse of the same key with a
+        different payload (caller's responsibility to reject deterministically
+        instead of silently serving the wrong job's result).
+        """
+        if not idempotency_key:
+            return None
+        with self.connect() as db:
+            rows = db.execute(
+                "SELECT id, execution_snapshot FROM tts_jobs WHERE kind=? ORDER BY created_at", (kind,)
+            ).fetchall()
+        for row in rows:
+            try:
+                execution = json.loads(row["execution_snapshot"])
+            except (TypeError, ValueError):
+                continue
+            if execution.get("idempotency_key") == idempotency_key:
+                return row["id"], execution.get("idempotency_fingerprint")
+        return None
 
     def get_job(self, job_id):
         with self.connect() as db:

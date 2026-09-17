@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -10,13 +10,36 @@ import {
   Button,
   Input,
   Select,
+  TextArea,
   StatusBadge,
   ProgressBar,
   AudioPlayer,
+  ErrorState,
+  EmptyState,
 } from '../components';
-import { useDeveloperMode } from '../hooks';
+import { useLongFormJobRunner, useVoiceProfiles } from '../hooks';
+import type { LongFormFormPayload } from '../hooks';
+import { longFormJobService } from '../services/longFormJobService';
+import type { LongFormAudioFormat } from '../services/longFormJobService';
 
-type LongFormScreen = 'EDITOR' | 'PROCESSING' | 'COMPLETED' | 'ERROR';
+type LongFormScreen = 'EDITOR' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'ERROR';
+
+// Mirrors backend/schemas/long_form.py LongFormRequest.text (Field(max_length=100000)) -
+// deliberately NOT the Short TTS 2,000-char limit (Task 3.5's chunking config
+// 240/320/3 is what makes text of this length practical to synthesize).
+const MAX_LONG_FORM_TEXT_LENGTH = 100_000;
+
+const LANGUAGES = [
+  { value: 'vi', label: 'Tiếng Việt (Vietnamese)' },
+  { value: 'en', label: 'Tiếng Anh (English)' },
+  { value: 'ja', label: 'Tiếng Nhật (Japanese)' },
+  { value: 'zh', label: 'Tiếng Trung (Chinese)' },
+];
+
+const FORMATS: { value: LongFormAudioFormat; label: string }[] = [
+  { value: 'wav', label: 'WAV (không nén, chất lượng gốc)' },
+  { value: 'mp3', label: 'MP3 (nén, dung lượng nhỏ)' },
+];
 
 const DEFAULT_TEXT = `Chương 1: Bình minh trên thảo nguyên xanh biếc.
 
@@ -26,212 +49,132 @@ Từ xa xa, tiếng chim sơn ca ríu rít cất lên bài ca đón chào ngày 
 
 Người lữ khách dừng chân bên gốc cây cổ thụ ngàn năm, khẽ mỉm cười và hít thở thật sâu luồng không khí thanh sạch. Hành trình dài vượt qua dãy núi tuyết hiểm trở cuối cùng cũng đã đưa anh tới vùng đất hứa - nơi khởi đầu của những truyền thuyết huyền thoại ngàn năm về trước.`;
 
+function languageLabel(code: string): string {
+  return LANGUAGES.find((l) => l.value === code)?.label.split(' (')[0] ?? code;
+}
+
+/**
+ * Screen derivation. `manualEditorReturn` lets the user leave a terminal
+ * screen (COMPLETED/CANCELLED/ERROR) and go back to editing without the hook
+ * needing an explicit "reset" - the job/requestError the hook holds are
+ * simply ignored for screen purposes until a new submit() clears the flag.
+ */
+function deriveScreen(
+  phase: 'idle' | 'submitting' | 'polling' | 'cancelling',
+  job: { status: string } | null,
+  requestError: { message: string } | null,
+  manualEditorReturn: boolean
+): LongFormScreen {
+  if (phase !== 'idle') return 'PROCESSING';
+  if (manualEditorReturn) return 'EDITOR';
+  if (!job) return requestError ? 'ERROR' : 'EDITOR';
+  if (job.status === 'COMPLETED') return 'COMPLETED';
+  if (job.status === 'CANCELLED') return 'CANCELLED';
+  if (job.status === 'FAILED') return 'ERROR';
+  return 'EDITOR';
+}
+
 export const LongFormPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isDevMode } = useDeveloperMode();
 
-  // Screen State
-  const [screen, setScreen] = useState<LongFormScreen>('EDITOR');
+  const { profiles, loading: profilesLoading, error: profilesError } = useVoiceProfiles();
+  const { job, phase, requestError, isBusy, submit, cancel, canCancel } = useLongFormJobRunner();
 
-  // Customer Editor Fields
+  // Local-only label for the current text - NOT sent to the backend
+  // (LongFormRequest has model_config = ConfigDict(extra="forbid"), so there
+  // is no project-name field to submit it as). Used only to title the
+  // Processing/Completed cards below.
   const [projectName, setProjectName] = useState('Chương 1: Bình minh trên thảo nguyên');
-  const [activeTab, setActiveTab] = useState<'text' | 'file'>('text');
   const [text, setText] = useState(DEFAULT_TEXT);
   const [language, setLanguage] = useState('vi');
-  const [voice, setVoice] = useState('vi-VN-HoaiMy');
-  const [quality, setQuality] = useState('balanced');
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [profileId, setProfileId] = useState('');
+  const [format, setFormat] = useState<LongFormAudioFormat>('wav');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [playbackError, setPlaybackError] = useState(false);
+  const [manualEditorReturn, setManualEditorReturn] = useState(false);
 
-  // Processing state
-  const [progressPercent, setProgressPercent] = useState(0);
-  const timerRef = useRef<number | null>(null);
-
-  // Stats calculation: Word/character count + Estimated audio duration
   const stats = useMemo(() => {
     const trimmed = text.trim();
     const words = trimmed ? trimmed.split(/\s+/).length : 0;
     const characters = text.length;
-
-    // Estimated audio duration (~14 chars per sec)
+    // Rough estimate only (~14 chars/sec) - purely informational, the real
+    // duration comes from the completed job's audio.
     const totalSecs = Math.max(0, Math.round(characters / 14));
     const m = Math.floor(totalSecs / 60);
     const s = totalSecs % 60;
     const estDuration = characters > 0 ? `${m} phút ${s} giây` : '0 phút 0 giây';
-
-    return { words, characters, estDuration, totalSecs: totalSecs || 1122 };
+    return { words, characters, estDuration };
   }, [text]);
 
-  // Handle Start Generation
+  const validate = (): string | null => {
+    if (!text.trim()) return 'Vui lòng nhập nội dung văn bản trước khi tạo audio.';
+    if (text.length > MAX_LONG_FORM_TEXT_LENGTH) return `Văn bản vượt quá giới hạn ${MAX_LONG_FORM_TEXT_LENGTH.toLocaleString()} ký tự.`;
+    if (!profileId) return 'Vui lòng chọn một voice profile trước khi tạo audio.';
+    return null;
+  };
+
   const handleStartGeneration = () => {
-    setProgressPercent(10);
-    setScreen('PROCESSING');
-
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    timerRef.current = window.setInterval(() => {
-      setProgressPercent((prev) => {
-        if (prev >= 95) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          timerRef.current = null;
-          setScreen('COMPLETED');
-          return 100;
-        }
-        return prev + 15;
-      });
-    }, 450);
+    const err = validate();
+    setFormError(err);
+    if (err) return;
+    setManualEditorReturn(false);
+    const payload: LongFormFormPayload = { text: text.trim(), language, profileId, format };
+    void submit(payload);
   };
 
-  const handleCancelProcessing = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setProgressPercent(0);
-    setScreen('EDITOR');
+  const handleCancel = () => {
+    void cancel();
   };
 
-  const handleSimulateError = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setScreen('ERROR');
+  const handleBackToEditor = () => {
+    setManualEditorReturn(true);
   };
 
-  const handleSaveProject = () => {
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2500);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
+  const screen = deriveScreen(phase, job, requestError, manualEditorReturn);
+  const audioUrl = job ? longFormJobService.resolveAudioUrl(job) : null;
+  const resolvedFormat = job ? longFormJobService.guessFormat(job) ?? format : format;
+  const progressPercent = job ? Math.round(job.progress_percent) : 0;
+  const errorMessage = requestError?.message ?? job?.error?.message;
+  const errorCode = requestError?.code ?? job?.error?.code;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-      {/* Developer Mode Banner (Visible ONLY when Developer Mode is ON under Settings) */}
-      {isDevMode && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', background: 'var(--neutral-100)', border: '1px dashed var(--neutral-400)', borderRadius: 'var(--radius-md)', fontSize: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <StatusBadge status="warning" label="Developer Mode ON" size="sm" />
-            <span style={{ color: 'var(--neutral-700)' }}>
-              Developer test shortcuts active:
-            </span>
-            <button
-              type="button"
-              onClick={() => setScreen('EDITOR')}
-              style={{ padding: '2px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--border-default)', background: '#fff' }}
-            >
-              Editor
-            </button>
-            <button
-              type="button"
-              onClick={() => { setProgressPercent(68); setScreen('PROCESSING'); }}
-              style={{ padding: '2px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--border-default)', background: '#fff' }}
-            >
-              Processing (68%)
-            </button>
-            <button
-              type="button"
-              onClick={() => setScreen('COMPLETED')}
-              style={{ padding: '2px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--border-default)', background: '#fff' }}
-            >
-              Completed
-            </button>
-            <button
-              type="button"
-              onClick={handleSimulateError}
-              style={{ padding: '2px 8px', fontSize: '11px', cursor: 'pointer', borderRadius: '4px', border: '1px solid var(--border-default)', background: '#fff', color: 'var(--danger-text)' }}
-            >
-              Simulate Error
-            </button>
-          </div>
-          <span style={{ color: 'var(--neutral-500)' }}>Internal chunks: 94</span>
-        </div>
-      )}
-
       {/* ==================================================================
-          1. EDITOR SCREEN (CUSTOMER-FACING)
+          1. EDITOR SCREEN
           ================================================================== */}
       {screen === 'EDITOR' && (
         <div className="ds-longform-layout">
-          {/* Left: 70% Editor Area */}
+          {/* Left: Editor Area */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Card>
               <CardHeader style={{ gap: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                  <div style={{ flex: 1, minWidth: '260px' }}>
-                    <Input
-                      label="Tên dự án"
-                      value={projectName}
-                      onChange={(e) => setProjectName(e.target.value)}
-                      placeholder="Nhập tên bài đọc hoặc tiêu đề sách..."
-                    />
-                  </div>
-
-                  <div className="ds-tabs-list" style={{ marginTop: '16px' }}>
-                    <button
-                      type="button"
-                      className={`ds-tab-trigger ${activeTab === 'text' ? 'ds-tab-trigger--active' : ''}`}
-                      onClick={() => setActiveTab('text')}
-                    >
-                      Nhập văn bản
-                    </button>
-                    <button
-                      type="button"
-                      className={`ds-tab-trigger ${activeTab === 'file' ? 'ds-tab-trigger--active' : ''}`}
-                      onClick={() => setActiveTab('file')}
-                    >
-                      Nhập từ file
-                    </button>
-                  </div>
-                </div>
+                <Input
+                  label="Tên dự án (chỉ hiển thị cục bộ)"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="Nhập tên bài đọc hoặc tiêu đề sách..."
+                />
               </CardHeader>
 
               <CardContent>
-                {activeTab === 'text' ? (
-                  <div className="ds-form-group">
-                    <textarea
-                      className="ds-textarea"
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      placeholder="Dán hoặc nhập toàn bộ nội dung sách, bài viết hoặc tài liệu tại đây..."
-                      style={{ minHeight: '340px', fontSize: '14px', lineHeight: '1.7' }}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    className="ds-dropzone"
-                    onClick={() => {
-                      setText(DEFAULT_TEXT + '\n\n[Đã nhập nội dung từ tệp tài liệu thành công]');
-                      setActiveTab('text');
+                <div className="ds-form-group">
+                  <TextArea
+                    aria-label="Nội dung văn bản"
+                    value={text}
+                    onChange={(e) => {
+                      setText(e.target.value);
+                      if (formError) setFormError(null);
                     }}
-                  >
-                    <div className="ds-dropzone-icon">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                      </svg>
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--neutral-900)' }}>
-                        Kéo thả tài liệu vào đây hoặc nhấn để duyệt file
-                      </h4>
-                      <p style={{ fontSize: '12px', color: 'var(--neutral-500)', marginTop: '4px' }}>
-                        Hỗ trợ định dạng .TXT, .DOCX, .EPUB, .MD
-                      </p>
-                    </div>
-                    <Button size="sm" variant="outline">
-                      Chọn file từ máy tính
-                    </Button>
-                  </div>
-                )}
+                    placeholder="Dán hoặc nhập toàn bộ nội dung sách, bài viết hoặc tài liệu tại đây..."
+                    style={{ minHeight: '340px', fontSize: '14px', lineHeight: '1.7' }}
+                    error={
+                      text.length > MAX_LONG_FORM_TEXT_LENGTH
+                        ? `Vượt quá ${MAX_LONG_FORM_TEXT_LENGTH.toLocaleString()} ký tự.`
+                        : undefined
+                    }
+                  />
+                </div>
 
-                {/* Simplified Customer Statistics Ribbon: Only Words, Characters, Estimated Duration */}
                 <div className="ds-stats-ribbon" style={{ marginTop: '16px' }}>
                   <div className="ds-stat-cell">
                     <span className="ds-stat-number">{stats.words.toLocaleString()}</span>
@@ -240,7 +183,12 @@ export const LongFormPage: React.FC = () => {
                   <div className="ds-stat-divider" />
 
                   <div className="ds-stat-cell">
-                    <span className="ds-stat-number">{stats.characters.toLocaleString()}</span>
+                    <span
+                      className="ds-stat-number"
+                      style={{ color: stats.characters > MAX_LONG_FORM_TEXT_LENGTH ? 'var(--danger-text)' : undefined }}
+                    >
+                      {stats.characters.toLocaleString()} / {MAX_LONG_FORM_TEXT_LENGTH.toLocaleString()}
+                    </span>
                     <span className="ds-stat-label">Số ký tự</span>
                   </div>
                   <div className="ds-stat-divider" />
@@ -250,22 +198,18 @@ export const LongFormPage: React.FC = () => {
                     <span className="ds-stat-label">Thời lượng ước tính</span>
                   </div>
                 </div>
+
+                {formError && (
+                  <p style={{ fontSize: '12px', color: 'var(--danger-text)', marginTop: '10px' }}>{formError}</p>
+                )}
               </CardContent>
 
-              <CardFooter style={{ justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Button variant="outline" size="md" onClick={handleSaveProject}>
-                    Lưu dự án
-                  </Button>
-                  {saveSuccess && (
-                    <StatusBadge status="success" label="Đã lưu dự án" size="sm" />
-                  )}
-                </div>
-
+              <CardFooter style={{ justifyContent: 'flex-end' }}>
                 <Button
                   variant="primary"
                   size="md"
                   onClick={handleStartGeneration}
+                  disabled={isBusy}
                   iconLeft={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -278,47 +222,51 @@ export const LongFormPage: React.FC = () => {
             </Card>
           </div>
 
-          {/* Right: 30% Settings Panel (Simplified: Language, Voice, Quality) */}
+          {/* Right: Settings Panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <Card>
               <CardHeader>
                 <CardTitle>Cài đặt giọng đọc</CardTitle>
-                <CardDescription>Chọn ngôn ngữ, giọng đọc và chất lượng âm thanh</CardDescription>
+                <CardDescription>Chọn ngôn ngữ, voice profile và định dạng xuất</CardDescription>
               </CardHeader>
               <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Select
                   label="Ngôn ngữ"
-                  options={[
-                    { value: 'vi', label: 'Tiếng Việt (Vietnamese)' },
-                    { value: 'en', label: 'Tiếng Anh (English)' },
-                    { value: 'ja', label: 'Tiếng Nhật (Japanese)' },
-                    { value: 'zh', label: 'Tiếng Trung (Chinese)' },
-                  ]}
+                  options={LANGUAGES}
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                 />
 
-                <Select
-                  label="Giọng đọc"
-                  options={[
-                    { value: 'vi-VN-HoaiMy', label: 'Hoài My (Nữ Miền Bắc - Truyền cảm)' },
-                    { value: 'vi-VN-NamAnh', label: 'Nam Anh (Nam Miền Bắc - Tự nhiên)' },
-                    { value: 'vi-VN-MaiThao', label: 'Mai Thảo (Nữ Miền Nam - Ấm áp)' },
-                    { value: 'vi-VN-MinhQuang', label: 'Minh Quang (Nam Miền Nam - Rõ ràng)' },
-                  ]}
-                  value={voice}
-                  onChange={(e) => setVoice(e.target.value)}
-                />
+                {profiles.length === 0 && !profilesLoading ? (
+                  <EmptyState
+                    title="Chưa có voice profile"
+                    description="Long-form yêu cầu một voice profile đã nhân bản. Tạo một hồ sơ trong Voice Cloning trước."
+                    actionLabel="Đến Voice Cloning"
+                    onAction={() => navigate('/clone')}
+                  />
+                ) : (
+                  <Select
+                    label="Voice Profile"
+                    placeholder={profilesLoading ? 'Đang tải danh sách...' : 'Chọn voice profile...'}
+                    options={profiles.map((p) => ({ value: p.profile_id, label: p.name }))}
+                    value={profileId}
+                    onChange={(e) => setProfileId(e.target.value)}
+                    disabled={profilesLoading}
+                    hint="Long-form chỉ hoạt động với một voice profile đã nhân bản - không có giọng mặc định"
+                  />
+                )}
+
+                {profilesError && (
+                  <span style={{ fontSize: '12px', color: 'var(--danger-text)' }}>
+                    Không thể tải danh sách voice profile: {profilesError.message}
+                  </span>
+                )}
 
                 <Select
-                  label="Chất lượng âm thanh"
-                  options={[
-                    { value: 'fast', label: 'Nhanh (Tiết kiệm thời gian)' },
-                    { value: 'balanced', label: 'Tự nhiên (Khuyên dùng)' },
-                    { value: 'high', label: 'Chất lượng cao (Phòng thu)' },
-                  ]}
-                  value={quality}
-                  onChange={(e) => setQuality(e.target.value)}
+                  label="Định dạng xuất"
+                  options={FORMATS}
+                  value={format}
+                  onChange={(e) => setFormat(e.target.value as LongFormAudioFormat)}
                 />
               </CardContent>
             </Card>
@@ -326,7 +274,8 @@ export const LongFormPage: React.FC = () => {
             <Card>
               <CardContent style={{ padding: '16px', fontSize: '13px', color: 'var(--neutral-600)', lineHeight: '1.6' }}>
                 <p>
-                  Tất cả các bản âm thanh dài sẽ được xử lý hoàn toàn trên máy tính của bạn với chất lượng đồng đều và bảo mật tuyệt đối.
+                  Văn bản dài sẽ được chia thành các đoạn nhỏ và tổng hợp tuần tự trên backend cục bộ. Bạn có thể theo dõi
+                  tiến độ thực tế và huỷ bất kỳ lúc nào trong khi đang xử lý.
                 </p>
               </CardContent>
             </Card>
@@ -335,52 +284,54 @@ export const LongFormPage: React.FC = () => {
       )}
 
       {/* ==================================================================
-          2. PROCESSING SCREEN (CUSTOMER-FACING)
+          2. PROCESSING SCREEN — real submit/poll via useLongFormJobRunner
           ================================================================== */}
       {screen === 'PROCESSING' && (
         <div style={{ maxWidth: '640px', margin: '40px auto', width: '100%' }}>
           <Card>
             <CardHeader style={{ textAlign: 'center', paddingBottom: '8px' }}>
               <CardTitle style={{ fontSize: '18px' }}>Đang tạo audio</CardTitle>
-              <CardDescription style={{ fontSize: '14px', marginTop: '4px' }}>
-                {projectName}
-              </CardDescription>
+              <CardDescription style={{ fontSize: '14px', marginTop: '4px' }}>{projectName}</CardDescription>
             </CardHeader>
 
             <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '24px' }}>
-              {/* Overall percentage & simple progress bar */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--neutral-900)' }}>
-                    Tiến độ hoàn thành
+                    {phase === 'submitting'
+                      ? 'Đang gửi yêu cầu...'
+                      : phase === 'cancelling'
+                      ? 'Đang huỷ...'
+                      : 'Tiến độ hoàn thành'}
                   </span>
-                  <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-primary-600)', fontFamily: 'var(--font-family-mono)' }}>
-                    {progressPercent}%
-                  </span>
+                  {phase === 'polling' && (
+                    <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-primary-600)', fontFamily: 'var(--font-family-mono)' }}>
+                      {progressPercent}%
+                    </span>
+                  )}
                 </div>
-                <ProgressBar value={progressPercent} size="lg" status="default" />
+                {phase === 'polling' ? (
+                  <ProgressBar value={progressPercent} size="lg" status="default" />
+                ) : (
+                  <ProgressBar indeterminate size="lg" />
+                )}
               </div>
 
-              {/* Friendly Processing Message */}
               <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--neutral-600)', lineHeight: '1.6' }}>
-                Hệ thống đang chuyển đổi văn bản thành giọng nói tự nhiên, vui lòng đợi trong giây lát...
+                {phase === 'cancelling'
+                  ? 'Đang gửi yêu cầu huỷ - hệ thống chỉ kiểm tra huỷ giữa các đoạn nên có thể mất một chút thời gian.'
+                  : 'Hệ thống đang chuyển đổi văn bản thành giọng nói tự nhiên theo từng đoạn, vui lòng đợi trong giây lát...'}
               </p>
 
-              {/* Developer Mode Collapsed Diagnostics (Visible ONLY when Developer Mode is ON) */}
-              {isDevMode && (
-                <div style={{ padding: '10px 14px', background: 'var(--neutral-100)', borderRadius: 'var(--radius-md)', fontSize: '11px', color: 'var(--neutral-600)', fontFamily: 'var(--font-family-mono)' }}>
-                  <div>[DEV INFO] Internal chunking pipeline active. Current chunk: 68/94.</div>
-                  <div>GPU VRAM: 1.8GB / 6.0GB. Model: vi_voice_v1.onnx. RTF: ~0.18.</div>
-                </div>
+              {job && (
+                <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--neutral-400)', fontFamily: 'var(--font-family-mono)' }}>
+                  Job ID: {job.job_id}
+                </p>
               )}
             </CardContent>
 
             <CardFooter style={{ justifyContent: 'center', padding: '16px' }}>
-              <Button
-                variant="outline"
-                size="md"
-                onClick={handleCancelProcessing}
-              >
+              <Button variant="outline" size="md" onClick={handleCancel} disabled={!canCancel}>
                 Hủy bỏ
               </Button>
             </CardFooter>
@@ -389,9 +340,9 @@ export const LongFormPage: React.FC = () => {
       )}
 
       {/* ==================================================================
-          3. COMPLETED SCREEN (CUSTOMER-FACING)
+          3. COMPLETED SCREEN — real audio via AudioPlayer's src prop
           ================================================================== */}
-      {screen === 'COMPLETED' && (
+      {screen === 'COMPLETED' && job && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Card>
             <CardHeader>
@@ -402,84 +353,65 @@ export const LongFormPage: React.FC = () => {
                     <StatusBadge status="success" label="Hoàn tất" />
                   </div>
                   <CardDescription style={{ marginTop: '4px' }}>
-                    Thời lượng: <strong>{stats.estDuration}</strong> • Giọng đọc: <strong>{voice}</strong>
+                    Job ID: <code style={{ fontSize: '12px' }}>{job.job_id}</code>
                   </CardDescription>
                 </div>
 
-                <Button
-                  size="sm"
-                  variant="primary"
-                  onClick={() => setScreen('EDITOR')}
-                >
+                <Button size="sm" variant="primary" onClick={handleBackToEditor}>
                   Tạo audio mới
                 </Button>
               </div>
             </CardHeader>
 
             <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {/* Final Audio Player */}
-              <AudioPlayer
-                title={projectName}
-                duration={stats.totalSecs}
-                voice={voice}
-                language={language === 'vi' ? 'Tiếng Việt' : language}
-                onDownloadWav={() => alert('Đang tải xuống tệp WAV...')}
-                onDownloadMp3={() => alert('Đang tải xuống tệp MP3...')}
-              />
+              {audioUrl ? (
+                <AudioPlayer
+                  title={projectName}
+                  voice={profiles.find((p) => p.profile_id === profileId)?.name || 'Voice profile'}
+                  language={languageLabel(language)}
+                  src={audioUrl}
+                  format={resolvedFormat ?? undefined}
+                  onError={() => setPlaybackError(true)}
+                />
+              ) : (
+                <ErrorState title="Thiếu tệp âm thanh" message="Tác vụ đã hoàn tất nhưng không có audio_url trả về từ backend." />
+              )}
 
-              {/* Customer Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', padding: '12px 16px', background: 'var(--neutral-50)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)' }}>
-                <span style={{ fontSize: '13px', color: 'var(--neutral-700)', fontWeight: 500 }}>
-                  Tệp âm thanh hoàn chỉnh đã sẵn sàng để tải về hoặc nghe lại.
-                </span>
-
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => alert('Đang tải xuống tệp MP3...')}
-                    iconLeft={
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                    }
-                  >
-                    Tải MP3
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => alert('Đang tải xuống tệp WAV...')}
-                    iconLeft={
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                      </svg>
-                    }
-                  >
-                    Tải WAV
-                  </Button>
-
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => setScreen('EDITOR')}
-                  >
-                    Tạo audio mới
-                  </Button>
-                </div>
-              </div>
+              {playbackError && (
+                <ErrorState
+                  title="Không thể phát âm thanh"
+                  message="Không tải được tệp âm thanh từ máy chủ (có thể đã bị xoá)."
+                />
+              )}
             </CardContent>
           </Card>
         </div>
       )}
 
       {/* ==================================================================
-          4. ERROR SCREEN (FRIENDLY CUSTOMER-FACING)
+          4. CANCELLED SCREEN
+          ================================================================== */}
+      {screen === 'CANCELLED' && job && (
+        <div style={{ maxWidth: '560px', margin: '40px auto', width: '100%' }}>
+          <Card>
+            <CardContent style={{ padding: '32px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <StatusBadge status="neutral" label="Đã huỷ" />
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--neutral-900)' }}>Đã huỷ tạo audio.</h2>
+                <p style={{ fontSize: '14px', color: 'var(--neutral-600)', marginTop: '6px', lineHeight: '1.5' }}>
+                  Bạn đã huỷ tác vụ trước khi hoàn tất. Không có tệp âm thanh nào được tạo.
+                </p>
+              </div>
+              <Button variant="primary" size="md" onClick={handleBackToEditor}>
+                Quay lại chỉnh sửa
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ==================================================================
+          5. ERROR SCREEN
           ================================================================== */}
       {screen === 'ERROR' && (
         <div style={{ maxWidth: '560px', margin: '40px auto', width: '100%' }}>
@@ -494,21 +426,19 @@ export const LongFormPage: React.FC = () => {
               </div>
 
               <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--neutral-900)' }}>
-                  Không thể hoàn tất audio.
-                </h2>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--neutral-900)' }}>Không thể hoàn tất audio.</h2>
                 <p style={{ fontSize: '14px', color: 'var(--neutral-600)', marginTop: '6px', lineHeight: '1.5' }}>
-                  Đã xảy ra sự cố trong quá trình tạo audio. Bạn có thể thử lại ngay bây giờ hoặc tiếp tục sau.
+                  {errorMessage || 'Đã xảy ra sự cố trong quá trình tạo audio. Bạn có thể thử lại ngay bây giờ hoặc tiếp tục sau.'}
                 </p>
+                {errorCode && (
+                  <code style={{ fontSize: '11px', marginTop: '6px', display: 'inline-block', background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {errorCode}
+                  </code>
+                )}
               </div>
 
-              {/* Actions: Thử lại, Để sau */}
               <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                <Button
-                  variant="outline"
-                  size="md"
-                  onClick={() => navigate('/projects')}
-                >
+                <Button variant="outline" size="md" onClick={() => navigate('/projects')}>
                   Để sau
                 </Button>
 
@@ -527,19 +457,10 @@ export const LongFormPage: React.FC = () => {
                   Thử lại
                 </Button>
               </div>
-
-              {/* Developer Mode Details (ONLY if Developer Mode is explicitly ON) */}
-              {isDevMode && (
-                <div style={{ marginTop: '16px', padding: '10px 14px', background: 'var(--neutral-100)', borderRadius: 'var(--radius-md)', fontSize: '11px', textAlign: 'left', width: '100%', fontFamily: 'var(--font-family-mono)', color: 'var(--neutral-600)' }}>
-                  <div>[DEV ERROR CODE] ERR_INFERENCE_TIMEOUT (Chunk #68)</div>
-                  <div>Retries: 2/2. Internal backend trace suppressed.</div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
       )}
-
     </div>
   );
 };

@@ -12,7 +12,7 @@ import logging
 from threading import Condition, RLock
 from typing import TYPE_CHECKING
 
-from backend.config import OMNIVOICE_PROVIDER_ID, Settings
+from backend.config import OMNIVOICE_PROVIDER_ID, PIPER_PROVIDER_ID, Settings
 from backend.errors import ApplicationError, ErrorCode
 from backend.schemas.providers import ProviderState, ProviderStatus, ProvidersResponse, VerifiedLanguage
 
@@ -209,12 +209,31 @@ class ProviderService:
 def create_provider_service(settings: Settings) -> ProviderService:
     # Adapter import/construction: numpy and metadata only, no Torch/model load.
     from providers.omnivoice import OmniVoiceProvider
+    from providers.piper import PiperProvider
 
-    provider = OmniVoiceProvider(device=settings.omnivoice_device)
+    # allow_unverified_cpu is the provider's own opt-in gate for its
+    # unbenchmarked CPU code path (see prototype/providers/omnivoice.py). It
+    # is enabled exactly when settings.omnivoice_device is "cpu" - which only
+    # happens when a customer deliberately chose CPU in Settings > Performance
+    # (see AppSettingsService.resolve_effective_settings() in backend/main.py's
+    # lifespan) or set LOCAL_AI_OMNIVOICE_DEVICE=cpu themselves. Either way,
+    # reaching this line with device == "cpu" already *is* the explicit
+    # consent the provider is asking for.
+    provider = OmniVoiceProvider(device=settings.omnivoice_device,
+                                 allow_unverified_cpu=(settings.omnivoice_device == "cpu"))
     if provider.provider_name() != OMNIVOICE_PROVIDER_ID:
         raise ApplicationError(ErrorCode.PROVIDER_NOT_FOUND)
     service = ProviderService()
     available = all(importlib.util.find_spec(name) is not None for name in ("torch", "omnivoice"))
     service.register(provider, device=settings.omnivoice_device, available=available)
     service.select_primary(settings.primary_tts_provider)
+
+    # Secondary provider, never primary: does not change the default (VI +
+    # cloning) synthesis path at all. TTSService routes to it only for its
+    # six explicitly-supported languages (see PiperProvider.LANGUAGES).
+    piper_provider = PiperProvider()
+    if piper_provider.provider_name() != PIPER_PROVIDER_ID:
+        raise ApplicationError(ErrorCode.PROVIDER_NOT_FOUND)
+    piper_available = all(importlib.util.find_spec(name) is not None for name in ("piper", "onnxruntime"))
+    service.register(piper_provider, device="cpu", available=piper_available)
     return service

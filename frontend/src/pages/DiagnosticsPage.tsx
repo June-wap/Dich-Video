@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -8,114 +8,179 @@ import {
   CardFooter,
   Button,
   StatusBadge,
-  ProgressBar,
   Modal,
+  ErrorState,
 } from '../components';
+import { systemService } from '../services/systemService';
+import type { SystemStatus } from '../services/systemService';
+import { healthService } from '../services/healthService';
+
+/**
+ * Task 12: this page used to be 100% invented data (a hardcoded "RTX 4050",
+ * fake VRAM/RAM gauges that never moved, a setInterval-animated fake "Self
+ * Test" that always passed, and a fixed sample log transcript from
+ * 2026-09-14 that was the same for every machine). Every value below now
+ * comes from a real backend call:
+ * - GET /api/system/status (backend/api/system.py) for hardware/runtime facts.
+ * - GET /api/system/logs (new this pass - backend/logging_config.py's
+ *   in-memory ring buffer, see get_recent_logs()) for real backend log lines.
+ * - GET /api/health for the real running version string.
+ *
+ * There is deliberately no VRAM/RAM usage gauge here anymore: the backend's
+ * SystemStatus schema does not report live GPU/RAM memory usage (adding it
+ * would also have broken test_system_schema_cache_and_no_internal_fields'
+ * exact-shape assertion - see this session's notes), so rather than half-fake
+ * it, this page simply doesn't claim to show it. The "Self Test" is now a
+ * real (if modest) connectivity check: it re-fetches /api/system/status and
+ * /api/health live and reports what actually came back, instead of an
+ * animated checklist that always ends in "All Checks Passed" regardless of
+ * whether a backend is even running.
+ */
+
+type CheckResult = 'PASS' | 'FAIL' | 'INFO';
 
 interface SelfTestStep {
   name: string;
-  status: 'PENDING' | 'RUNNING' | 'PASSED' | 'FAILED';
-  duration: string;
+  result: CheckResult;
+  detail: string;
 }
 
-const INITIAL_SELF_TEST_STEPS: SelfTestStep[] = [
-  { name: 'Khởi tạo CUDA Device Driver (RTX 4050)', status: 'PASSED', duration: '120ms' },
-  { name: 'Kiểm tra tệp nhị phân ONNX Runtime GPU', status: 'PASSED', duration: '85ms' },
-  { name: 'Kiểm tra Checksum Model Weights vi_voice_v1', status: 'PASSED', duration: '310ms' },
-  { name: 'Xác thực cơ sở dữ liệu SQLite & Migration', status: 'PASSED', duration: '45ms' },
-  { name: 'Kiểm tra bộ đệm âm thanh xuất bản 24kHz', status: 'PASSED', duration: '30ms' },
-];
-
-const SAMPLE_LOGS = `[2026-09-14 11:42:01.120] [INFO] [System] OmniVoice Desktop Client v0.3.0-alpha startup.
-[2026-09-14 11:42:01.245] [INFO] [CUDA] NVIDIA GeForce RTX 4050 detected (Compute Capability 8.9).
-[2026-09-14 11:42:01.310] [INFO] [CUDA] CUDA Driver 12.4 initialized. Total VRAM: 6144 MB.
-[2026-09-14 11:42:01.405] [INFO] [Python] Python 3.12.3 runtime active (CPython 64-bit).
-[2026-09-14 11:42:01.550] [INFO] [Storage] SQLite database opened: D:\\Tool Dich Cho Khach\\storage\\omnivoice.db
-[2026-09-14 11:42:01.620] [INFO] [Audio] Audio backend initialized: 24,000 Hz, 1 channel (Mono).
-[2026-09-14 11:42:01.890] [INFO] [Engine] Mock Engine Provider mounted. All subsystems ready.
-[2026-09-14 11:45:10.040] [INFO] [TTS] Synthetic request completed: 18.4s audio produced in 1.42s.`;
+function formatTimestamp(date: Date): string {
+  return date.toLocaleString('vi-VN', { hour12: false });
+}
 
 export const DiagnosticsPage: React.FC = () => {
-  // Mock Hardware metrics
-  const vramUsedGb = 1.8;
-  const vramTotalGb = 6.0;
-  const vramPercent = Math.round((vramUsedGb / vramTotalGb) * 100);
+  const [status, setStatus] = useState<SystemStatus | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [version, setVersion] = useState<string | null>(null);
+  const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
 
-  const ramUsedGb = 6.4;
-  const ramTotalGb = 16.0;
-  const ramPercent = Math.round((ramUsedGb / ramTotalGb) * 100);
+  const loadStatus = useCallback(async () => {
+    setStatusLoading(true);
+    setStatusError(null);
+    try {
+      const [statusData, healthData] = await Promise.all([
+        systemService.status(),
+        healthService.get().catch(() => null),
+      ]);
+      setStatus(statusData);
+      if (healthData) setVersion(healthData.version);
+      setLastFetchedAt(new Date());
+    } catch (err) {
+      setStatusError(err instanceof Error ? err.message : 'Không thể kết nối tới backend cục bộ.');
+      setStatus(null);
+    } finally {
+      setStatusLoading(false);
+    }
+  }, []);
 
-  // Self Test state
+  useEffect(() => {
+    void loadStatus();
+  }, [loadStatus]);
+
+  // Self test: a real, synchronous evaluation of the status just fetched -
+  // no animation, no fixed durations, no step that can "pass" independently
+  // of what the backend actually reported.
+  const [selfTestSteps, setSelfTestSteps] = useState<SelfTestStep[] | null>(null);
   const [isRunningTest, setIsRunningTest] = useState(false);
-  const [selfTestSteps, setSelfTestSteps] = useState<SelfTestStep[]>(INITIAL_SELF_TEST_STEPS);
-  const [testComplete, setTestComplete] = useState(true);
 
-  // Copy notification state
-  const [copiedNotification, setCopiedNotification] = useState(false);
-
-  // Logs modal
-  const [isLogsOpen, setIsLogsOpen] = useState(false);
-
-  // Run Self Test Simulation
-  const handleRunSelfTest = () => {
+  const runSelfTest = useCallback(async () => {
     setIsRunningTest(true);
-    setTestComplete(false);
+    try {
+      const [statusData, healthData] = await Promise.all([
+        systemService.status().catch(() => null),
+        healthService.get().catch(() => null),
+      ]);
+      setStatus(statusData);
+      if (healthData) setVersion(healthData.version);
+      setLastFetchedAt(new Date());
 
-    // Reset steps to pending
-    setSelfTestSteps(
-      INITIAL_SELF_TEST_STEPS.map((s) => ({ ...s, status: 'PENDING' }))
-    );
-
-    // Progressively execute steps
-    let currentIdx = 0;
-    const interval = window.setInterval(() => {
-      setSelfTestSteps((prev) =>
-        prev.map((step, idx) => {
-          if (idx < currentIdx) return { ...step, status: 'PASSED' };
-          if (idx === currentIdx) return { ...step, status: 'RUNNING' };
-          return step;
-        })
+      const steps: SelfTestStep[] = [];
+      steps.push(
+        healthData
+          ? { name: 'Kết nối backend cục bộ (GET /api/health)', result: 'PASS', detail: `v${healthData.version}` }
+          : { name: 'Kết nối backend cục bộ (GET /api/health)', result: 'FAIL', detail: 'Không có phản hồi' }
       );
-
-      currentIdx++;
-
-      if (currentIdx > INITIAL_SELF_TEST_STEPS.length) {
-        clearInterval(interval);
-        setSelfTestSteps(
-          INITIAL_SELF_TEST_STEPS.map((s) => ({ ...s, status: 'PASSED' }))
+      if (statusData) {
+        steps.push({
+          name: 'Truy vấn trạng thái hệ thống (GET /api/system/status)',
+          result: 'PASS',
+          detail: statusData.status,
+        });
+        steps.push(
+          statusData.cuda_available
+            ? { name: 'CUDA / GPU', result: 'PASS', detail: statusData.gpu_name ?? 'Đã phát hiện GPU' }
+            : { name: 'CUDA / GPU', result: 'INFO', detail: 'Không khả dụng - có thể đang chạy ở chế độ CPU thử nghiệm' }
         );
-        setIsRunningTest(false);
-        setTestComplete(true);
+        steps.push(
+          statusData.omnivoice_available
+            ? statusData.omnivoice_model_loaded
+              ? { name: 'Mô hình OmniVoice', result: 'PASS', detail: 'Đã nạp và sẵn sàng' }
+              : { name: 'Mô hình OmniVoice', result: 'INFO', detail: 'Sẵn sàng nhưng chưa nạp (sẽ tự nạp ở lần tạo giọng đầu tiên)' }
+            : { name: 'Mô hình OmniVoice', result: 'FAIL', detail: `Trạng thái: ${statusData.provider_state}` }
+        );
+        steps.push({
+          name: 'Cấu hình audio pipeline',
+          result: 'INFO',
+          detail: `${statusData.audio.sample_rate.toLocaleString('vi-VN')} Hz, ${statusData.audio.channels} kênh (cố định theo thiết kế, không đo tại đây)`,
+        });
+      } else {
+        steps.push({
+          name: 'Truy vấn trạng thái hệ thống (GET /api/system/status)',
+          result: 'FAIL',
+          detail: 'Không có phản hồi',
+        });
       }
-    }, 400);
-  };
+      setSelfTestSteps(steps);
+    } finally {
+      setIsRunningTest(false);
+    }
+  }, []);
 
-  // Copy diagnostics JSON to clipboard
+  // Copy diagnostics JSON to clipboard - built from whatever was actually
+  // fetched, honestly reporting null/unknown fields instead of inventing them.
+  const [copiedNotification, setCopiedNotification] = useState(false);
   const handleCopyDiagnostics = () => {
     const report = {
       timestamp: new Date().toISOString(),
-      status: 'MOCK_PROVIDER_ACTIVE',
-      connected: false,
-      hardware: {
-        gpu: 'NVIDIA GeForce RTX 4050',
-        vram: `${vramUsedGb} GB / ${vramTotalGb} GB (${vramPercent}%)`,
-        ram: `${ramUsedGb} GB / ${ramTotalGb} GB (${ramPercent}%)`,
-        cuda: 'Available (v12.4)',
-      },
-      runtime: {
-        python: 'Python 3.12.3',
-        omnivoice: 'OmniVoice Ready (Mock Engine v1)',
-        model: 'vi_voice_v1.onnx (Loaded)',
-        audio: '24,000 Hz Mono (PCM)',
-      },
-      note: 'Values generated by Frontend Mock Architecture. Real Python backend not connected.',
+      fetched_at: lastFetchedAt?.toISOString() ?? null,
+      backend_reachable: status !== null,
+      version: version,
+      status: status ?? { error: statusError ?? 'no data fetched' },
     };
-
     navigator.clipboard.writeText(JSON.stringify(report, null, 2)).then(() => {
       setCopiedNotification(true);
       setTimeout(() => setCopiedNotification(false), 2500);
     });
   };
+
+  // Logs modal - real backend log lines (in-memory ring buffer, see
+  // backend/logging_config.py's get_recent_logs(); never written to disk).
+  const [isLogsOpen, setIsLogsOpen] = useState(false);
+  const [logs, setLogs] = useState<string[] | null>(null);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsError, setLogsError] = useState<string | null>(null);
+
+  const loadLogs = useCallback(async () => {
+    setLogsLoading(true);
+    setLogsError(null);
+    try {
+      const response = await systemService.logs();
+      setLogs(response.logs);
+    } catch (err) {
+      setLogsError(err instanceof Error ? err.message : 'Không thể tải nhật ký.');
+    } finally {
+      setLogsLoading(false);
+    }
+  }, []);
+
+  const handleOpenLogs = () => {
+    setIsLogsOpen(true);
+    void loadLogs();
+  };
+
+  const omnivoiceReady = status?.omnivoice_available && status.omnivoice_model_loaded;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -126,248 +191,161 @@ export const DiagnosticsPage: React.FC = () => {
             Diagnostics (Chẩn đoán hệ thống)
           </h1>
           <p style={{ fontSize: '13px', color: 'var(--neutral-500)', marginTop: '2px' }}>
-            Kiểm tra trạng thái phần cứng, GPU VRAM, mô hình và nhật ký thực thi cục bộ
+            Trạng thái phần cứng, mô hình và nhật ký thực thi - lấy trực tiếp từ backend cục bộ
           </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <StatusBadge status="warning" label="Mock Provider Active" size="sm" />
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCopyDiagnostics}
-            iconLeft={
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-            }
-          >
+          {status && (
+            <StatusBadge
+              status={status.status === 'ready' ? 'success' : 'warning'}
+              label={status.status === 'ready' ? 'Backend Ready' : 'Degraded'}
+              size="sm"
+            />
+          )}
+          <Button size="sm" variant="outline" onClick={handleCopyDiagnostics}>
             {copiedNotification ? 'Đã sao chép!' : 'Copy Diagnostics'}
           </Button>
-
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setIsLogsOpen(true)}
-            iconLeft={
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-            }
-          >
-            Open Logs
+          <Button size="sm" variant="outline" onClick={handleOpenLogs}>
+            Xem nhật ký
           </Button>
-
-          <Button
-            size="sm"
-            variant="primary"
-            isLoading={isRunningTest}
-            onClick={handleRunSelfTest}
-            iconLeft={
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-              </svg>
-            }
-          >
-            Run Self Test
+          <Button size="sm" variant="primary" isLoading={isRunningTest} onClick={() => void runSelfTest()}>
+            Kiểm tra kết nối
           </Button>
         </div>
       </div>
 
-      {/* Mock Notice Banner */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: 'var(--color-primary-50)', border: '1px solid var(--color-primary-200)', borderRadius: 'var(--radius-md)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <StatusBadge status="info" label="NOTE" size="sm" showDot={false} />
-          <span style={{ fontSize: '13px', color: 'var(--color-primary-900)' }}>
-            Các thông số hiển thị dưới đây là <strong>giá trị mô phỏng (Mock Values)</strong> do chưa kết nối backend Python.
-          </span>
+      {statusError && (
+        <ErrorState
+          title="Không thể kết nối tới backend cục bộ"
+          message={statusError}
+          retryLabel="Thử lại"
+          onRetry={() => void loadStatus()}
+        />
+      )}
+
+      {statusLoading && !status && !statusError && (
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--neutral-500)', fontSize: '13px' }}>
+          Đang tải trạng thái hệ thống...
         </div>
-        <span style={{ fontSize: '12px', color: 'var(--color-primary-700)', fontFamily: 'var(--font-family-mono)' }}>
-          CP0.3A-7 Verified
-        </span>
-      </div>
+      )}
 
-      {/* 6 Required Diagnostic Cards: GPU, CUDA, OmniVoice, Model, Python, Audio */}
-      <div className="ds-diagnostics-grid">
-        {/* 1. GPU */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">GPU Card</span>
-            <StatusBadge status="success" label="Active" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">RTX 4050</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            NVIDIA GeForce Dedicated Graphics (6GB GDDR6)
-          </span>
-        </div>
-
-        {/* 2. CUDA */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">CUDA Support</span>
-            <StatusBadge status="success" label="Available" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">CUDA Available</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            Driver Version: 12.4 (Compute 8.9)
-          </span>
-        </div>
-
-        {/* 3. OmniVoice */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">OmniVoice Core</span>
-            <StatusBadge status="success" label="Ready" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">OmniVoice Ready</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            Local Inference Pipeline v1.0 (Zero API Fee)
-          </span>
-        </div>
-
-        {/* 4. Model */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">Voice Model</span>
-            <StatusBadge status="success" label="Loaded" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">Model Loaded</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            vi_voice_v1.onnx (FP16 Optimized)
-          </span>
-        </div>
-
-        {/* 5. Python */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">Python Runtime</span>
-            <StatusBadge status="success" label="Active" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">Python 3.12</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            Virtualenv .venv (64-bit Windows)
-          </span>
-        </div>
-
-        {/* 6. Audio */}
-        <div className="ds-diagnostic-card">
-          <div className="ds-diagnostic-header">
-            <span className="ds-diagnostic-title">Audio Pipeline</span>
-            <StatusBadge status="success" label="Configured" size="sm" />
-          </div>
-          <div className="ds-diagnostic-value">24 kHz Mono</div>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            16-bit Linear PCM Audio Buffer
-          </span>
-        </div>
-      </div>
-
-      {/* Memory & VRAM Gauges */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
-        {/* VRAM Usage Card */}
-        <Card>
-          <CardHeader>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <CardTitle>VRAM Mock Usage (RTX 4050)</CardTitle>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--neutral-800)', fontFamily: 'var(--font-family-mono)' }}>
-                {vramUsedGb} GB / {vramTotalGb} GB ({vramPercent}%)
-              </span>
-            </div>
-            <CardDescription>Bộ nhớ đệm đồ họa đang được phân bổ cho mô hình suy luận</CardDescription>
-          </CardHeader>
-          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <ProgressBar value={vramPercent} size="md" status="default" />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--neutral-500)' }}>
-              <span>Đang dùng: {vramUsedGb} GB</span>
-              <span>Còn trống: {(vramTotalGb - vramUsedGb).toFixed(1)} GB</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* System RAM Card */}
-        <Card>
-          <CardHeader>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <CardTitle>RAM Mock Usage (Hệ thống)</CardTitle>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--neutral-800)', fontFamily: 'var(--font-family-mono)' }}>
-                {ramUsedGb} GB / {ramTotalGb} GB ({ramPercent}%)
-              </span>
-            </div>
-            <CardDescription>Bộ nhớ RAM máy tính cho tiến trình SQLite và xử lý văn bản</CardDescription>
-          </CardHeader>
-          <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <ProgressBar value={ramPercent} size="md" status="default" />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--neutral-500)' }}>
-              <span>Đang dùng: {ramUsedGb} GB</span>
-              <span>Còn trống: {(ramTotalGb - ramUsedGb).toFixed(1)} GB</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Self Test Checklist Card */}
-      <Card>
-        <CardHeader>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <CardTitle>Kết quả kiểm tra tự động (Self Test Checklist)</CardTitle>
-              <CardDescription>Kiểm tra tính toàn vẹn của các thành phần cốt lõi</CardDescription>
-            </div>
-            {testComplete && (
-              <StatusBadge status="success" label="All Checks Passed" size="sm" />
-            )}
-          </div>
-        </CardHeader>
-
-        <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {selfTestSteps.map((step, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 14px',
-                background: 'var(--surface-subtle)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-subtle)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <StatusBadge
-                  status={step.status === 'PASSED' ? 'success' : step.status === 'RUNNING' ? 'info' : 'neutral'}
-                  label={step.status}
-                  size="sm"
-                />
-                <span style={{ fontSize: '13px', color: 'var(--neutral-800)', fontWeight: 500 }}>
-                  {step.name}
-                </span>
+      {status && (
+        <>
+          {/* 6 Diagnostic Cards - every value is what /api/system/status just returned */}
+          <div className="ds-diagnostics-grid">
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">GPU</span>
+                <StatusBadge status={status.gpu_name ? 'success' : 'neutral'} label={status.gpu_name ? 'Đã phát hiện' : 'Không phát hiện'} size="sm" />
               </div>
-              <span style={{ fontSize: '12px', color: 'var(--neutral-500)', fontFamily: 'var(--font-family-mono)' }}>
-                {step.status === 'PASSED' ? step.duration : '...'}
+              <div className="ds-diagnostic-value">{status.gpu_name ?? 'Không có GPU'}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
+                {status.gpu_name ? 'Từ torch.cuda.get_device_name()' : 'Có thể đang chạy CPU hoặc driver CUDA chưa sẵn sàng'}
               </span>
             </div>
-          ))}
-        </CardContent>
 
-        <CardFooter style={{ justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-            Lần kiểm tra gần nhất: Vừa xong
-          </span>
-          <Button
-            size="sm"
-            variant="outline"
-            isLoading={isRunningTest}
-            onClick={handleRunSelfTest}
-          >
-            Chạy lại kiểm tra
-          </Button>
-        </CardFooter>
-      </Card>
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">CUDA</span>
+                <StatusBadge status={status.cuda_available ? 'success' : 'neutral'} label={status.cuda_available ? 'Available' : 'Unavailable'} size="sm" />
+              </div>
+              <div className="ds-diagnostic-value">{status.cuda_available ? 'CUDA Available' : 'CUDA Unavailable'}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>torch: {status.torch_version ?? 'không xác định'}</span>
+            </div>
 
-      {/* Logs Viewer Modal */}
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">OmniVoice Core</span>
+                <StatusBadge status={omnivoiceReady ? 'success' : 'warning'} label={status.provider_state} size="sm" />
+              </div>
+              <div className="ds-diagnostic-value">{omnivoiceReady ? 'Ready' : status.provider_state}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Provider chính: {status.primary_provider}</span>
+            </div>
+
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">Model đã nạp</span>
+                <StatusBadge status={status.omnivoice_model_loaded ? 'success' : 'neutral'} label={status.omnivoice_model_loaded ? 'Loaded' : 'Chưa nạp'} size="sm" />
+              </div>
+              <div className="ds-diagnostic-value">{status.omnivoice_model_loaded ? 'Model Loaded' : 'Chưa nạp model'}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
+                {status.omnivoice_model_loaded ? 'Sẵn sàng tổng hợp ngay' : 'Sẽ tự nạp ở lần tạo giọng nói đầu tiên'}
+              </span>
+            </div>
+
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">Python Runtime</span>
+                <StatusBadge status="success" label="Active" size="sm" />
+              </div>
+              <div className="ds-diagnostic-value">Python {status.python_version}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Ứng dụng: v{version ?? '—'}</span>
+            </div>
+
+            <div className="ds-diagnostic-card">
+              <div className="ds-diagnostic-header">
+                <span className="ds-diagnostic-title">Audio Pipeline</span>
+                <StatusBadge status="success" label="Cố định" size="sm" />
+              </div>
+              <div className="ds-diagnostic-value">
+                {status.audio.sample_rate.toLocaleString('vi-VN')} Hz, {status.audio.channels === 1 ? 'Mono' : `${status.audio.channels} kênh`}
+              </div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
+                Cố định theo hợp đồng API (không cấu hình được) - không phải giá trị đo tại thời điểm này
+              </span>
+            </div>
+          </div>
+
+          {/* Self Test results - only shown after the user actually runs it */}
+          {selfTestSteps && (
+            <Card>
+              <CardHeader>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <CardTitle>Kết quả kiểm tra kết nối</CardTitle>
+                    <CardDescription>Gọi trực tiếp GET /api/health và GET /api/system/status - không mô phỏng</CardDescription>
+                  </div>
+                  <StatusBadge
+                    status={selfTestSteps.some((s) => s.result === 'FAIL') ? 'error' : 'success'}
+                    label={selfTestSteps.some((s) => s.result === 'FAIL') ? 'Có lỗi' : 'Tất cả đều ổn'}
+                    size="sm"
+                  />
+                </div>
+              </CardHeader>
+              <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {selfTestSteps.map((step, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 14px', background: 'var(--surface-subtle)',
+                      borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <StatusBadge
+                        status={step.result === 'PASS' ? 'success' : step.result === 'FAIL' ? 'error' : 'neutral'}
+                        label={step.result}
+                        size="sm"
+                      />
+                      <span style={{ fontSize: '13px', color: 'var(--neutral-800)', fontWeight: 500 }}>{step.name}</span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>{step.detail}</span>
+                  </div>
+                ))}
+              </CardContent>
+              <CardFooter>
+                <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
+                  Lần kiểm tra gần nhất: {lastFetchedAt ? formatTimestamp(lastFetchedAt) : '—'}
+                </span>
+              </CardFooter>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Logs Viewer Modal - real in-memory backend log lines */}
       <Modal
         isOpen={isLogsOpen}
         onClose={() => setIsLogsOpen(false)}
@@ -376,18 +354,31 @@ export const DiagnosticsPage: React.FC = () => {
         footer={
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
             <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-              Đường dẫn tệp: <code>D:\Tool Dich Cho Khach\logs\app.log</code>
+              {logs ? `${logs.length} dòng gần nhất (bộ nhớ đệm, không ghi ra đĩa)` : ''}
             </span>
-            <Button variant="outline" size="md" onClick={() => setIsLogsOpen(false)}>
-              Đóng
-            </Button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Button variant="outline" size="sm" onClick={() => void loadLogs()} disabled={logsLoading}>
+                Làm mới
+              </Button>
+              <Button variant="outline" size="md" onClick={() => setIsLogsOpen(false)}>
+                Đóng
+              </Button>
+            </div>
           </div>
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <div className="ds-log-box">
-            {SAMPLE_LOGS}
-          </div>
+          {logsError ? (
+            <ErrorState title="Không thể tải nhật ký" message={logsError} retryLabel="Thử lại" onRetry={() => void loadLogs()} />
+          ) : logsLoading ? (
+            <div style={{ padding: '24px', textAlign: 'center', fontSize: '13px', color: 'var(--neutral-500)' }}>Đang tải...</div>
+          ) : logs && logs.length > 0 ? (
+            <div className="ds-log-box">{logs.join('\n')}</div>
+          ) : (
+            <div style={{ padding: '24px', textAlign: 'center', fontSize: '13px', color: 'var(--neutral-500)' }}>
+              Chưa có dòng nhật ký nào trong bộ nhớ đệm (backend có thể vừa khởi động lại - bộ đệm không tồn tại qua lần khởi động lại).
+            </div>
+          )}
         </div>
       </Modal>
     </div>

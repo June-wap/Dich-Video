@@ -22,11 +22,27 @@ from backend.schemas.common import ErrorBody
 from backend.schemas.long_form import LongFormRequest, LongFormStatus
 from core.languages import VERIFIED, language_status
 from core.tts_manager import TTSManager
-from core.long_text import build_chunks
+from core.long_text import ChunkingConfig, build_chunks
 from backend.persistence import Repository
 
 logger = logging.getLogger("backend.long_form")
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED"}
+
+# Task 3.5 (TTS performance): benchmark-proven long-form chunk sizing.
+# Fewer, larger chunks cut fixed per-chunk overhead (CUDA sync barriers, a
+# full-file WAV re-validation per chunk, an extra disk copy, three DB writes)
+# without touching inference itself: num_step, the model and the provider are
+# all unchanged. Measured on the fixed long-form Vietnamese corpus against the
+# production TTSManager + OmniVoiceProvider path (not just the vendored
+# package): 15 chunks / 26.613s / RTF 0.2895 (old default 100/160/1) versus
+# 7 chunks / 16.727s / RTF 0.1822 (this config) -- ~37% faster wall time,
+# text integrity PASS, valid WAV/MP3, model_load_count stayed 1, peak VRAM
+# +~3.3%. Single source of truth: both the preflight build_chunks() call and
+# the synthesize_long_text() call in _run() below must reference this exact
+# object, never a re-declared literal, so they can never silently chunk
+# differently from each other (see test_long_form.py::
+# test_preflight_and_synthesis_use_identical_chunk_config).
+LONG_FORM_CHUNK_CONFIG = ChunkingConfig(target_chars=240, max_chars=320, max_sentences_per_chunk=3)
 
 
 def validate_wav(path: Path) -> dict:
@@ -58,10 +74,17 @@ class _Job:
 
 
 class LongFormTTSService:
-    def __init__(self, settings, providers, profiles):
+    def __init__(self, settings, providers, profiles, app_settings_service=None):
         self._settings = settings
         self._providers = providers
         self._profiles = profiles
+        # Optional, defaults to None so existing callers/tests that construct
+        # this service directly keep today's exact behavior (max_retries=0,
+        # provider's own default num_step - see _run() below). When present
+        # (real backend startup via main.py), Settings > Performance's Retry
+        # Count and Advanced's num_step become live inputs to every long-form
+        # job's per-chunk synthesis, matching TTSService's Short TTS wiring.
+        self._app_settings = app_settings_service
         self._output = Path(settings.output_dir)
         self._staging = self._output / "long_form_private"
         self._staging.mkdir(parents=True, exist_ok=True)
@@ -174,6 +197,21 @@ class LongFormTTSService:
         work = self._staging / job_id
         published = []
         started = time.perf_counter()
+        # Settings > Performance > Retry Count is expressed there as "N total
+        # attempts" (see TTSService._run()'s identical mapping for Short TTS);
+        # TTSManager's own max_retries means "extra attempts after the first"
+        # (see prototype/core/tts_manager.py, `range(1, max_retries + 2)`), so
+        # max_retries = retry_count - 1. 0 (today's exact hardcoded value, no
+        # retry) when no AppSettingsService is wired in.
+        max_retries = max(0, self._app_settings.resolve_retry_count() - 1) if self._app_settings is not None else 0
+        num_step = self._app_settings.resolve_num_steps() if self._app_settings is not None else None
+        # Long-form always synthesizes through OmniVoice's synthesize_cloned()
+        # (cloning is the only path here, unlike TTSService which also routes
+        # some languages to PiperProvider) so this can be passed
+        # unconditionally - no INVALID_OPTIONS risk the way TTSService has to
+        # guard against for Piper. See prototype/providers/omnivoice.py's
+        # `_trim_silence` for what this actually does per chunk.
+        silence_trim = self._app_settings.resolve_silence_trim() if self._app_settings is not None else False
         try:
             self._profiles.restore_profile(record)
             provider = self._providers.get_provider(record.provider_id)
@@ -192,7 +230,7 @@ class LongFormTTSService:
             positions = [i for i, char in enumerate(request.text) if not char.isspace()]
             source = ''.join(request.text[i] for i in positions)
             cursor = 0
-            for chunk in build_chunks(request.text):
+            for chunk in build_chunks(request.text, LONG_FORM_CHUNK_CONFIG):
                 content = ''.join(chunk.text.split())
                 end = cursor + len(content)
                 if source[cursor:end] != content:
@@ -211,7 +249,8 @@ class LongFormTTSService:
                         raise ValueError()
                     result = provider.synthesize_cloned(text=text, language=language,
                                                        profile=record.provider_profile,
-                                                       output_path=output_path)
+                                                       output_path=output_path, num_step=num_step,
+                                                       trim_silence=silence_trim)
                     if (result.status != "PASS" or not result.wav_path
                             or Path(result.wav_path).resolve() != Path(output_path).resolve()
                             or getattr(provider, "_model", None) is not model
@@ -238,7 +277,8 @@ class LongFormTTSService:
 
             result = manager.synthesize_long_text(
                 request.text, request.language, "omnivoice_auto",
-                filename="final.wav", max_retries=0, chunk_synthesizer=synthesize,
+                filename="final.wav", chunk_config=LONG_FORM_CHUNK_CONFIG,
+                max_retries=max_retries, chunk_synthesizer=synthesize,
                 audio_validator=validate_wav, export_mp3_enabled=request.format == "mp3",
                 on_progress=progress, is_cancelled=job.cancel.is_set)
             # The voice_id above only selects the registered provider in legacy

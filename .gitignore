@@ -50,3 +50,7 @@ Thumbs.db
 .env
 .env.local
 *.env
+# Local API auth session token (security P0 - see backend/config.py's
+# DEFAULT_TOKEN_PATH / checklist-bao-mat-truoc-dong-goi-17-09.md item 1) -
+# regenerated fresh every backend start, never meant to be committed.
+.runtime/

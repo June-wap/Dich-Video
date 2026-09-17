@@ -19,14 +19,13 @@ async def get_audio(
     if not SAFE_ARTIFACT_RE.fullmatch(artifact_id):
         raise ApplicationError(ErrorCode.ARTIFACT_NOT_FOUND)
 
-    base_dir = service.output_dir.resolve()
-    target_file = (base_dir / artifact_id).resolve()
-
-    try:
-        if not target_file.is_relative_to(base_dir):
-            raise ApplicationError(ErrorCode.ARTIFACT_NOT_FOUND)
-    except (ValueError, AttributeError):
-        raise ApplicationError(ErrorCode.ARTIFACT_NOT_FOUND)
+    # resolve_audio_path() looks up the directory this specific job actually
+    # wrote to (which may differ from today's default if Settings > Audio's
+    # Output Directory changed since), falling back to the current default
+    # directory - see TTSService.resolve_audio_path(). artifact_id is already
+    # constrained by SAFE_ARTIFACT_RE to a bare "<uuid>.<ext>" with no path
+    # separators, so joining it onto either directory can never escape it.
+    target_file = service.resolve_audio_path(artifact_id).resolve()
 
     if not target_file.is_file():
         raise ApplicationError(ErrorCode.ARTIFACT_NOT_FOUND)

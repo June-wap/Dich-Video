@@ -92,3 +92,19 @@ table {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--neutral-400);
 }
+
+/* Respect OS-level "reduce motion" preference.
+   Does not remove any animation for users who have NOT enabled this OS
+   setting — default behavior (spinners, transitions, hover motion) is
+   unchanged. Only shortens/stops motion for users who opted in via OS
+   accessibility settings. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

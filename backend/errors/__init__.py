@@ -30,6 +30,13 @@ class ErrorCode(str, Enum):
     VOICE_PROFILE_NOT_FOUND = "VOICE_PROFILE_NOT_FOUND"
     VOICE_PROFILE_NOT_READY = "VOICE_PROFILE_NOT_READY"
     CLONE_GENERATION_FAILED = "CLONE_GENERATION_FAILED"
+    IDEMPOTENCY_KEY_CONFLICT = "IDEMPOTENCY_KEY_CONFLICT"
+    # BYOK machine-translation step (backend/services/translation_service.py).
+    TRANSLATION_KEY_REQUIRED = "TRANSLATION_KEY_REQUIRED"
+    TRANSLATION_FAILED = "TRANSLATION_FAILED"
+    # Security P0 local API auth token (backend/main.py's request_boundary,
+    # backend/api/auth.py) - missing/wrong X-Local-Token header or ?token=.
+    UNAUTHORIZED = "UNAUTHORIZED"
 
 
 class ApplicationError(Exception):

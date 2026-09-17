@@ -1,19 +1,122 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '../Button/Button';
 import { StatusBadge } from '../StatusBadge/StatusBadge';
+import type { TtsAudioFormat } from '../../services/ttsJobService';
 
 export interface AudioPlayerProps {
   title?: string;
-  duration?: number; // duration in seconds, default 18
+  duration?: number; // duration in seconds, default 18 - SimulatedAudioPlayer only
   voice?: string;
   language?: string;
   onDownloadWav?: () => void;
   onDownloadMp3?: () => void;
   onRegenerate?: () => void;
   className?: string;
+  /**
+   * A real, fetchable audio URL (already resolved via
+   * ttsJobService.resolveAudioUrl - never reconstructed here). When present,
+   * AudioPlayer renders RealAudioPlayer (a native <audio controls> element)
+   * instead of the old simulated timeline. Absent - the default, and still
+   * what every mock caller (LongFormPage, HistoryPage's modal) passes -
+   * keeps the original SimulatedAudioPlayer behavior unchanged.
+   */
+  src?: string;
+  /** Best-effort format label (WAV/MP3) for the RealAudioPlayer's badge and
+   * download button text. Purely cosmetic - does not affect playback. */
+  format?: TtsAudioFormat;
+  /** Real playback error handler - fires when the browser fails to load the
+   * given `src` (e.g. the backend audio artifact has since been deleted and
+   * now 404s). Only meaningful together with `src`. */
+  onError?: () => void;
 }
 
-export const AudioPlayer: React.FC<AudioPlayerProps> = ({
+/**
+ * Dispatcher: real playback when a real `src` is supplied (Task 3's
+ * persisted TTS Job API), the original mock/simulated player otherwise -
+ * every existing caller that doesn't pass `src` keeps working unchanged.
+ */
+export const AudioPlayer: React.FC<AudioPlayerProps> = (props) => {
+  if (props.src) {
+    return <RealAudioPlayer {...props} src={props.src} />;
+  }
+  return <SimulatedAudioPlayer {...props} />;
+};
+
+/**
+ * Real playback backed by an actual backend audio URL. Uses the native
+ * <audio controls> element rather than extending the fully custom
+ * fake-timeline player below: it gets real seeking, volume, and
+ * keyboard/screen-reader accessibility from the browser for free, and needs
+ * no fake duration/progress simulation - the browser already knows the
+ * file's real duration once it loads.
+ */
+const RealAudioPlayer: React.FC<AudioPlayerProps & { src: string }> = ({
+  title = 'Kết quả âm thanh',
+  voice = 'Mặc định',
+  language = 'Vietnamese',
+  format,
+  src,
+  onError,
+}) => {
+  const formatLabel = format ? format.toUpperCase() : null;
+
+  return (
+    <div className="ds-audio-player">
+      <div className="ds-audio-player-meta">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="ds-audio-player-title">{title}</span>
+          {formatLabel && <StatusBadge status="success" label={formatLabel} size="sm" />}
+        </div>
+
+        <div className="ds-audio-player-tags">
+          <StatusBadge status="neutral" label={`Voice: ${voice}`} size="sm" showDot={false} />
+          <StatusBadge status="info" label={language} size="sm" showDot={false} />
+        </div>
+      </div>
+
+      {/* Real, native playback - keyboard-accessible and screen-reader
+          friendly out of the box, unlike the fully custom timeline below. */}
+      <audio controls src={src} onError={onError} style={{ width: '100%', marginTop: '8px' }}>
+        Trình duyệt của bạn không hỗ trợ phát tệp âm thanh.
+      </audio>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          borderTop: '1px solid var(--border-subtle)',
+          paddingTop: '10px',
+          marginTop: '10px',
+        }}
+      >
+        {/* A real <a href download> rather than a JS-driven "Mock Download"
+            handler - it downloads the actual backend artifact bytes. */}
+        <a
+          href={src}
+          download
+          className="ds-btn ds-btn--outline ds-btn--sm"
+          style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Tải xuống {formatLabel ?? 'tệp âm thanh'}</span>
+        </a>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Original fully-simulated fake-timeline player. Unchanged in behavior from
+ * before Task 3 aside from the rename - preserved as-is for every caller
+ * that has no real `src` (LongFormPage, HistoryPage's replay modal, and any
+ * other mock flow not yet migrated to a real backend).
+ */
+const SimulatedAudioPlayer: React.FC<AudioPlayerProps> = ({
   title = 'Generated Audio Result',
   duration = 18.4,
   voice = 'vi-VN-HoaiMy',

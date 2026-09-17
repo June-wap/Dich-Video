@@ -37,7 +37,7 @@
 }
 
 .ds-btn--md {
-  height: 36px;
+  height: var(--space-10); /* 40px — was 36px; closer to the 44px touch-target guideline for the primary/default button size */
   padding: 0 var(--space-4);
   font-size: var(--font-size-base);
   border-radius: var(--radius-md);
@@ -277,7 +277,7 @@
 
 .ds-input,
 .ds-select {
-  height: 36px;
+  height: var(--space-10); /* 40px — was 36px, to match the .ds-btn--md touch-target fix */
   padding: 0 var(--space-3);
 }
 
@@ -823,7 +823,7 @@
    -------------------------------------------------------------------------- */
 .ds-action-cards-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* was repeat(4, 1fr) — Dashboard now has 3 action cards (Long-form Studio removed) */
   gap: var(--space-4);
 }
 

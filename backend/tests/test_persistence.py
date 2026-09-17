@@ -19,8 +19,10 @@ from backend.persistence import (
     checksum,
 )
 from backend.schemas.long_form import LongFormRequest, LongFormStatus
+from backend.schemas.voices import CloneTestRequest
 from backend.services.long_form_service import LongFormTTSService
 from backend.services.provider_service import ProviderService
+from backend.services.translation_service import TranslationService
 from backend.services.tts_service import TTSService
 from backend.services.voice_profile_service import VoiceProfileService
 from backend.tests.provider_fakes import FakeCloneProvider, registry
@@ -395,7 +397,14 @@ def test_short_tts_job_persistence(tmp_path):
     settings = Settings(output_dir=tmp_path / "short", database_path=tmp_path / "short.sqlite3")
     provider = FakeCloneProvider()
     providers = registry(provider)
-    tts_service = TTSService(settings, providers)
+    # TTSService.__init__ has needed translation_service/voice_profile_service
+    # since a Short TTS job's voice_id can also name a cloned voice profile
+    # (see main.py's lifespan) - real, cheap-to-construct services here (no
+    # network call happens unless translate()/create_voice_profile() is
+    # actually invoked, and this test's request is Vietnamese, so neither is).
+    translation_service = TranslationService(settings)
+    voice_profile_service = VoiceProfileService(settings, providers)
+    tts_service = TTSService(settings, providers, translation_service, voice_profile_service)
 
     from backend.schemas.tts import TTSRequest
 
@@ -416,3 +425,109 @@ def test_short_tts_job_persistence(tmp_path):
     outputs = tts_service._db.get_audio_outputs(gen_id)
     assert len(outputs) == 1
     assert outputs[0]["format"] == "wav"
+
+
+def test_clone_job_persistence_success(tmp_path):
+    """A completed clone generation must persist kind='clone', COMPLETED status,
+    the owning profile_id, a queryable execution_snapshot, and an audio_outputs
+    row whose checksum matches the artifact actually written to disk."""
+    settings = Settings(output_dir=tmp_path / "clone_ok", database_path=tmp_path / "clone_ok.sqlite3")
+    provider = FakeCloneProvider()
+    providers = registry(provider)
+    vps = VoiceProfileService(settings, providers)
+
+    audio = io.BytesIO()
+    sf.write(audio, np.ones(72000) * 0.1, 24000, format="WAV")
+    profile = vps.create_profile(audio.getvalue(), "ref.wav", "Câu mẫu giọng gốc.", "Giọng test persistence")
+    profile_id = profile.data.profile_id
+    provider_id = profile.data.provider
+
+    resp = vps.synthesize_clone(
+        profile_id,
+        CloneTestRequest(text="Xin chào, đây là kiểm tra persistence cho clone.", language="vi", speed=1.0, format="wav"),
+    )
+    assert resp.ok is True
+    assert resp.data.status == "completed"
+    generation_id = resp.data.generation_id
+
+    # Job row: kind, terminal status, owning profile, no error.
+    job = vps._db.get_job(generation_id)
+    assert job is not None
+    assert job["kind"] == "clone"
+    assert job["status"] == "COMPLETED"
+    assert job["profile_id"] == profile_id
+    assert job["error_code"] is None
+    assert job["completed_at"] is not None
+
+    snapshot = json.loads(job["snapshot"])
+    assert snapshot["status"] == "COMPLETED"
+    assert snapshot["audio_url"] == f"/api/audio/{generation_id}.wav"
+
+    # Execution snapshot: immutable record of what generated this job.
+    execution_snapshot = json.loads(job["execution_snapshot"])
+    assert execution_snapshot["request"]["text"] == "Xin chào, đây là kiểm tra persistence cho clone."
+    assert execution_snapshot["provider_id"] == provider_id
+    assert execution_snapshot["audio"]["sample_rate"] == 24000
+    assert execution_snapshot["audio"]["format"] == "wav"
+
+    # Audio output row + checksum matches the artifact on disk.
+    outputs = vps._db.get_audio_outputs(generation_id)
+    assert len(outputs) == 1
+    output = outputs[0]
+    assert output["job_id"] == generation_id
+    assert output["format"] == "wav"
+    assert output["checksum"] is not None
+    output_path = Path(output["path"])
+    assert output_path.is_file()
+    assert output["checksum"] == checksum(output_path)
+
+
+def test_clone_job_persistence_failure(tmp_path):
+    """A clone generation that fails inside the provider must leave the job
+    FAILED with the correct error_code and must not persist a completed
+    audio_outputs row or leave a generated artifact on disk."""
+    settings = Settings(output_dir=tmp_path / "clone_fail", database_path=tmp_path / "clone_fail.sqlite3")
+    provider = FakeCloneProvider()
+    providers = registry(provider)
+    vps = VoiceProfileService(settings, providers)
+
+    audio = io.BytesIO()
+    sf.write(audio, np.ones(72000) * 0.1, 24000, format="WAV")
+    profile_id = vps.create_profile(
+        audio.getvalue(), "ref.wav", "Câu mẫu giọng gốc.", "Giọng test lỗi"
+    ).data.profile_id
+
+    # Force clone generation to fail inside the provider.
+    provider.fail_synthesize_cloned = True
+
+    with pytest.raises(ApplicationError) as exc_info:
+        vps.synthesize_clone(
+            profile_id,
+            CloneTestRequest(text="Câu này sẽ tạo ra lỗi khi tổng hợp.", language="vi", speed=1.0, format="wav"),
+        )
+    assert exc_info.value.code == ErrorCode.CLONE_GENERATION_FAILED
+
+    # Locate the job created for this attempt (only one clone job exists here).
+    history = vps._db.history("clone")
+    assert len(history) == 1
+    failed_snapshot, _ = history[0]
+    job_id = failed_snapshot["job_id"]
+
+    job = vps._db.get_job(job_id)
+    assert job is not None
+    assert job["kind"] == "clone"
+    assert job["status"] == "FAILED"
+    assert job["error_code"] == ErrorCode.CLONE_GENERATION_FAILED.value
+    assert job["profile_id"] == profile_id
+    assert job["completed_at"] is not None
+
+    assert failed_snapshot["status"] == "FAILED"
+    assert failed_snapshot["error"]["code"] == ErrorCode.CLONE_GENERATION_FAILED.value
+    assert failed_snapshot["audio_url"] is None
+
+    # No completed audio output was ever recorded for the failed job.
+    assert vps._db.get_audio_outputs(job_id) == []
+
+    # No orphaned artifact was left behind on disk either.
+    wav_path = Path(settings.output_dir) / f"{job_id}.wav"
+    assert not wav_path.exists()

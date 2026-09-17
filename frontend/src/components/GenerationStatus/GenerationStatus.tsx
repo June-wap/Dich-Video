@@ -2,11 +2,17 @@ import React from 'react';
 import { StatusBadge } from '../StatusBadge/StatusBadge';
 import { ProgressBar } from '../ProgressBar/ProgressBar';
 
-export type TTSGenerationState = 'IDLE' | 'GENERATING' | 'COMPLETED' | 'ERROR';
+export type TTSGenerationState = 'IDLE' | 'QUEUED' | 'GENERATING' | 'COMPLETED' | 'ERROR';
 
 export interface GenerationStatusProps {
   state: TTSGenerationState;
-  progress?: number; // 0 to 100
+  /** Real progress percentage (0-100), when the caller actually has one.
+   * Optional because the persisted Short TTS Job API (Task 2/3) reports no
+   * progress field on TTSStatus at all - callers that don't have a real
+   * number (Short TTS) omit this and get an honest indeterminate indicator
+   * instead of a fabricated percentage. Callers that still simulate progress
+   * locally (e.g. LongFormPage) may continue to pass a number unchanged. */
+  progress?: number;
   latencyMs?: number;
   errorMessage?: string;
   onCancel?: () => void;
@@ -14,7 +20,7 @@ export interface GenerationStatusProps {
 
 export const GenerationStatus: React.FC<GenerationStatusProps> = ({
   state,
-  progress = 0,
+  progress,
   latencyMs,
   errorMessage,
   onCancel,
@@ -25,10 +31,36 @@ export const GenerationStatus: React.FC<GenerationStatusProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <StatusBadge status="neutral" label="IDLE" size="sm" />
           <span style={{ fontSize: '13px', color: 'var(--neutral-600)' }}>
-            Sẵn sàng tạo giọng nói (Local inference offline)
+            Sẵn sàng tạo giọng nói
           </span>
         </div>
-        <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>Mock Engine</span>
+      </div>
+    );
+  }
+
+  if (state === 'QUEUED') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px 14px', background: 'var(--neutral-50)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <StatusBadge status="warning" label="QUEUED" size="sm" />
+            <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--neutral-700)' }}>
+              Đang chờ xử lý trong hàng đợi...
+            </span>
+          </div>
+
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              style={{ fontSize: '12px', color: 'var(--neutral-600)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Ẩn tiến trình
+            </button>
+          )}
+        </div>
+
+        <ProgressBar indeterminate size="sm" />
       </div>
     );
   }
@@ -40,7 +72,9 @@ export const GenerationStatus: React.FC<GenerationStatusProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <StatusBadge status="info" label="GENERATING" size="sm" />
             <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-primary-900)' }}>
-              Đang tổng hợp âm thanh giọng nói... ({progress}%)
+              {typeof progress === 'number'
+                ? `Đang tổng hợp âm thanh giọng nói... (${progress}%)`
+                : 'Đang tổng hợp âm thanh giọng nói...'}
             </span>
           </div>
 
@@ -50,12 +84,16 @@ export const GenerationStatus: React.FC<GenerationStatusProps> = ({
               onClick={onCancel}
               style={{ fontSize: '12px', color: 'var(--color-primary-700)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}
             >
-              Hủy bỏ
+              Ẩn tiến trình
             </button>
           )}
         </div>
 
-        <ProgressBar value={progress} size="sm" />
+        {typeof progress === 'number' ? (
+          <ProgressBar value={progress} size="sm" />
+        ) : (
+          <ProgressBar indeterminate size="sm" />
+        )}
       </div>
     );
   }

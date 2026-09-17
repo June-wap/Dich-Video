@@ -1,12 +1,35 @@
 {
   "name": "Tool Dich Cho Khach",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Local AI Voice Studio for Windows",
+  "main": "desktop/main.cjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm --prefix frontend test",
+    "build:frontend": "npm --prefix frontend run build",
+    "stage:runtime": "powershell -ExecutionPolicy Bypass -File scripts/stage_release_runtime.ps1",
+    "package:win": "npm run build:frontend && npm run stage:runtime && electron-builder --win nsis --x64",
+    "start:desktop": "electron ."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "UNLICENSED",
+  "build": {
+    "appId": "vn.localaivoice.studio",
+    "productName": "Local AI Voice Studio",
+    "directories": { "output": "release/dist", "buildResources": "release" },
+    "files": ["desktop/**", "package.json"],
+    "extraResources": [
+      { "from": "frontend/dist", "to": "frontend" },
+      { "from": "release/staged-runtime", "to": "runtime" },
+      { "from": "release/THIRD_PARTY_NOTICES.md", "to": "THIRD_PARTY_NOTICES.md" }
+    ],
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "perMachine": false }
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.8.1",
+    "wait-on": "^9.0.1"
+  }
 }

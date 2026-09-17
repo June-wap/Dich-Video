@@ -36,6 +36,10 @@ MESSAGES = {
     ErrorCode.VOICE_PROFILE_NOT_FOUND: "Không tìm thấy hồ sơ giọng đọc.",
     ErrorCode.VOICE_PROFILE_NOT_READY: "Hồ sơ giọng đọc chưa sẵn sàng.",
     ErrorCode.CLONE_GENERATION_FAILED: "Quá trình tạo giọng nói nhân bản thất bại.",
+    ErrorCode.IDEMPOTENCY_KEY_CONFLICT: "Khóa idempotency này đã được dùng với một yêu cầu khác.",
+    ErrorCode.TRANSLATION_KEY_REQUIRED: "Cần cấu hình API key Gemini trong Cài đặt để tạo giọng nói cho ngôn ngữ khác tiếng Việt.",
+    ErrorCode.TRANSLATION_FAILED: "Không thể dịch văn bản qua Gemini API. Kiểm tra API key, hạn mức sử dụng, hoặc kết nối mạng rồi thử lại.",
+    ErrorCode.UNAUTHORIZED: "Không có quyền truy cập API cục bộ.",
 }
 STATUSES = {
     ErrorCode.PROFILE_IN_USE: 409, ErrorCode.JOB_NOT_FOUND: 404,
@@ -53,6 +57,9 @@ STATUSES = {
     ErrorCode.INVALID_REFERENCE_TRANSCRIPT: 422,
     ErrorCode.VOICE_PROFILE_NOT_FOUND: 404, ErrorCode.VOICE_PROFILE_NOT_READY: 503,
     ErrorCode.VOICE_PROFILE_CREATION_FAILED: 500, ErrorCode.CLONE_GENERATION_FAILED: 500,
+    ErrorCode.IDEMPOTENCY_KEY_CONFLICT: 409,
+    ErrorCode.TRANSLATION_KEY_REQUIRED: 422, ErrorCode.TRANSLATION_FAILED: 502,
+    ErrorCode.UNAUTHORIZED: 401,
 }
 
 

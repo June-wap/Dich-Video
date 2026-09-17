@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Card,
   CardHeader,
@@ -8,60 +8,31 @@ import {
   CardFooter,
   Button,
   Select,
+  TextArea,
   AudioPlayer,
   GenerationStatus,
   ErrorState,
   StatusBadge,
+  DataTable,
+  Modal,
 } from '../components';
 import type { TTSGenerationState } from '../components/GenerationStatus/GenerationStatus';
+import type { ColumnDef } from '../components/DataTable/DataTable';
+import { useTtsJobRunner, useVoiceProfiles } from '../hooks';
+import type { TtsFormPayload } from '../hooks';
+import { ttsJobService } from '../services/ttsJobService';
+import type { TtsAudioFormat, TtsJob } from '../services/ttsJobService';
+import { useAppSettings } from '../context/AppSettingsContext';
+import { notify } from '../utils/notifications';
 
-interface VoiceOption {
-  value: string;
-  label: string;
-  gender: 'Female' | 'Male';
-}
-
-const VOICES_BY_LANG: Record<string, VoiceOption[]> = {
-  vi: [
-    { value: 'vi-VN-HoaiMy', label: 'Hoài My (Nữ - Giọng Bắc truyền cảm)', gender: 'Female' },
-    { value: 'vi-VN-NamAnh', label: 'Nam Anh (Nam - Giọng Bắc tự nhiên)', gender: 'Male' },
-    { value: 'vi-VN-MaiThao', label: 'Mai Thảo (Nữ - Giọng Nam ấm áp)', gender: 'Female' },
-    { value: 'vi-VN-MinhQuang', label: 'Minh Quang (Nam - Giọng Nam chuẩn)', gender: 'Male' },
-  ],
-  en: [
-    { value: 'en-US-Jenny', label: 'Jenny Studio (Female - Natural US)', gender: 'Female' },
-    { value: 'en-US-Guy', label: 'Guy Studio (Male - Confident US)', gender: 'Male' },
-    { value: 'en-GB-Sonia', label: 'Sonia Neural (Female - British RP)', gender: 'Female' },
-  ],
-  zh: [
-    { value: 'zh-CN-Xiaoxiao', label: 'Xiaoxiao (Female - Mandarin Standard)', gender: 'Female' },
-    { value: 'zh-CN-Yunxi', label: 'Yunxi (Male - Mandarin Warm)', gender: 'Male' },
-  ],
-  ja: [
-    { value: 'ja-JP-Nanami', label: 'Nanami (Female - Tokyo Standard)', gender: 'Female' },
-    { value: 'ja-JP-Keita', label: 'Keita (Male - Standard News)', gender: 'Male' },
-  ],
-  es: [
-    { value: 'es-ES-Elvira', label: 'Elvira (Female - Castilian)', gender: 'Female' },
-    { value: 'es-MX-Jorge', label: 'Jorge (Male - Mexican Spanish)', gender: 'Male' },
-  ],
-  pt: [
-    { value: 'pt-BR-Francisca', label: 'Francisca (Female - Brazilian)', gender: 'Female' },
-    { value: 'pt-BR-Antonio', label: 'Antonio (Male - Brazilian)', gender: 'Male' },
-  ],
-  it: [
-    { value: 'it-IT-Elsa', label: 'Elsa (Female - Standard Italian)', gender: 'Female' },
-    { value: 'it-IT-Diego', label: 'Diego (Male - Standard Italian)', gender: 'Male' },
-  ],
-  fr: [
-    { value: 'fr-FR-Denise', label: 'Denise (Female - Parisian French)', gender: 'Female' },
-    { value: 'fr-FR-Henri', label: 'Henri (Male - Clear Articulation)', gender: 'Male' },
-  ],
-  hi: [
-    { value: 'hi-IN-Swara', label: 'Swara (Female - Hindi Natural)', gender: 'Female' },
-    { value: 'hi-IN-Madhur', label: 'Madhur (Male - Hindi Standard)', gender: 'Male' },
-  ],
-};
+// Selecting a cloned voice profile here submits its profile_id as voice_id -
+// backend/services/tts_service.py's validate_request()/_run() (updated
+// alongside this dropdown) now accepts that as well as the provider's fixed
+// built-in voice ids, resolving it through VoiceProfileService and calling
+// OmniVoiceProvider.synthesize_cloned() instead of synthesize(). Cloning is
+// exclusively an OmniVoice capability, so this option only exists for
+// non-Piper languages (see isPiperLanguage below).
+const DEFAULT_VOICE_OPTION_VALUE = '';
 
 const LANGUAGES = [
   { value: 'vi', label: 'Vietnamese (Tiếng Việt)' },
@@ -75,153 +46,389 @@ const LANGUAGES = [
   { value: 'hi', label: 'Hindi (Tiếng Hindi)' },
 ];
 
-const QUALITIES = [
-  { value: 'fast', label: 'Fast (Tốc độ cao - Tiết kiệm tài nguyên)' },
-  { value: 'balanced', label: 'Balanced (Cân bằng tự nhiên - Khuyên dùng)' },
-  { value: 'high', label: 'High Quality (Chất lượng phòng thu Studio)' },
+// Languages routed to the secondary Piper provider (backend/services/tts_service.py
+// _select_provider). Piper has one fixed voice per language, no cloning - the
+// Voice ID field is hidden for these and the backend auto-selects the voice.
+const PIPER_LANGUAGES = new Set(['en', 'es', 'pt', 'fr', 'it', 'zh']);
+
+const FORMATS: { value: TtsAudioFormat; label: string }[] = [
+  { value: 'wav', label: 'WAV (không nén, chất lượng gốc)' },
+  { value: 'mp3', label: 'MP3 (nén, dung lượng nhỏ)' },
 ];
 
-const SPEEDS = [
-  { value: '0.5', label: '0.5x' },
-  { value: '0.75', label: '0.75x' },
-  { value: '1.0', label: '1.0x (Chuẩn)' },
-  { value: '1.25', label: '1.25x' },
-  { value: '1.5', label: '1.5x' },
-  { value: '2.0', label: '2.0x' },
-];
+// Mirrors backend/services/tts_service.py MAX_TEXT_LENGTH - checked
+// client-side for immediate feedback, but the backend remains authoritative.
+const MAX_TEXT_LENGTH = 2000;
 
-const DEFAULT_SAMPLE_TEXT = `Xin chào! Chào mừng bạn đến với OmniVoice Local AI Voice Studio. Đây là phần mềm tổng hợp giọng nói trí tuệ nhân tạo chạy hoàn toàn offline trên máy tính của bạn với card đồ họa RTX 4050, bảo mật dữ liệu tuyệt đối và không phát sinh chi phí API.`;
+// Import-from-.txt: a generous cap on the FILE itself (not the resulting
+// text) so a user cannot accidentally hand the browser a huge file to decode
+// - MAX_TEXT_LENGTH already catches an over-long result afterward via the
+// existing character counter/validate(), this just guards the read itself.
+const MAX_IMPORT_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
+
+const DEFAULT_SAMPLE_TEXT =
+  'Xin chào! Chào mừng bạn đến với OmniVoice Local AI Voice Studio. Đây là phần mềm tổng hợp giọng nói trí tuệ nhân tạo chạy hoàn toàn offline trên máy tính của bạn, bảo mật dữ liệu tuyệt đối và không phát sinh chi phí API.';
+
+function languageLabel(code: string): string {
+  return LANGUAGES.find((l) => l.value === code)?.label.split(' (')[0] ?? code;
+}
+
+/** Displays a cloned profile's name instead of its raw profile_id (a UUID)
+ * wherever a submitted voice_id is shown back to the user. Falls back to the
+ * id itself if the profile can't be found (e.g. deleted since), so nothing
+ * silently disappears. */
+function voiceLabel(id: string | null | undefined, profiles: { profile_id: string; name: string }[]): string {
+  if (!id) return 'Mặc định';
+  return profiles.find((p) => p.profile_id === id)?.name ?? id;
+}
+
+/** Maps the job runner's (phase, job, requestError) onto the GenerationStatus
+ * component's state, honestly: no fake percentage anywhere, since the
+ * backend's TTSStatus carries no progress field at all (see Known
+ * Limitations in the Task 3 report). */
+function deriveGenerationState(
+  phase: 'idle' | 'submitting' | 'polling',
+  job: TtsJob | null,
+  requestError: { message: string } | null
+): TTSGenerationState {
+  if (phase === 'submitting') return 'QUEUED';
+  if (phase === 'polling') return job?.status === 'RUNNING' ? 'GENERATING' : 'QUEUED';
+  if (requestError) return 'ERROR';
+  if (job?.status === 'COMPLETED') return 'COMPLETED';
+  if (job?.status === 'FAILED') return 'ERROR';
+  return 'IDLE';
+}
 
 export const TTSPage: React.FC = () => {
   // Form controls
   const [language, setLanguage] = useState('vi');
-  const [voice, setVoice] = useState('vi-VN-HoaiMy');
-  const [quality, setQuality] = useState('balanced');
-  const [speed, setSpeed] = useState('1.0');
+  const [voiceId, setVoiceId] = useState('');
+  const [format, setFormat] = useState<TtsAudioFormat>('wav');
   const [text, setText] = useState(DEFAULT_SAMPLE_TEXT);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  // Generation state machine
-  const [genState, setGenState] = useState<TTSGenerationState>('IDLE');
-  const [genProgress, setGenProgress] = useState(0);
-  const [genLatency, setGenLatency] = useState<number | undefined>(undefined);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Mock audio details
-  const [generatedAudio, setGeneratedAudio] = useState<{
-    duration: number;
-    voice: string;
-    language: string;
-  } | null>(null);
-
-  const timerRef = useRef<number | null>(null);
-
-  // Handle language change: reset voice to first available for that language
-  const handleLanguageChange = (newLang: string) => {
-    setLanguage(newLang);
-    const available = VOICES_BY_LANG[newLang] || [];
-    if (available.length > 0) {
-      setVoice(available[0].value);
+  // Settings > Audio > Output Format pre-fills this page's per-job Format
+  // dropdown the first time Settings finishes loading - the user can still
+  // freely change it per job afterward (this only sets the starting value,
+  // it never fights a manual choice). The backend's real /api/tts only
+  // accepts exactly "wav" or "mp3" (see backend/schemas/tts.py's
+  // TTSData.format Literal and tts_service.py's validate_request()) - there
+  // is no actual "produce both" request mode, so Settings' "wav+mp3" choice
+  // maps to submitting "mp3" here, which is the closest real backend
+  // behavior: whenever fmt=="mp3", TTSService keeps BOTH the original .wav
+  // and the exported .mp3 on disk (see tts_service.py's `outputs = [wav_path]
+  // + ([mp3_path] if fmt == "mp3" else [])`), it just serves/plays the mp3 as
+  // the primary artifact - "wav" alone never produces the extra mp3 copy.
+  const { settings: appSettings } = useAppSettings();
+  const formatDefaultAppliedRef = useRef(false);
+  useEffect(() => {
+    if (formatDefaultAppliedRef.current || !appSettings) return;
+    formatDefaultAppliedRef.current = true;
+    if (appSettings.output_format === 'mp3' || appSettings.output_format === 'wav+mp3') {
+      setFormat('mp3');
+    } else {
+      setFormat('wav');
     }
-  };
+  }, [appSettings]);
 
-  // Mock generation trigger
-  const handleGenerate = () => {
-    if (!text.trim()) {
-      setErrorMessage('Vui lòng nhập nội dung văn bản trước khi tạo giọng nói.');
-      setGenState('ERROR');
+  // Import text from a local .txt file, so a customer can paste in a
+  // prepared script instead of retyping/pasting it by hand.
+  const txtFileInputRef = useRef<HTMLInputElement | null>(null);
+  const handleImportTxt = (file: File | null) => {
+    if (!file) return;
+    setFormError(null);
+    const isTxt = file.name.toLowerCase().endsWith('.txt') || file.type === 'text/plain';
+    if (!isTxt) {
+      setFormError('Chỉ hỗ trợ nhập từ tệp .txt.');
       return;
     }
+    if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+      setFormError(`Tệp quá lớn (tối đa ${Math.floor(MAX_IMPORT_FILE_SIZE_BYTES / 1024)} KB cho văn bản).`);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = typeof reader.result === 'string' ? reader.result : '';
+      // Strip a leading UTF-8 BOM (common from Windows Notepad "Save As" ->
+      // UTF-8) so it doesn't show up as a stray character at the start of
+      // the text area / get read aloud.
+      setText(content.replace(/^﻿/, ''));
+    };
+    reader.onerror = () => {
+      setFormError('Không đọc được nội dung tệp. Vui lòng chọn một tệp .txt hợp lệ.');
+    };
+    reader.readAsText(file, 'utf-8');
+  };
 
-    // Clear previous timer
-    if (timerRef.current) clearInterval(timerRef.current);
+  // Piper languages have one fixed voice each - no manual Voice ID and no
+  // cloning. Clear any leftover Voice ID the moment the user switches into
+  // one of these languages, so a stale OmniVoice voice id is never submitted.
+  const isPiperLanguage = PIPER_LANGUAGES.has(language);
+  useEffect(() => {
+    if (isPiperLanguage && voiceId) setVoiceId('');
+  }, [isPiperLanguage, voiceId]);
 
-    setErrorMessage(null);
-    setGenState('GENERATING');
-    setGenProgress(10);
+  // Cloned voice profiles (Voice Cloning page) - offered as a dropdown
+  // alongside the language's default voice, non-Piper languages only.
+  const { profiles: voiceProfiles, loading: voiceProfilesLoading } = useVoiceProfiles();
+  const voiceOptions = useMemo(
+    () => [
+      { value: DEFAULT_VOICE_OPTION_VALUE, label: 'Mặc định (giọng chuẩn của ngôn ngữ)' },
+      ...voiceProfiles.map((p) => ({ value: p.profile_id, label: p.name })),
+    ],
+    [voiceProfiles]
+  );
+  // A profile picked while on a Piper language (before switching away) is
+  // already cleared by the effect above; this also covers a profile that
+  // was deleted elsewhere (e.g. on /voices) while still selected here.
+  useEffect(() => {
+    if (!isPiperLanguage && voiceId && !voiceProfilesLoading && !voiceProfiles.some((p) => p.profile_id === voiceId)) {
+      setVoiceId('');
+    }
+  }, [isPiperLanguage, voiceId, voiceProfiles, voiceProfilesLoading]);
 
-    const startTime = Date.now();
+  const { job, phase, requestError, isBusy, submit, retry, canRetry, cancelTracking, lastPayload } =
+    useTtsJobRunner();
 
-    // Simulate progressive generation chunks
-    timerRef.current = window.setInterval(() => {
-      setGenProgress((prev) => {
-        if (prev >= 95) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          timerRef.current = null;
+  // Latency display only - purely local timing, not a backend-reported value.
+  const submitStartRef = useRef<number | null>(null);
+  const [latencyMs, setLatencyMs] = useState<number | undefined>(undefined);
+  useEffect(() => {
+    if (phase === 'submitting') {
+      submitStartRef.current = Date.now();
+      setLatencyMs(undefined);
+    }
+  }, [phase]);
+  useEffect(() => {
+    if (job?.status === 'COMPLETED' && submitStartRef.current) {
+      setLatencyMs(Date.now() - submitStartRef.current);
+    }
+  }, [job]);
 
-          const latency = Date.now() - startTime;
-          setGenLatency(latency);
-          setGenProgress(100);
-          setGenState('COMPLETED');
+  // Playback error (e.g. the completed job's artifact 404s) - reset per job.
+  const [playbackError, setPlaybackError] = useState(false);
+  useEffect(() => setPlaybackError(false), [job?.job_id]);
 
-          // Estimate duration based on text length (~15 characters per second)
-          const estDuration = Math.max(3.5, Math.round((text.length / 14) * 10) / 10);
-          const langObj = LANGUAGES.find((l) => l.value === language);
-          setGeneratedAudio({
-            duration: estDuration,
-            voice,
-            language: langObj ? langObj.label.split(' ')[0] : 'Vietnamese',
-          });
-          return 100;
-        }
-        return prev + 25;
+  // The backend's TTSStatus does not return the submitted text (job_id,
+  // status, audio_url, error only - see backend/schemas/tts.py TTSStatus).
+  // This in-memory map enriches jobs created THIS browser session with a
+  // text preview for the history table below; it intentionally does not
+  // survive a reload, and jobs read back from GET /api/tts/jobs on mount
+  // never have an entry here. That is a documented backend contract
+  // limitation, not a bug - see the Task 3 report's Known Limitations.
+  const textPreviewsRef = useRef<Map<string, { text: string; language: string; voiceId: string | null }>>(new Map());
+  useEffect(() => {
+    if (job && lastPayload && !textPreviewsRef.current.has(job.job_id)) {
+      textPreviewsRef.current.set(job.job_id, {
+        text: lastPayload.text,
+        language: lastPayload.language,
+        voiceId: lastPayload.voiceId,
       });
-    }, 250);
-  };
-
-  const handleCancel = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
     }
-    setGenState('IDLE');
-    setGenProgress(0);
-  };
+  }, [job, lastPayload]);
 
-  const handleSimulateError = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+  // History (GET /api/tts/jobs), persisted server-side - survives reload.
+  const [history, setHistory] = useState<TtsJob[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  const loadHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    setHistoryError(null);
+    try {
+      const items = await ttsJobService.list();
+      setHistory([...items].reverse()); // backend returns oldest-first; show newest-first
+    } catch (err) {
+      setHistoryError(err instanceof Error ? err.message : 'Không thể tải lịch sử.');
+    } finally {
+      setHistoryLoading(false);
     }
-    setErrorMessage('Mô phỏng lỗi: Không thể cấp phát GPU VRAM hoặc bộ đệm âm thanh bị gián đoạn.');
-    setGenState('ERROR');
+  }, []);
+
+  useEffect(() => {
+    void loadHistory();
+  }, [loadHistory]);
+
+  // Refresh history the moment the active job reaches a terminal state, so
+  // it updates without requiring a full page reload.
+  const lastSyncedJobIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (job && (job.status === 'COMPLETED' || job.status === 'FAILED') && lastSyncedJobIdRef.current !== job.job_id) {
+      lastSyncedJobIdRef.current = job.job_id;
+      void loadHistory();
+    }
+  }, [job, loadHistory]);
+
+  // Settings > General > "Thông báo khi hoàn tất tác vụ" / "Âm báo cảnh báo
+  // lỗi" - real browser notifications (see utils/notifications.ts), fired
+  // once per job when it reaches a terminal state. Separate ref from
+  // lastSyncedJobIdRef above so a notification still fires even if history
+  // refresh ever changes independently of this.
+  const lastNotifiedJobIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!job || !appSettings || lastNotifiedJobIdRef.current === job.job_id) return;
+    if (job.status === 'COMPLETED') {
+      lastNotifiedJobIdRef.current = job.job_id;
+      if (appSettings.notify_completion) {
+        notify('Text to Speech hoàn tất', `Job ${job.job_id.slice(0, 8)}… đã sẵn sàng để nghe.`);
+      }
+    } else if (job.status === 'FAILED') {
+      lastNotifiedJobIdRef.current = job.job_id;
+      if (appSettings.notify_errors) {
+        notify('Text to Speech thất bại', job.error?.message || `Job ${job.job_id.slice(0, 8)}… đã thất bại.`);
+      }
+    }
+  }, [job, appSettings]);
+
+  // Replay modal
+  const [playingJob, setPlayingJob] = useState<TtsJob | null>(null);
+  const [replayError, setReplayError] = useState(false);
+  useEffect(() => setReplayError(false), [playingJob?.job_id]);
+
+  const validate = (value: string): string | null => {
+    if (!value.trim()) return 'Vui lòng nhập nội dung văn bản trước khi tạo giọng nói.';
+    if (value.length > MAX_TEXT_LENGTH) return `Văn bản vượt quá giới hạn ${MAX_TEXT_LENGTH} ký tự.`;
+    return null;
   };
 
-  const currentVoiceOptions = VOICES_BY_LANG[language] || [];
+  const buildPayload = (): TtsFormPayload => ({
+    text: text.trim(),
+    language,
+    voiceId: voiceId.trim() || null,
+    format,
+    speed: 1.0, // backend currently only accepts exactly 1.0 - see Known Limitations
+  });
+
+  const handleGenerate = () => {
+    const err = validate(text);
+    setFormError(err);
+    if (err) return;
+    void submit(buildPayload());
+  };
+
+  const handleRetry = () => {
+    // Re-attempts the LAST submitted payload (tracked inside the hook) as a
+    // fresh operation - not the current form state, which the user may have
+    // started editing in the meantime.
+    void retry();
+  };
+
+  const genState = deriveGenerationState(phase, job, requestError);
+  const errorMessage = requestError?.message ?? job?.error?.message;
+  const errorCode = requestError?.code ?? job?.error?.code;
+
+  const currentAudioUrl = job ? ttsJobService.resolveAudioUrl(job) : null;
+  const currentFormat = job ? ttsJobService.guessFormat(job) ?? format : format;
+
+  const historyColumns: ColumnDef<TtsJob>[] = useMemo(
+    () => [
+      {
+        key: 'job_id',
+        header: 'Job ID',
+        width: '110px',
+        render: (item) => (
+          <span
+            title={item.job_id}
+            style={{ fontFamily: 'var(--font-family-mono)', fontSize: '12px', color: 'var(--neutral-600)' }}
+          >
+            {item.job_id.slice(0, 8)}…
+          </span>
+        ),
+      },
+      {
+        key: 'text',
+        header: 'Văn bản',
+        render: (item) => {
+          const preview = textPreviewsRef.current.get(item.job_id);
+          return (
+            <span
+              title={preview?.text}
+              style={{
+                fontSize: '13px',
+                color: 'var(--neutral-800)',
+                display: 'block',
+                maxWidth: '360px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {preview ? preview.text : <em style={{ color: 'var(--neutral-400)' }}>(không có bản xem trước)</em>}
+            </span>
+          );
+        },
+      },
+      {
+        key: 'status',
+        header: 'Trạng thái',
+        width: '120px',
+        render: (item) => (
+          <StatusBadge
+            status={
+              item.status === 'COMPLETED'
+                ? 'success'
+                : item.status === 'FAILED'
+                ? 'error'
+                : item.status === 'RUNNING'
+                ? 'info'
+                : 'warning'
+            }
+            label={item.status}
+            size="sm"
+          />
+        ),
+      },
+      {
+        key: 'format',
+        header: 'Định dạng',
+        width: '90px',
+        render: (item) => {
+          const fmt = ttsJobService.guessFormat(item);
+          return <span style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>{fmt ? fmt.toUpperCase() : '—'}</span>;
+        },
+      },
+      {
+        key: 'actions',
+        header: 'Hành động',
+        width: '130px',
+        align: 'right',
+        render: (item) =>
+          item.status === 'COMPLETED' && item.audio_url ? (
+            <Button size="sm" variant="outline" onClick={() => setPlayingJob(item)}>
+              Phát lại
+            </Button>
+          ) : item.status === 'FAILED' ? (
+            <span style={{ fontSize: '12px', color: 'var(--danger-text)' }} title={item.error?.message}>
+              {item.error?.code ?? 'FAILED'}
+            </span>
+          ) : (
+            <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>—</span>
+          ),
+      },
+    ],
+    []
+  );
+
   const charCount = text.length;
-  const maxCharLimit = 5000;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      {/* 1. Page Header & Quick Diagnostics */}
+      {/* 1. Page Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--neutral-900)' }}>
-            Text to Speech
-          </h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--neutral-900)' }}>Text to Speech</h1>
           <p style={{ fontSize: '13px', color: 'var(--neutral-500)', marginTop: '2px' }}>
             Tổng hợp giọng nói cục bộ (Single Prompt TTS) — Không tốn phí, không gửi dữ liệu ra ngoài
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <StatusBadge status="success" label="Local Core: Ready" size="sm" />
-          <StatusBadge status="neutral" label="GPU: RTX 4050" size="sm" showDot={false} />
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={handleSimulateError}
-            title="Kiểm tra trạng thái lỗi giao diện"
-          >
-            Simulate Error
-          </Button>
-        </div>
+        <StatusBadge status="neutral" label={`Định dạng: ${format.toUpperCase()}`} size="sm" showDot={false} />
       </div>
 
       {/* 2. Main 2-Column Desktop Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: '20px' }}>
         {/* Left Column: Text Editor & Generation Status / Result */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Text Editor Card */}
           <Card>
             <CardHeader>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -229,11 +436,11 @@ export const TTSPage: React.FC = () => {
                 <span
                   style={{
                     fontSize: '12px',
-                    color: charCount > maxCharLimit ? 'var(--danger-solid)' : 'var(--neutral-500)',
+                    color: charCount > MAX_TEXT_LENGTH ? 'var(--danger-solid)' : 'var(--neutral-500)',
                     fontFamily: 'var(--font-family-mono)',
                   }}
                 >
-                  {charCount} / {maxCharLimit} ký tự
+                  {charCount} / {MAX_TEXT_LENGTH} ký tự
                 </span>
               </div>
               <CardDescription>
@@ -242,32 +449,56 @@ export const TTSPage: React.FC = () => {
             </CardHeader>
 
             <CardContent>
-              <div className="ds-form-group">
-                <textarea
-                  className="ds-textarea"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Nhập hoặc dán văn bản tại đây..."
-                  style={{ minHeight: '180px', fontSize: '14px', lineHeight: '1.6' }}
-                  disabled={genState === 'GENERATING'}
-                />
-              </div>
+              <TextArea
+                aria-label="Văn bản cần đọc"
+                value={text}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                placeholder="Nhập hoặc dán văn bản tại đây..."
+                style={{ minHeight: '180px', fontSize: '14px', lineHeight: '1.6' }}
+                disabled={isBusy}
+                error={formError ?? undefined}
+              />
             </CardContent>
 
             <CardFooter style={{ justifyContent: 'space-between' }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setText('')}
-                disabled={genState === 'GENERATING' || !text}
-              >
-                Xóa văn bản
-              </Button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  ref={txtFileInputRef}
+                  type="file"
+                  accept=".txt,text/plain"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    handleImportTxt(e.target.files?.[0] ?? null);
+                    e.target.value = ''; // allow re-selecting the same file
+                  }}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => txtFileInputRef.current?.click()}
+                  disabled={isBusy}
+                  iconLeft={
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  }
+                >
+                  Nhập từ tệp .txt
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => setText('')} disabled={isBusy || !text}>
+                  Xóa văn bản
+                </Button>
+              </div>
 
               <div style={{ display: 'flex', gap: '10px' }}>
-                {genState === 'GENERATING' && (
-                  <Button variant="outline" size="md" onClick={handleCancel}>
-                    Hủy bỏ
+                {isBusy && (
+                  <Button variant="outline" size="md" onClick={cancelTracking}>
+                    Ẩn tiến trình
                   </Button>
                 )}
 
@@ -275,8 +506,8 @@ export const TTSPage: React.FC = () => {
                   variant="primary"
                   size="md"
                   onClick={handleGenerate}
-                  isLoading={genState === 'GENERATING'}
-                  loadingText="Đang tạo giọng nói..."
+                  isLoading={isBusy}
+                  loadingText="Đang xử lý..."
                   iconLeft={
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -289,44 +520,55 @@ export const TTSPage: React.FC = () => {
             </CardFooter>
           </Card>
 
-          {/* Generation Status Indicator */}
-          <GenerationStatus
-            state={genState}
-            progress={genProgress}
-            latencyMs={genLatency}
-            errorMessage={errorMessage || undefined}
-            onCancel={handleCancel}
-          />
+          {/* Generation Status Indicator (skipped while fully idle with no prior attempt) */}
+          {(genState !== 'IDLE' || job) && (
+            <GenerationStatus
+              state={genState}
+              latencyMs={latencyMs}
+              errorMessage={errorMessage}
+              onCancel={isBusy ? cancelTracking : undefined}
+            />
+          )}
 
-          {/* Completed State: Mock Audio Player */}
-          {genState === 'COMPLETED' && generatedAudio && (
+          {/* Completed State: Real Audio Player */}
+          {genState === 'COMPLETED' && job && currentAudioUrl && (
             <Card>
               <CardHeader>
                 <CardTitle>Kết quả âm thanh đã tạo</CardTitle>
                 <CardDescription>
-                  Tệp âm thanh được kết xuất cục bộ. Bạn có thể nghe thử hoặc xuất định dạng WAV / MP3.
+                  Job ID: <code style={{ fontSize: '12px' }}>{job.job_id}</code>
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <AudioPlayer
-                  title="OmniVoice TTS Result"
-                  duration={generatedAudio.duration}
-                  voice={generatedAudio.voice}
-                  language={generatedAudio.language}
+                  title="Kết quả Text to Speech"
+                  voice={voiceLabel(voiceId, voiceProfiles)}
+                  language={languageLabel(language)}
+                  src={currentAudioUrl}
+                  format={currentFormat ?? undefined}
                   onRegenerate={handleGenerate}
+                  onError={() => setPlaybackError(true)}
                 />
+                {playbackError && (
+                  <ErrorState
+                    title="Không thể phát âm thanh"
+                    message="Không tải được tệp âm thanh từ máy chủ (có thể đã bị xoá). Bạn có thể tạo lại."
+                    retryLabel="Tạo lại"
+                    onRetry={handleGenerate}
+                  />
+                )}
               </CardContent>
             </Card>
           )}
 
-          {/* Error State Banner if applicable */}
+          {/* Error State Banner */}
           {genState === 'ERROR' && (
             <ErrorState
               title="Không thể hoàn thành tổng hợp"
               message={errorMessage || 'Đã xảy ra lỗi không xác định trong quá trình xử lý giọng nói.'}
-              details="ErrorCode: ERR_TTS_SIMULATED_LOCAL_FAIL"
-              retryLabel="Thử lại ngay"
-              onRetry={handleGenerate}
+              details={errorCode}
+              retryLabel="Thử lại"
+              onRetry={canRetry ? handleRetry : undefined}
             />
           )}
         </div>
@@ -336,82 +578,152 @@ export const TTSPage: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Cấu hình giọng đọc</CardTitle>
-              <CardDescription>Ngôn ngữ, mô hình giọng và tốc độ phát</CardDescription>
+              <CardDescription>Ngôn ngữ, định dạng xuất và giọng đọc</CardDescription>
             </CardHeader>
 
             <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* 1. Language Control */}
               <Select
                 label="Ngôn ngữ (Language)"
                 options={LANGUAGES}
                 value={language}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-                disabled={genState === 'GENERATING'}
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={isBusy}
                 hint="Hỗ trợ 9 ngôn ngữ chuẩn bản địa"
               />
 
-              {/* 2. Voice Control */}
               <Select
-                label="Giọng đọc (Voice)"
-                options={currentVoiceOptions.map((v) => ({
-                  value: v.value,
-                  label: `${v.label} [${v.gender}]`,
-                }))}
-                value={voice}
-                onChange={(e) => setVoice(e.target.value)}
-                disabled={genState === 'GENERATING'}
-                hint="Mô hình giọng nói cục bộ (Offline)"
+                label="Định dạng xuất (Format)"
+                options={FORMATS}
+                value={format}
+                onChange={(e) => setFormat(e.target.value as TtsAudioFormat)}
+                disabled={isBusy}
+                hint="WAV cho chất lượng gốc, MP3 cho dung lượng nhỏ"
               />
 
-              {/* 3. Quality Control */}
-              <Select
-                label="Chất lượng (Quality)"
-                options={QUALITIES}
-                value={quality}
-                onChange={(e) => setQuality(e.target.value)}
-                disabled={genState === 'GENERATING'}
-                hint="Cân bằng giữa tốc độ tạo và độ tự nhiên"
-              />
+              {isPiperLanguage ? (
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--neutral-500)',
+                    background: 'var(--neutral-100)',
+                    borderRadius: '6px',
+                    padding: '8px 10px',
+                  }}
+                >
+                  Ngôn ngữ này dùng giọng đọc mặc định cố định (chưa hỗ trợ nhân bản giọng nói / chọn Voice ID).
+                </div>
+              ) : (
+                <Select
+                  label="Giọng đọc"
+                  options={voiceOptions}
+                  value={voiceId || DEFAULT_VOICE_OPTION_VALUE}
+                  onChange={(e) => setVoiceId(e.target.value === DEFAULT_VOICE_OPTION_VALUE ? '' : e.target.value)}
+                  disabled={isBusy || voiceProfilesLoading}
+                  hint={
+                    voiceProfiles.length > 0
+                      ? 'Chọn "Mặc định" hoặc một giọng bạn đã nhân bản ở trang Voice Cloning'
+                      : 'Chưa có giọng nhân bản nào - tạo ở trang Voice Cloning để chọn tại đây'
+                  }
+                />
+              )}
 
-              {/* 4. Speed Control (0.5x - 2.0x) */}
               <Select
                 label="Tốc độ đọc (Speed)"
-                options={SPEEDS}
-                value={speed}
-                onChange={(e) => setSpeed(e.target.value)}
-                disabled={genState === 'GENERATING'}
-                hint="Điều chỉnh nhịp điệu phát âm từ 0.5x đến 2.0x"
+                options={[{ value: '1.0', label: '1.0x (cố định)' }]}
+                value="1.0"
+                disabled
+                hint="Backend hiện chỉ hỗ trợ tốc độ 1.0x"
+                onChange={() => {}}
               />
             </CardContent>
           </Card>
 
-          {/* Model Specification Card */}
           <Card>
             <CardHeader>
               <CardTitle>Thông số cục bộ</CardTitle>
-              <CardDescription>Trạng thái tài nguyên máy trạm</CardDescription>
+              <CardDescription>Trạng thái kết nối backend</CardDescription>
             </CardHeader>
             <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--neutral-600)' }}>
-                <span>Backend Provider:</span>
-                <span style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>OmniVoice Mock v1</span>
+                <span>API:</span>
+                <span style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>POST /api/tts/jobs</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--neutral-600)' }}>
                 <span>Sample Rate:</span>
                 <span style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>24,000 Hz</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--neutral-600)' }}>
-                <span>Độ trễ dự kiến:</span>
-                <span style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>~1.2s – 1.8s</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--neutral-600)' }}>
-                <span>Bộ nhớ VRAM:</span>
-                <span style={{ fontWeight: 600, color: 'var(--neutral-900)' }}>1.8 GB / 6.0 GB</span>
-              </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* 3. TTS History (persisted, GET /api/tts/jobs) */}
+      <Card>
+        <CardHeader>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <CardTitle>Lịch sử Text to Speech</CardTitle>
+              <CardDescription>Đọc trực tiếp từ backend - vẫn còn sau khi tải lại trang</CardDescription>
+            </div>
+            <Button size="sm" variant="ghost" onClick={() => void loadHistory()} disabled={historyLoading}>
+              Làm mới
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {historyError ? (
+            <ErrorState
+              title="Không thể tải lịch sử"
+              message={historyError}
+              retryLabel="Thử lại"
+              onRetry={() => void loadHistory()}
+            />
+          ) : historyLoading ? (
+            <div style={{ padding: '24px', textAlign: 'center', fontSize: '13px', color: 'var(--neutral-500)' }}>
+              Đang tải lịch sử...
+            </div>
+          ) : (
+            <DataTable
+              columns={historyColumns}
+              data={history}
+              keyExtractor={(item) => item.job_id}
+              emptyTitle="Chưa có lịch sử Text to Speech"
+              emptyDescription="Các tác vụ bạn tạo ở trên sẽ xuất hiện tại đây, kể cả sau khi tải lại trang."
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Replay Modal */}
+      <Modal
+        isOpen={Boolean(playingJob)}
+        onClose={() => setPlayingJob(null)}
+        title="Nghe lại âm thanh"
+        size="md"
+        footer={
+          <Button variant="outline" size="md" onClick={() => setPlayingJob(null)}>
+            Đóng
+          </Button>
+        }
+      >
+        {playingJob && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <AudioPlayer
+              title={`Job ${playingJob.job_id.slice(0, 8)}`}
+              voice={voiceLabel(textPreviewsRef.current.get(playingJob.job_id)?.voiceId, voiceProfiles)}
+              language={languageLabel(textPreviewsRef.current.get(playingJob.job_id)?.language ?? language)}
+              src={ttsJobService.resolveAudioUrl(playingJob) ?? undefined}
+              format={ttsJobService.guessFormat(playingJob) ?? undefined}
+              onError={() => setReplayError(true)}
+            />
+            {replayError && (
+              <p style={{ fontSize: '12px', color: 'var(--danger-text)' }}>
+                Không tìm thấy tệp âm thanh trên máy chủ (có thể đã bị xoá).
+              </p>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

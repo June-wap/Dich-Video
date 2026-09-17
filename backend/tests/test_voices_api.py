@@ -1,5 +1,6 @@
 import io
 from pathlib import Path
+import subprocess
 import tempfile
 import uuid
 import wave
@@ -39,7 +40,17 @@ def app_client():
             settings=settings,
             service_factory=lambda provs: SystemService(provs),
             provider_service_factory=lambda s: providers,
-            tts_service_factory=lambda s, provs: TTSService(s, provs),
+            # create_app()'s lifespan always calls this with all 5 positional
+            # args (settings, providers, translation_service,
+            # voice_profile_service, app_settings_service) - the 2-arg form
+            # here predates translation_service/voice_profile_service being
+            # added to TTSService.__init__. Forward the real
+            # voice_profile_service instance the lifespan already built
+            # (below), so a cloned voice profile created through
+            # /api/voices/profiles in these tests resolves correctly when a
+            # Short TTS job's voice_id names it.
+            tts_service_factory=lambda s, provs, translation, voice_profiles, app_settings=None:
+                TTSService(s, provs, translation, voice_profiles, app_settings),
             voice_profile_service_factory=lambda s, provs: VoiceProfileService(s, provs),
         )
         with TestClient(app, base_url="http://127.0.0.1:8000") as client:
@@ -89,6 +100,48 @@ def test_create_profile_api_validation(app_client):
     )
     assert resp.status_code == 422
     assert resp.json()["error"]["code"] == "INVALID_REFERENCE_AUDIO"
+
+
+def test_create_profile_api_accepts_mp3(app_client, tmp_path):
+    """E2E regression for the reported bug: POST /api/voices/profiles with a
+    real reference WAV/MP3 must succeed, not 422 INVALID_REFERENCE_AUDIO.
+    Covers both a genuinely MP3-encoded upload and the routine real-world
+    case of AAC audio (e.g. from a phone voice recorder) saved with a plain
+    `.mp3` extension - see
+    backend/services/voice_profile_service.py::_validate_reference_audio.
+    """
+    client, _, _ = app_client
+    wav_bytes = make_wav_bytes(5.0)
+    wav_path = tmp_path / "ref_source.wav"
+    wav_path.write_bytes(wav_bytes)
+
+    mp3_path = tmp_path / "ref.mp3"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", "-i", str(wav_path), "-c:a", "libmp3lame", str(mp3_path)],
+        check=True, capture_output=True, timeout=30,
+    )
+    resp = client.post(
+        "/api/voices/profiles",
+        files={"file": ("ref.mp3", mp3_path.read_bytes(), "audio/mpeg")},
+        data={"reference_transcript": "Văn bản phát âm chuẩn."},
+        headers={"Origin": "http://localhost:5173"},
+    )
+    assert resp.status_code == 200
+    assert resp.json()["ok"] is True
+
+    disguised_path = tmp_path / "reference.mp3"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", "-i", str(wav_path), "-c:a", "aac", "-f", "ipod", str(disguised_path)],
+        check=True, capture_output=True, timeout=30,
+    )
+    resp2 = client.post(
+        "/api/voices/profiles",
+        files={"file": ("reference.mp3", disguised_path.read_bytes(), "audio/mpeg")},
+        data={"reference_transcript": "Văn bản phát âm chuẩn."},
+        headers={"Origin": "http://localhost:5173"},
+    )
+    assert resp2.status_code == 200
+    assert resp2.json()["ok"] is True
 
 
 def test_get_and_list_profiles_api(app_client):

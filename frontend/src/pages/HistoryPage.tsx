@@ -1,313 +1,199 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  StatusBadge,
-  SearchInput,
-  FilterBar,
-  DataTable,
-  ConfirmDialog,
-  Modal,
-  AudioPlayer,
-  Select,
-} from '../components';
+import { Button, StatusBadge, SearchInput, DataTable, Modal, AudioPlayer, ErrorState } from '../components';
 import type { ColumnDef } from '../components/DataTable/DataTable';
-import { historyService, type HistoryItem } from '../services';
+import { ttsJobService } from '../services/ttsJobService';
+import type { TtsJob } from '../services/ttsJobService';
+import { ApiError, NetworkError } from '../services/httpClient';
 
-export type HistoryType = 'Text to Speech' | 'Long-form' | 'Voice Clone';
-export type HistoryStatus = 'COMPLETED' | 'FAILED' | 'CANCELLED';
+function describeError(err: unknown): string {
+  if (err instanceof ApiError) return `${err.message} (${err.code})`;
+  if (err instanceof NetworkError) return err.message;
+  if (err instanceof Error) return err.message;
+  return 'Đã xảy ra lỗi không xác định.';
+}
 
 export const HistoryPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<TtsJob[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const loadHistory = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const items = await ttsJobService.list();
+      setHistory([...items].reverse()); // backend returns oldest-first; show newest-first
+    } catch (err) {
+      setError(describeError(err));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    historyService.getHistory().then(setHistoryItems);
-  }, []);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTypeFilter, setSelectedTypeFilter] = useState('ALL');
-  const [selectedDateFilter, setSelectedDateFilter] = useState<'ALL' | 'today' | 'week' | 'month'>('ALL');
+    void loadHistory();
+  }, [loadHistory]);
 
-  // Audio Play modal
-  const [playingItem, setPlayingItem] = useState<HistoryItem | null>(null);
+  // Play modal
+  const [playingJob, setPlayingJob] = useState<TtsJob | null>(null);
+  const [replayError, setReplayError] = useState(false);
+  useEffect(() => setReplayError(false), [playingJob?.job_id]);
 
-  // Delete confirmation
-  const [deleteTarget, setDeleteTarget] = useState<HistoryItem | null>(null);
-
-  // Filter options
-  const typeFilterOptions = useMemo(() => {
-    return [
-      { id: 'ALL', label: 'Tất cả', count: historyItems.length },
-      { id: 'Text to Speech', label: 'Text to Speech', count: historyItems.filter((h) => h.type === 'Text to Speech').length },
-      { id: 'Long-form', label: 'Long-form', count: historyItems.filter((h) => h.type === 'Long-form').length },
-      { id: 'Voice Clone', label: 'Voice Clone', count: historyItems.filter((h) => h.type === 'Voice Clone').length },
-    ];
-  }, [historyItems]);
-
-  // Filtered dataset
   const filteredHistory = useMemo(() => {
-    return historyItems.filter((item) => {
-      const matchesSearch =
-        searchQuery.trim() === '' ||
-        item.textPreview.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.voice.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.type.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return history;
+    return history.filter((item) => item.job_id.toLowerCase().includes(q));
+  }, [history, searchQuery]);
 
-      const matchesType =
-        selectedTypeFilter === 'ALL' || item.type === selectedTypeFilter;
-
-      const matchesDate =
-        selectedDateFilter === 'ALL' ||
-        item.dateCategory === selectedDateFilter ||
-        (selectedDateFilter === 'month' && (item.dateCategory === 'week' || item.dateCategory === 'today'));
-
-      return matchesSearch && matchesType && matchesDate;
-    });
-  }, [historyItems, searchQuery, selectedTypeFilter, selectedDateFilter]);
-
-  const handleConfirmDelete = () => {
-    if (!deleteTarget) return;
-    setHistoryItems((prev) => prev.filter((h) => h.id !== deleteTarget.id));
-    setDeleteTarget(null);
-  };
-
-  const handleRegenerate = (_item: HistoryItem) => {
-    navigate('/tts');
-  };
-
-  // DataTable columns
-  const columns: ColumnDef<HistoryItem>[] = [
-    {
-      key: 'date',
-      header: 'Thời gian (Date)',
-      width: '140px',
-      render: (item) => (
-        <span style={{ fontSize: '12px', color: 'var(--neutral-600)', fontFamily: 'var(--font-family-mono)' }}>
-          {item.date}
-        </span>
-      ),
-    },
-    {
-      key: 'type',
-      header: 'Loại (Type)',
-      width: '130px',
-      render: (item) => (
-        <StatusBadge
-          status={
-            item.type === 'Text to Speech'
-              ? 'info'
-              : item.type === 'Long-form'
-              ? 'neutral'
-              : 'warning'
-          }
-          label={item.type}
-          size="sm"
-          showDot={false}
-        />
-      ),
-    },
-    {
-      key: 'textPreview',
-      header: 'Trích đoạn văn bản (Text Preview)',
-      render: (item) => (
-        <span
-          style={{
-            fontSize: '13px',
-            color: 'var(--neutral-800)',
-            lineHeight: '1.5',
-            display: 'block',
-            maxWidth: '380px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-          title={item.textPreview}
-        >
-          {item.textPreview}
-        </span>
-      ),
-    },
-    {
-      key: 'voice',
-      header: 'Giọng đọc (Voice)',
-      width: '170px',
-      render: (item) => (
-        <span style={{ fontSize: '13px', color: 'var(--neutral-700)' }}>
-          {item.voice}
-        </span>
-      ),
-    },
-    {
-      key: 'duration',
-      header: 'Thời lượng',
-      width: '100px',
-      render: (item) => (
-        <span style={{ fontSize: '12px', fontFamily: 'var(--font-family-mono)', color: 'var(--neutral-600)' }}>
-          {item.duration}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Trạng thái',
-      width: '120px',
-      render: (item) => (
-        <StatusBadge
-          status={
-            item.status === 'COMPLETED'
-              ? 'success'
-              : item.status === 'CANCELLED'
-              ? 'warning'
-              : 'error'
-          }
-          label={item.status}
-          size="sm"
-        />
-      ),
-    },
-    {
-      key: 'actions',
-      header: 'Hành động',
-      width: '200px',
-      align: 'right',
-      render: (item) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
-          {item.status === 'COMPLETED' && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setPlayingItem(item)}
-              iconLeft={
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-              }
-            >
-              Play
+  const columns: ColumnDef<TtsJob>[] = useMemo(
+    () => [
+      {
+        key: 'job_id',
+        header: 'Job ID',
+        width: '140px',
+        render: (item) => (
+          <span
+            title={item.job_id}
+            style={{ fontFamily: 'var(--font-family-mono)', fontSize: '12px', color: 'var(--neutral-600)' }}
+          >
+            {item.job_id.slice(0, 8)}…
+          </span>
+        ),
+      },
+      {
+        key: 'status',
+        header: 'Trạng thái',
+        width: '130px',
+        render: (item) => (
+          <StatusBadge
+            status={
+              item.status === 'COMPLETED'
+                ? 'success'
+                : item.status === 'FAILED'
+                ? 'error'
+                : item.status === 'RUNNING'
+                ? 'info'
+                : 'warning'
+            }
+            label={item.status}
+            size="sm"
+          />
+        ),
+      },
+      {
+        key: 'format',
+        header: 'Định dạng',
+        width: '100px',
+        render: (item) => {
+          const fmt = ttsJobService.guessFormat(item);
+          return <span style={{ fontSize: '12px', color: 'var(--neutral-600)' }}>{fmt ? fmt.toUpperCase() : '—'}</span>;
+        },
+      },
+      {
+        key: 'actions',
+        header: 'Hành động',
+        width: '160px',
+        align: 'right',
+        render: (item) =>
+          item.status === 'COMPLETED' && item.audio_url ? (
+            <Button size="sm" variant="outline" onClick={() => setPlayingJob(item)}>
+              Phát lại
             </Button>
-          )}
-
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => navigate(item.route)}
-          >
-            Open
-          </Button>
-
-          <Button
-            size="sm"
-            variant="ghost"
-            title="Tạo lại"
-            onClick={() => handleRegenerate(item)}
-          >
-            Regenerate
-          </Button>
-
-          <Button
-            size="sm"
-            variant="ghost"
-            style={{ color: 'var(--danger-text)' }}
-            title="Xóa bản ghi"
-            onClick={() => setDeleteTarget(item)}
-          >
-            Xóa
-          </Button>
-        </div>
-      ),
-    },
-  ];
+          ) : item.status === 'FAILED' ? (
+            <span style={{ fontSize: '12px', color: 'var(--danger-text)' }} title={item.error?.message}>
+              {item.error?.code ?? 'FAILED'}
+            </span>
+          ) : (
+            <span style={{ fontSize: '12px', color: 'var(--neutral-400)' }}>—</span>
+          ),
+      },
+    ],
+    []
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Top Header */}
-      <div>
-        <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--neutral-900)' }}>
-          History (Lịch sử tác vụ âm thanh)
-        </h1>
-        <p style={{ fontSize: '13px', color: 'var(--neutral-500)', marginTop: '2px' }}>
-          Nhật ký audit các lượt tổng hợp giọng nói, xuất tệp và nhân bản offline
-        </p>
-      </div>
-
-      {/* Filter, Search & Date Filter Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Tìm theo trích đoạn, giọng đọc..."
-          />
-
-          <div style={{ width: '160px' }}>
-            <Select
-              options={[
-                { value: 'ALL', label: 'Toàn bộ thời gian' },
-                { value: 'today', label: 'Hôm nay' },
-                { value: 'week', label: '7 ngày qua' },
-                { value: 'month', label: '30 ngày qua' },
-              ]}
-              value={selectedDateFilter}
-              onChange={(e) => setSelectedDateFilter(e.target.value as any)}
-            />
-          </div>
+        <div>
+          <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--neutral-900)' }}>
+            History (Lịch sử Text to Speech)
+          </h1>
+          <p style={{ fontSize: '13px', color: 'var(--neutral-500)', marginTop: '2px' }}>
+            Đọc trực tiếp từ backend, còn nguyên sau khi tải lại trang. Chỉ gồm các tác vụ Text to Speech — Voice
+            Cloning chưa có API liệt kê lịch sử.
+          </p>
         </div>
-
-        <FilterBar
-          options={typeFilterOptions}
-          activeId={selectedTypeFilter}
-          onSelect={setSelectedTypeFilter}
-        />
+        <Button size="sm" variant="ghost" onClick={() => void loadHistory()} disabled={loading}>
+          Làm mới
+        </Button>
       </div>
+
+      {/* Load error */}
+      {error && (
+        <ErrorState title="Không thể tải lịch sử" message={error} retryLabel="Thử lại" onRetry={() => void loadHistory()} />
+      )}
+
+      {/* Search */}
+      {!loading && !error && history.length > 0 && (
+        <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Tìm theo Job ID..." />
+      )}
 
       {/* History DataTable */}
-      <DataTable
-        columns={columns}
-        data={filteredHistory}
-        keyExtractor={(item) => item.id}
-        emptyTitle="Không có lịch sử tác vụ"
-        emptyDescription="Chưa có tác vụ tổng hợp giọng nói nào khớp với bộ lọc thời gian và từ khóa."
-      />
+      {!error && (
+        <DataTable
+          columns={columns}
+          data={loading ? [] : filteredHistory}
+          keyExtractor={(item) => item.job_id}
+          emptyTitle={loading ? 'Đang tải lịch sử...' : 'Chưa có lịch sử tác vụ'}
+          emptyDescription={
+            loading
+              ? 'Vui lòng đợi trong giây lát.'
+              : 'Các tác vụ Text to Speech bạn tạo sẽ xuất hiện tại đây, kể cả sau khi tải lại trang.'
+          }
+        />
+      )}
+
+      {!loading && !error && history.length === 0 && (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button variant="primary" size="md" onClick={() => navigate('/tts')}>
+            Tạo Text to Speech đầu tiên
+          </Button>
+        </div>
+      )}
 
       {/* Play Audio Modal */}
       <Modal
-        isOpen={Boolean(playingItem)}
-        onClose={() => setPlayingItem(null)}
-        title="Nghe lại âm thanh lịch sử"
+        isOpen={Boolean(playingJob)}
+        onClose={() => setPlayingJob(null)}
+        title="Nghe lại âm thanh"
         size="md"
         footer={
-          <Button variant="outline" size="md" onClick={() => setPlayingItem(null)}>
+          <Button variant="outline" size="md" onClick={() => setPlayingJob(null)}>
             Đóng
           </Button>
         }
       >
-        {playingItem && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ padding: '10px 12px', background: 'var(--neutral-50)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', fontSize: '13px', color: 'var(--neutral-700)' }}>
-              <strong>Văn bản đọc:</strong> {playingItem.textPreview}
-            </div>
-
+        {playingJob && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <AudioPlayer
-              title={`Exported Track: ${playingItem.type}`}
-              duration={18.4}
-              voice={playingItem.voice}
-              language={playingItem.language}
+              title={`Job ${playingJob.job_id.slice(0, 8)}`}
+              src={ttsJobService.resolveAudioUrl(playingJob) ?? undefined}
+              format={ttsJobService.guessFormat(playingJob) ?? undefined}
+              onError={() => setReplayError(true)}
             />
+            {replayError && (
+              <p style={{ fontSize: '12px', color: 'var(--danger-text)' }}>
+                Không tìm thấy tệp âm thanh trên máy chủ (có thể đã bị xoá).
+              </p>
+            )}
           </div>
         )}
       </Modal>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={Boolean(deleteTarget)}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleConfirmDelete}
-        title="Xóa nhật ký tác vụ"
-        message={`Bạn có chắc chắn muốn xóa bản ghi lịch sử ngày ${deleteTarget?.date || ''}? Tệp âm thanh đã xuất có thể không còn phát lại được từ lịch sử.`}
-        confirmLabel="Xóa bản ghi"
-        isDestructive
-      />
     </div>
   );
 };

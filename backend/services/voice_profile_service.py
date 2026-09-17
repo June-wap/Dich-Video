@@ -107,18 +107,48 @@ class VoiceProfileService:
         return self._output_dir
 
     def _validate_reference_audio(self, temp_path: Path) -> tuple[float, int, int]:
-        """Validate audio decodability, duration, finite samples, and metrics."""
+        """Validate audio decodability, duration, finite samples, and metrics.
+
+        Decodes in exactly the same order as OmniVoiceProvider._decode_reference
+        (prototype/providers/omnivoice.py) - the primary provider's own,
+        already-tested reference-audio decoder (see
+        prototype/tests/test_omnivoice_cloning.py::test_aac_in_mp3_filename).
+        FFmpeg does container detection FIRST. This is not cosmetic: this
+        function used to try libsndfile (`sf.read`) first and only fall back
+        to FFmpeg if that raised. libsndfile's own MP3 decoding does
+        frame-resync scanning that can succeed *wrongly* - producing
+        corrupted/near-silent samples instead of raising - on a compressed
+        container that is not really MP3, most commonly AAC/MP4 audio saved
+        with a plain ".mp3" extension, which is a routine upload from a
+        phone voice recorder. Trying libsndfile first let exactly that
+        garbage decode slip past the `except Exception` fallback entirely
+        and only get caught later by the amplitude/finite-sample check below
+        - by which point a real, valid reference file had already been
+        rejected as INVALID_REFERENCE_AUDIO, even though the OmniVoice
+        provider this profile is destined for decodes the identical file
+        correctly. WAV/FLAC remain decodable via a signature-checked
+        libsndfile fallback, but ONLY when FFmpeg itself is not installed (a
+        narrow FileNotFoundError catch) - not on any other decode failure,
+        so genuinely corrupt or unsupported audio is still rejected.
+        """
         try:
-            # Try decoding via soundfile or ffmpeg pipeline
             try:
-                samples, rate = sf.read(temp_path, dtype="float32", always_2d=True)
-            except Exception:
                 decoded = subprocess.run(
                     ["ffmpeg", "-v", "error", "-nostdin", "-i", str(temp_path.resolve()),
                      "-map", "0:a:0", "-f", "wav", "-acodec", "pcm_f32le", "pipe:1"],
                     capture_output=True, timeout=30, check=True
                 )
                 samples, rate = sf.read(io.BytesIO(decoded.stdout), dtype="float32", always_2d=True)
+            except FileNotFoundError:
+                # FFmpeg is not installed - WAV/FLAC remain usable via a
+                # signature-checked libsndfile fallback. Do not hand an
+                # unknown compressed container to a decoder chosen by file
+                # extension alone.
+                with temp_path.open("rb") as source:
+                    header = source.read(12)
+                if not (header[:4] == b"fLaC" or (header[:4] == b"RIFF" and header[8:12] == b"WAVE")):
+                    raise ValueError("FFmpeg is required to decode this container") from None
+                samples, rate = sf.read(temp_path, dtype="float32", always_2d=True)
 
             if rate <= 0 or not samples.size or not np.isfinite(samples).all() or not np.any(samples):
                 raise ValueError("Invalid audio samples")

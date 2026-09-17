@@ -14,7 +14,7 @@ from backend.config import Settings
 from backend.errors import ApplicationError, ErrorCode
 from backend.main import create_app
 from backend.schemas.long_form import LongFormRequest
-from backend.services.long_form_service import validate_wav
+from backend.services.long_form_service import LONG_FORM_CHUNK_CONFIG, validate_wav
 from backend.tests.provider_fakes import FakeCloneProvider, registry
 from core.long_text import build_chunks
 import core.tts_manager as core
@@ -80,7 +80,7 @@ def test_create_order_identity_merge_and_artifact(harness, monkeypatch):
     assert response.json()["status"] == "QUEUED"
     result = wait(jobs, response.json()["job_id"])
     assert result.status == "COMPLETED"
-    assert [c[0] for c in calls] == [c.text for c in build_chunks(TEXT)]
+    assert [c[0] for c in calls] == [c.text for c in build_chunks(TEXT, LONG_FORM_CHUNK_CONFIG)]
     assert "".join(TEXT.split()) == "".join("".join(c[0].split()) for c in calls)
     assert all(c[1] is profile for c in calls)
     assert merged == [c[2] for c in calls]
@@ -148,7 +148,7 @@ def test_fifo_running_cancel_and_profile_deletion(harness, monkeypatch):
         release.set()
         assert wait(jobs, first).status == "CANCELLED"
         assert wait(jobs, third).status == "COMPLETED"
-        assert provider.synthesize_cloned_calls == 1 + len(build_chunks(TEXT))
+        assert provider.synthesize_cloned_calls == 1 + len(build_chunks(TEXT, LONG_FORM_CHUNK_CONFIG))
         assert profiles.get_profile_record(pid).active_jobs == 0
     finally:
         release.set()
@@ -359,3 +359,61 @@ def test_merge_exception_never_publishes(harness, monkeypatch, caplog):
     result = wait(jobs, jobs.submit(LongFormRequest(**payload(pid))).job_id)
     assert result.status == "FAILED" and not list(settings.output_dir.glob("*.wav"))
     assert "SECRET_REFERENCE_TRANSCRIPT" not in caplog.text
+
+
+def test_preflight_and_synthesis_use_identical_chunk_config(harness, monkeypatch):
+    """Task 3.5: _run() calls build_chunks() twice on its way to a COMPLETED
+    job -- once directly, to pre-create per-chunk DB rows and verify source
+    ranges before any generation starts, and once inside
+    TTSManager.synthesize_long_text() (via chunk_config=), to actually chunk
+    and generate audio. Each import binds its own local name for
+    build_chunks(), so the two call sites can silently drift onto different
+    ChunkingConfig objects even though both read from the same source text.
+    This proves they never do: both must resolve to the single centralized
+    LONG_FORM_CHUNK_CONFIG object, and -- because build_chunks() is a pure
+    function of (text, config) -- that identity is exactly what guarantees
+    the pre-created chunk bookkeeping never drifts from what is synthesized
+    and merged.
+    """
+    _, jobs, _, _, pid, _ = harness
+    preflight_calls = []
+    synthesis_calls = []
+
+    def spy_preflight(text, config=None):
+        chunks = build_chunks(text, config)
+        preflight_calls.append((config, [c.text for c in chunks]))
+        return chunks
+
+    def spy_synthesis(text, config=None):
+        chunks = build_chunks(text, config)
+        synthesis_calls.append((config, [c.text for c in chunks]))
+        return chunks
+
+    # _run()'s preflight loop calls its OWN module-local `build_chunks` name
+    # (from `backend.services.long_form_service`); TTSManager.synthesize_long_text
+    # calls its own (aliased as `core` in this test file, per the existing
+    # test_text_integrity_guard_prevents_generation pattern above). Patching
+    # only one would not catch the two drifting apart.
+    monkeypatch.setattr("backend.services.long_form_service.build_chunks", spy_preflight)
+    monkeypatch.setattr(core, "build_chunks", spy_synthesis)
+
+    result = wait(jobs, jobs.submit(LongFormRequest(**payload(pid))).job_id)
+    assert result.status == "COMPLETED"
+
+    assert len(preflight_calls) == 1, "preflight build_chunks() must run exactly once per job"
+    assert len(synthesis_calls) == 1, "synthesis build_chunks() must run exactly once per job"
+    preflight_config, preflight_texts = preflight_calls[0]
+    synthesis_config, synthesis_texts = synthesis_calls[0]
+
+    assert preflight_config is LONG_FORM_CHUNK_CONFIG
+    assert synthesis_config is LONG_FORM_CHUNK_CONFIG
+    assert preflight_texts == synthesis_texts
+    # The real assertion: whatever build_chunks(TEXT, LONG_FORM_CHUNK_CONFIG)
+    # independently computes right now is exactly what both call sites used --
+    # not a hardcoded chunk count (this test's TEXT constant is not the
+    # benchmark corpus quoted in LONG_FORM_CHUNK_CONFIG's comment, so it was
+    # never separately measured; asserting a guessed count here would just be
+    # a second, unverified literal to drift out of sync).
+    expected_texts = [c.text for c in build_chunks(TEXT, LONG_FORM_CHUNK_CONFIG)]
+    assert preflight_texts == expected_texts
+    assert len(expected_texts) >= 2, "fixture TEXT must still exercise multiple chunks"

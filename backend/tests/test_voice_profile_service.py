@@ -1,5 +1,6 @@
 import io
 from pathlib import Path
+import subprocess
 import tempfile
 import uuid
 import wave
@@ -89,6 +90,76 @@ def test_invalid_audio_rejected(service_env):
     with pytest.raises(ApplicationError) as exc:
         vps.create_profile(long_bytes, "long.wav", transcript)
     assert exc.value.code == ErrorCode.INVALID_REFERENCE_AUDIO
+
+    # Corrupt audio *labeled* .mp3 - a genuinely undecodable file must still
+    # be rejected under the FFmpeg-first decode order (regression guard for
+    # the fix below: FFmpeg-first must not accidentally *widen* what's
+    # accepted, only correctly decode real compressed containers).
+    with pytest.raises(ApplicationError) as exc:
+        vps.create_profile(b"not an audio file at all", "bad.mp3", transcript)
+    assert exc.value.code == ErrorCode.INVALID_REFERENCE_AUDIO
+
+
+def test_create_profile_accepts_real_mp3(service_env, tmp_path):
+    """A genuinely MP3-encoded reference file must be accepted end to end.
+
+    Regression test for the INVALID_REFERENCE_AUDIO bug: create_profile()'s
+    own pre-validation (_validate_reference_audio) used to try libsndfile
+    before FFmpeg, which is the reverse of OmniVoiceProvider's own, already
+    proven decode order (prototype/providers/omnivoice.py::_decode_reference).
+    """
+    vps, provider, _, _ = service_env
+    wav_bytes = make_wav_bytes(duration=5.0)
+    wav_path = tmp_path / "ref_source.wav"
+    wav_path.write_bytes(wav_bytes)
+    mp3_path = tmp_path / "ref.mp3"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", "-i", str(wav_path), "-c:a", "libmp3lame", str(mp3_path)],
+        check=True, capture_output=True, timeout=30,
+    )
+    transcript = "Đây là văn bản phát âm chuẩn để tạo giọng mẫu."
+
+    resp = vps.create_profile(
+        audio_bytes=mp3_path.read_bytes(),
+        filename="ref.mp3",
+        transcript=transcript,
+    )
+
+    assert resp.ok is True
+    assert round(resp.data.reference.duration_seconds, 0) == 5.0
+    assert provider.create_profile_calls == 1
+
+
+def test_create_profile_accepts_aac_disguised_as_mp3(service_env, tmp_path):
+    """A routine real-world case: a phone voice recorder exports AAC audio
+    but the file still has a `.mp3` extension. FFmpeg's container detection
+    must decode this correctly instead of handing it to a decoder keyed off
+    the (wrong) file extension - mirrors
+    prototype/tests/test_omnivoice_cloning.py::test_aac_in_mp3_filename,
+    which already proves OmniVoiceProvider itself handles this; this proves
+    the service's own pre-validation gate (the actual site of the reported
+    bug - a failure here surfaces as INVALID_REFERENCE_AUDIO before the
+    provider is ever reached) does too.
+    """
+    vps, _, _, _ = service_env
+    wav_bytes = make_wav_bytes(duration=5.0)
+    wav_path = tmp_path / "ref_source.wav"
+    wav_path.write_bytes(wav_bytes)
+    disguised_path = tmp_path / "reference.mp3"
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", "-i", str(wav_path), "-c:a", "aac", "-f", "ipod", str(disguised_path)],
+        check=True, capture_output=True, timeout=30,
+    )
+    transcript = "Đây là văn bản phát âm chuẩn để tạo giọng mẫu."
+
+    resp = vps.create_profile(
+        audio_bytes=disguised_path.read_bytes(),
+        filename="reference.mp3",
+        transcript=transcript,
+    )
+
+    assert resp.ok is True
+    assert round(resp.data.reference.duration_seconds, 0) == 5.0
 
 
 def test_oversized_audio_rejected(service_env):

@@ -40,12 +40,23 @@ def test_bootstrap_one_primary_adapter_and_never_loads(monkeypatch):
             assert response.status_code == 200
             data = response.json()
             assert data["primary"] == OMNIVOICE_PROVIDER_ID
-            assert len(data["providers"]) == 1
-            assert data["providers"][0]["state"] == "NOT_LOADED"
-            assert data["providers"][0]["loaded"] is False
-            assert data["providers"][0]["available"] is True
+            # create_app()'s real provider_service_factory (create_provider_service)
+            # now also always registers Piper as a second, non-primary provider
+            # (see backend/services/provider_service.py) - it was never mocked
+            # out here (only OmniVoiceProvider is monkeypatched above), so the
+            # real bootstrap has registered 2 providers since Piper was added,
+            # not 1. Look up the primary (OmniVoice/fake) entry by id rather
+            # than assuming it is providers[0].
+            assert len(data["providers"]) == 2
+            primary_entry = next(p for p in data["providers"] if p["id"] == OMNIVOICE_PROVIDER_ID)
+            assert primary_entry["state"] == "NOT_LOADED"
+            assert primary_entry["loaded"] is False
+            assert primary_entry["available"] is True
             assert service.get_primary_provider() is fake
-        constructor.assert_called_once_with(device="cuda:0")
+        # allow_unverified_cpu is always passed alongside device now (Settings
+        # > Performance > Device's CPU fallback - see create_provider_service),
+        # not just device= alone.
+        constructor.assert_called_once_with(device="cuda:0", allow_unverified_cpu=False)
         assert fake.load_calls == 0
     assert fake.unload_calls == 0
     assert app.state.provider_service is None
@@ -330,11 +341,44 @@ def test_load_error_response_hides_original_exception():
         assert "secret" not in response.text and "traceback" not in response.text.lower()
 
 
-def test_device_override_has_no_cpu_fallback(monkeypatch):
+def test_device_override_and_experimental_cpu_opt_in(monkeypatch):
+    # NOTE: this test previously asserted that Settings(omnivoice_device="cpu")
+    # always raised ("no CPU fallback"). That changed deliberately: Settings >
+    # Performance > Device now has a real, working CPU option (Task 6) built
+    # on prototype/providers/omnivoice.py's own pre-existing, opt-in
+    # allow_unverified_cpu code path (see
+    # backend/services/provider_service.py's create_provider_service() and
+    # backend/services/app_settings_service.py's resolve_effective_settings()).
+    # CPU stays clearly labeled experimental/unverified in the UI and in
+    # OmniVoiceProvider.capabilities()['cpu_verified'] (still False) - it is
+    # opt-in only, never a silent fallback for a broken/missing GPU.
     monkeypatch.setenv("LOCAL_AI_OMNIVOICE_DEVICE", "cuda:1")
     assert Settings.from_env().omnivoice_device == "cuda:1"
-    with pytest.raises(ValueError, match="no CPU fallback"):
-        Settings(omnivoice_device="cpu")
+    assert Settings(omnivoice_device="cpu").omnivoice_device == "cpu"
+    with pytest.raises(ValueError, match="must be"):
+        Settings(omnivoice_device="rocm:0")
+
+
+def test_create_provider_service_opts_into_cpu_only_when_device_is_cpu(monkeypatch):
+    """Task 6: choosing CPU is the explicit, deliberate consent
+    prototype/providers/omnivoice.py's own allow_unverified_cpu gate asks
+    for - never silently enabled for a plain 'cuda:N' settings value."""
+    from providers import omnivoice
+    calls = []
+
+    class RecordingProvider(FakeProvider):
+        def __init__(self, device="cuda:0", allow_unverified_cpu=False):
+            calls.append({"device": device, "allow_unverified_cpu": allow_unverified_cpu})
+            super().__init__()
+            self.device = device
+
+    monkeypatch.setattr(omnivoice, "OmniVoiceProvider", RecordingProvider)
+    create_provider_service(Settings(omnivoice_device="cuda:0"))
+    create_provider_service(Settings(omnivoice_device="cpu"))
+    assert calls == [
+        {"device": "cuda:0", "allow_unverified_cpu": False},
+        {"device": "cpu", "allow_unverified_cpu": True},
+    ]
 
 
 def test_real_adapter_api_reuses_load_once_without_real_model(monkeypatch):
