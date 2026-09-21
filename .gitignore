@@ -64,12 +64,23 @@ tools/keygen/*.spec
 Voca-Keygen.exe
 serviceAccountKey.json
 server_keygen/serviceAccountKey.json
+*.key
+*.p12
+*.pfx
 
 # --- AI Assistants & Vendored checkouts ---
 .vendor-vieneu/
 .claude/
 
 # --- Build & release artifacts (large binaries / archives) ---
+build/
+out/
+coverage/
+*.7z
+*.rar
+*.zip
+*.exe
+*.msi
 release/core-dist/
 release/Voca-Basic-1.0.1-Customer/
 release/Voca-Basic-Core.zip
@@ -81,8 +92,6 @@ release/runtime-chatterbox/
 release/runtime-main/
 release/AI-Packages/
 release/Voca Basic/
-release/*.zip
-release/*.7z
 release/*.log
 *.log
 
