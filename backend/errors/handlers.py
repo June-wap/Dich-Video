@@ -40,6 +40,20 @@ MESSAGES = {
     ErrorCode.TRANSLATION_KEY_REQUIRED: "Cần cấu hình API key Gemini trong Cài đặt để tạo giọng nói cho ngôn ngữ khác tiếng Việt.",
     ErrorCode.TRANSLATION_FAILED: "Không thể dịch văn bản qua Gemini API. Kiểm tra API key, hạn mức sử dụng, hoặc kết nối mạng rồi thử lại.",
     ErrorCode.UNAUTHORIZED: "Không có quyền truy cập API cục bộ.",
+    ErrorCode.LOCAL_GPU_UNAVAILABLE: "GPU NVIDIA cục bộ không khả dụng cho Chatterbox.",
+    ErrorCode.GPU_RESOURCE_INSUFFICIENT: "GPU không đủ bộ nhớ để tạo giọng nói.",
+    ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH: "Hồ sơ giọng đọc không tương thích với ngôn ngữ đầu ra đã chọn.",
+    ErrorCode.LICENSE_REQUIRED: "Phần mềm chưa được kích hoạt bản quyền. Vui lòng nhập mã bản quyền để sử dụng.",
+    ErrorCode.LICENSE_EXPIRED: "Bản quyền đã hết hạn sử dụng. Vui lòng liên hệ để gia hạn bản quyền.",
+    ErrorCode.LICENSE_INVALID: "Mã bản quyền không hợp lệ hoặc không khớp với thiết bị này.",
+    ErrorCode.LICENSE_CLOCK_TAMPERED: "Phát hiện thời gian hệ thống không chính xác. Vui lòng kiểm tra lại ngày giờ máy tính.",
+    ErrorCode.LICENSE_BLOCKED: "Mã bản quyền này đã bị khóa do vi phạm chính sách sử dụng.",
+    ErrorCode.DEVICE_LIMIT_REACHED: "Mã bản quyền đã đạt số lượng thiết bị tối đa cho phép. Vui lòng gỡ kích hoạt trên máy cũ.",
+    ErrorCode.ACTIVATION_REVOKED: "Bản quyền trên thiết bị này đã bị thu hồi từ máy chủ.",
+    ErrorCode.MACHINE_MISMATCH: "Mã bản quyền không khớp với thiết bị hiện tại.",
+    ErrorCode.TOKEN_INVALID: "Token bản quyền không hợp lệ hoặc đã bị thay đổi.",
+    ErrorCode.TOKEN_EXPIRED: "Token bản quyền đã hết hạn sử dụng.",
+    ErrorCode.LEASE_EXPIRED: "Đã hết thời hạn sử dụng ngoại tuyến. Vui lòng kết nối Internet để đồng bộ bản quyền.",
 }
 STATUSES = {
     ErrorCode.PROFILE_IN_USE: 409, ErrorCode.JOB_NOT_FOUND: 404,
@@ -60,6 +74,14 @@ STATUSES = {
     ErrorCode.IDEMPOTENCY_KEY_CONFLICT: 409,
     ErrorCode.TRANSLATION_KEY_REQUIRED: 422, ErrorCode.TRANSLATION_FAILED: 502,
     ErrorCode.UNAUTHORIZED: 401,
+    ErrorCode.LOCAL_GPU_UNAVAILABLE: 503, ErrorCode.GPU_RESOURCE_INSUFFICIENT: 503,
+    ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH: 422,
+    ErrorCode.LICENSE_REQUIRED: 403, ErrorCode.LICENSE_EXPIRED: 403,
+    ErrorCode.LICENSE_INVALID: 403, ErrorCode.LICENSE_CLOCK_TAMPERED: 403,
+    ErrorCode.LICENSE_BLOCKED: 403, ErrorCode.DEVICE_LIMIT_REACHED: 403,
+    ErrorCode.ACTIVATION_REVOKED: 403, ErrorCode.MACHINE_MISMATCH: 403,
+    ErrorCode.TOKEN_INVALID: 403, ErrorCode.TOKEN_EXPIRED: 403,
+    ErrorCode.LEASE_EXPIRED: 403,
 }
 
 

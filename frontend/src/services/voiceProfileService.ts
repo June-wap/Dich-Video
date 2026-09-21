@@ -49,6 +49,8 @@ export interface CreateVoiceProfilePayload {
   /** Optional display name; the backend defaults to "Voice Profile
    * {id[:8]}" when omitted. */
   name?: string | null;
+  /** Output language selects the backend-owned profile family, never an engine. */
+  language?: string;
 }
 
 export interface SynthesizeCloneTestPayload {
@@ -73,6 +75,7 @@ export const voiceProfileService = {
     form.append('file', payload.file, payload.file.name);
     form.append('reference_transcript', payload.referenceTranscript);
     if (payload.name) form.append('name', payload.name);
+    if (payload.language) form.append('language', payload.language);
     const response = await apiFetch<OkEnvelope<VoiceProfile>>('/voices/profiles', {
       method: 'POST',
       body: form,

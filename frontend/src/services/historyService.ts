@@ -5,7 +5,7 @@ const MOCK_HISTORY: HistoryItem[] = [
     id: 'hist-001',
     date: '14/09/2026 11:42',
     type: 'Text to Speech',
-    textPreview: 'Xin chào! Chào mừng bạn đến với OmniVoice Local AI Voice Studio...',
+    textPreview: 'Xin chào! Chào mừng bạn đến với Voca Basic...',
     voice: 'Hoài My (Nữ Miền Bắc)',
     language: 'Vietnamese',
     duration: '18.4s',

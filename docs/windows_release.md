@@ -43,3 +43,15 @@ approved a distributable model/voice combination.
    the menu; confirm generated audio, profiles, SQLite and token are removed.
 5. Uninstall the app and verify program files are removed while user data is
    retained until the user explicitly erases it.
+
+## Portable release (no Windows shortcut)
+
+When distributing a single executable is preferable to an installed application,
+run `npm run package:portable`. The artifact is written to
+`release/portable-dist/` and does not create a Desktop or Start Menu shortcut.
+It uses a separate output directory, so a running development or unpacked copy
+cannot partially overwrite this portable build. The same staged runtime and
+model-license checks apply as for the NSIS installer.
+
+For a repeatable local packaging test using the runtime already staged by a
+previous approved release build, use `npm run package:portable:staged`.

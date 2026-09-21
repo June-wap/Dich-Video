@@ -1,6 +1,6 @@
 # Historical CP0 legacy-provider snapshot, not the official backend installer.
 # CP0.3B-0: use ../requirements-backend.txt and ../docs/backend_runtime.md.
-# Do not merge this snapshot into the official OmniVoice environment blindly.
+# Do not merge this legacy snapshot into the official backend environment blindly.
 gradio==6.27.0
 sherpa-onnx==1.12.26
 onnxruntime==1.30.0

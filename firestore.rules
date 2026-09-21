@@ -1,0 +1,12 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Voca Basic Cloud License Security Rules:
+    // Tuyệt đối chặn toàn bộ truy cập trực tiếp từ client SDK (deny-by-default).
+    // Voca Basic Desktop chỉ tương tác qua Cloud Functions (Firebase Admin SDK).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

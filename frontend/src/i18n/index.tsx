@@ -21,7 +21,7 @@ export type Locale = 'vi' | 'en';
 type Dict = Record<string, string>;
 
 const vi: Dict = {
-  'app.brand': 'Local AI Voice',
+  'app.brand': 'Voca Basic',
   'app.offlineEngine': 'Công cụ chạy cục bộ (Offline)',
 
   'nav.dashboard': 'Dashboard',
@@ -35,7 +35,6 @@ const vi: Dict = {
   'nav.history': 'Lịch sử',
   'nav.settings': 'Cài đặt',
   'nav.diagnostics': 'Chẩn đoán',
-  'sidebar.status.omnivoice': 'OmniVoice',
   'sidebar.status.gpu': 'GPU',
   'sidebar.status.version': 'Phiên bản',
   'sidebar.status.ready': 'Sẵn sàng',
@@ -45,8 +44,6 @@ const vi: Dict = {
 
   'dashboard.greeting': 'Xin chào',
   'dashboard.subtitle': 'Bạn muốn tạo gì hôm nay?',
-  'dashboard.status.omnivoiceReady': 'OmniVoice sẵn sàng',
-  'dashboard.status.omnivoiceDegraded': 'OmniVoice gián đoạn',
   'dashboard.status.cudaAvailable': 'CUDA khả dụng',
   'dashboard.status.cudaUnavailable': 'CUDA không khả dụng',
   'dashboard.card.tts.title': 'Text to Speech',
@@ -152,7 +149,7 @@ const vi: Dict = {
   'settings.advanced.badge': 'Developer Section',
   'settings.advanced.desc': 'Cấu hình chuyên sâu thuật toán suy luận và nhật ký gỡ lỗi',
   'settings.advanced.devMode.title': 'Chế độ Nhà phát triển (Developer Mode)',
-  'settings.advanced.devMode.desc': 'Mặc định TẮT (OFF). Khi BẬT, cho phép xem tiến độ chunk, số lần thử lại (retries), mã lỗi (error codes), chẩn đoán OmniVoice, thông tin model, RTF và logs.',
+  'settings.advanced.devMode.desc': 'Mặc định TẮT (OFF). Khi BẬT, cho phép xem tiến độ chunk, số lần thử lại, mã lỗi, thông tin model, RTF và logs.',
   'settings.advanced.collapsed': 'Phần cài đặt dành cho nhà phát triển đang được thu gọn. Hãy bật công tắc phía trên để mở khóa các tham số kỹ thuật.',
   'settings.advanced.numSteps.label': 'Số bước khử nhiễu (num_step)',
   'settings.advanced.numSteps.hint': 'Áp dụng thật cho pipeline tổng hợp (Text to Speech và Long-form). Số bước cao hơn = chất lượng cao hơn nhưng chậm hơn.',
@@ -169,7 +166,7 @@ const vi: Dict = {
 };
 
 const en: Dict = {
-  'app.brand': 'Local AI Voice',
+  'app.brand': 'Voca Basic',
   'app.offlineEngine': 'Local Offline Engine',
 
   'nav.dashboard': 'Dashboard',
@@ -183,7 +180,6 @@ const en: Dict = {
   'nav.history': 'History',
   'nav.settings': 'Settings',
   'nav.diagnostics': 'Diagnostics',
-  'sidebar.status.omnivoice': 'OmniVoice',
   'sidebar.status.gpu': 'GPU',
   'sidebar.status.version': 'Version',
   'sidebar.status.ready': 'Ready',
@@ -193,8 +189,6 @@ const en: Dict = {
 
   'dashboard.greeting': 'Hello',
   'dashboard.subtitle': 'What would you like to create today?',
-  'dashboard.status.omnivoiceReady': 'OmniVoice ready',
-  'dashboard.status.omnivoiceDegraded': 'OmniVoice degraded',
   'dashboard.status.cudaAvailable': 'CUDA available',
   'dashboard.status.cudaUnavailable': 'CUDA unavailable',
   'dashboard.card.tts.title': 'Text to Speech',
@@ -300,7 +294,7 @@ const en: Dict = {
   'settings.advanced.badge': 'Developer Section',
   'settings.advanced.desc': 'Deep inference tuning and debug logging',
   'settings.advanced.devMode.title': 'Developer Mode',
-  'settings.advanced.devMode.desc': 'OFF by default. When ON, shows chunk progress, retries, error codes, OmniVoice diagnostics, model info, RTF and logs.',
+  'settings.advanced.devMode.desc': 'OFF by default. When ON, shows chunk progress, retries, error codes, model info, RTF and logs.',
   'settings.advanced.collapsed': 'Developer settings are collapsed. Turn on the switch above to unlock the technical parameters.',
   'settings.advanced.numSteps.label': 'Denoising steps (num_step)',
   'settings.advanced.numSteps.hint': 'Really applied to the synthesis pipeline (Text to Speech and Long-form). Higher = better quality but slower.',

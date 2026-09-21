@@ -8,7 +8,7 @@ Japanese and Hindi Piper voices exist in the same CP0 checkpoint but are
 REJECTED for the proposed commercial catalogue (CC-BY-NC-SA-4.0 datasets, no
 commercial grant), so they are intentionally NOT registered as usable
 languages by this provider; requests for "ja"/"hi" keep going to the primary
-(OmniVoice) provider exactly as before, unchanged by this file.
+(legacy primary) provider exactly as before, unchanged by this file.
 
 IMPORTANT - license status: piper-tts itself is GPL-3.0-or-later and the six
 voice packages here are still PENDING (not APPROVED) per the license matrix.

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useT } from '../../i18n';
-import { systemService, type SystemStatus } from '../../services/systemService';
 import { healthService } from '../../services/healthService';
 
 interface NavItem {
@@ -88,36 +87,20 @@ const NAV_SECTIONS: NavSection[] = [
           </svg>
         ),
       },
-      {
-        to: '/diagnostics',
-        labelKey: 'nav.diagnostics',
-        icon: (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-        ),
-      },
+      // Diagnostics (17/09): gỡ khỏi nav theo yêu cầu - không muốn khách
+      // hàng nhìn thấy tên/trạng thái provider đang chạy phía sau.
+      // Route trong App.tsx cũng đã gỡ theo (không chỉ ẩn link) để không ai
+      // vào được bằng cách gõ thẳng /diagnostics - xem ghi chú ở đó.
     ],
   },
 ];
 
 export const Sidebar: React.FC = () => {
   const { t } = useT();
-  const [status, setStatus] = useState<SystemStatus | null>(null);
   const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    systemService
-      .status()
-      .then((data) => {
-        if (!cancelled) setStatus(data);
-      })
-      .catch(() => {
-        // Real status is a nice-to-have here (Diagnostics is the page of
-        // record for failures) - silently keep the "unknown" placeholder
-        // rather than showing an error state in the nav rail.
-      });
     healthService
       .get()
       .then((data) => {
@@ -129,13 +112,11 @@ export const Sidebar: React.FC = () => {
     };
   }, []);
 
-  const omnivoiceReady = status?.omnivoice_available && status.omnivoice_model_loaded;
-
   return (
     <aside className="ds-sidebar">
       {/* Brand Header */}
       <NavLink to="/" className="ds-sidebar-brand" style={{ textDecoration: 'none' }}>
-        <div className="ds-sidebar-brand-icon">V</div>
+        <img src="/logo-128.png" alt="Voca Basic" className="ds-sidebar-brand-icon" style={{ objectFit: 'cover', background: 'transparent' }} />
         <span className="ds-sidebar-brand-text">{t('app.brand')}</span>
       </NavLink>
 
@@ -178,22 +159,13 @@ export const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      {/* BOTTOM STATUS - real data from GET /api/system/status (was
-          hardcoded "RTX 4050" / "Ready" / "Prototype" for every machine). */}
+      {/* BOTTOM STATUS (17/09): chỉ còn phiên bản ứng dụng - đã bỏ hẳn dòng
+          tên/trạng thái provider và tên GPU/phần cứng theo yêu cầu,
+          không muốn lộ ra cho khách hàng đang chạy model/thiết bị gì phía
+          sau. Diagnostics (đã gỡ khỏi nav + route ở trên/App.tsx) vẫn là nơi
+          duy nhất còn xem được các chi tiết đó, và giờ cũng không ai vào
+          được nữa qua giao diện. */}
       <div className="ds-sidebar-status-panel">
-        <div className="ds-sidebar-status-row">
-          <span>{t('sidebar.status.omnivoice')}</span>
-          <span className="ds-sidebar-status-value">
-            <span className="ds-sidebar-status-dot" aria-hidden="true" />
-            {status == null ? t('sidebar.status.unknown') : omnivoiceReady ? t('sidebar.status.ready') : t('sidebar.status.notReady')}
-          </span>
-        </div>
-        <div className="ds-sidebar-status-row">
-          <span>{t('sidebar.status.gpu')}</span>
-          <span className="ds-sidebar-status-value">
-            {status == null ? '—' : status.gpu_name ?? t('sidebar.status.notDetected')}
-          </span>
-        </div>
         <div className="ds-sidebar-status-row">
           <span>{t('sidebar.status.version')}</span>
           <span className="ds-sidebar-status-value">{version ? `v${version}` : '—'}</span>

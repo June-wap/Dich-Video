@@ -29,6 +29,7 @@ export type TtsAudioFormat = 'wav' | 'mp3';
 
 export interface SubmitTtsJobPayload {
   text: string;
+  source_language: string;
   language: string;
   voice_id?: string | null;
   speed: number;

@@ -10,7 +10,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from backend.config import OMNIVOICE_PROVIDER_ID, Settings
+from backend.config import Settings
+from backend.tests.provider_fakes import TEST_PROVIDER_ID
 from backend.main import create_app
 from backend.services.provider_service import ProviderService
 from backend.services.system_service import SystemService
@@ -30,11 +31,18 @@ def make_wav_bytes(duration: float = 5.0, sample_rate: int = 24000) -> bytes:
 @pytest.fixture
 def app_client():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        settings = Settings(output_dir=Path(tmp_dir))
+        # database_path must be isolated per test like output_dir is: without
+        # it, Repository falls back to Settings.app_data_dir's real,
+        # persistent %LOCALAPPDATA%\Voca Basic\data\metadata.sqlite3 (see
+        # backend/persistence.py), so profiles created by every test run -
+        # not just this one - accumulate in the same database (this was the
+        # actual cause of test_get_and_list_profiles_api expecting 1 profile
+        # and getting dozens).
+        settings = Settings(output_dir=Path(tmp_dir), database_path=Path(tmp_dir) / "metadata.sqlite3")
         provider = FakeCloneProvider()
         providers = ProviderService()
         providers.register(provider, device="cuda:0", available=True)
-        providers.select_primary(OMNIVOICE_PROVIDER_ID)
+        providers.select_primary(TEST_PROVIDER_ID)
 
         app = create_app(
             settings=settings,
@@ -71,7 +79,7 @@ def test_create_profile_api_success(app_client):
     data = resp.json()
     assert data["ok"] is True
     assert data["data"]["name"] == "Giọng Mẫu"
-    assert data["data"]["provider"] == OMNIVOICE_PROVIDER_ID
+    assert data["data"]["provider"] == TEST_PROVIDER_ID
     assert data["data"]["status"] == "ready"
     assert round(data["data"]["reference"]["duration_seconds"], 1) == 5.0
     assert provider.create_profile_calls == 1
@@ -242,7 +250,7 @@ def test_normal_tts_regression(app_client):
     # Normal TTS endpoint must continue functioning independently
     tts_resp = client.post(
         "/api/tts",
-        json={"text": "Đây là bài kiểm tra TTS thông thường.", "language": "vi", "voice_id": "omnivoice_auto"},
+        json={"text": "Đây là bài kiểm tra TTS thông thường.", "language": "vi", "voice_id": "test_auto"},
         headers={"Origin": "http://localhost:5173"},
     )
     assert tts_resp.status_code == 200

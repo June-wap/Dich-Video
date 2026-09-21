@@ -114,11 +114,9 @@ export const DiagnosticsPage: React.FC = () => {
             : { name: 'CUDA / GPU', result: 'INFO', detail: 'Không khả dụng - có thể đang chạy ở chế độ CPU thử nghiệm' }
         );
         steps.push(
-          statusData.omnivoice_available
-            ? statusData.omnivoice_model_loaded
-              ? { name: 'Mô hình OmniVoice', result: 'PASS', detail: 'Đã nạp và sẵn sàng' }
-              : { name: 'Mô hình OmniVoice', result: 'INFO', detail: 'Sẵn sàng nhưng chưa nạp (sẽ tự nạp ở lần tạo giọng đầu tiên)' }
-            : { name: 'Mô hình OmniVoice', result: 'FAIL', detail: `Trạng thái: ${statusData.provider_state}` }
+          statusData.primary_provider
+            ? { name: 'TTS provider', result: 'INFO', detail: `Trạng thái: ${statusData.provider_state}` }
+            : { name: 'TTS provider', result: 'INFO', detail: 'Chưa có provider được cấu hình' }
         );
         steps.push({
           name: 'Cấu hình audio pipeline',
@@ -180,7 +178,7 @@ export const DiagnosticsPage: React.FC = () => {
     void loadLogs();
   };
 
-  const omnivoiceReady = status?.omnivoice_available && status.omnivoice_model_loaded;
+  const providerReady = Boolean(status?.primary_provider && status.provider_state === 'READY');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -256,21 +254,21 @@ export const DiagnosticsPage: React.FC = () => {
 
             <div className="ds-diagnostic-card">
               <div className="ds-diagnostic-header">
-                <span className="ds-diagnostic-title">OmniVoice Core</span>
-                <StatusBadge status={omnivoiceReady ? 'success' : 'warning'} label={status.provider_state} size="sm" />
+                <span className="ds-diagnostic-title">TTS Provider</span>
+                <StatusBadge status={providerReady ? 'success' : 'warning'} label={status.provider_state ?? 'UNAVAILABLE'} size="sm" />
               </div>
-              <div className="ds-diagnostic-value">{omnivoiceReady ? 'Ready' : status.provider_state}</div>
-              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Provider chính: {status.primary_provider}</span>
+              <div className="ds-diagnostic-value">{providerReady ? 'Ready' : 'Unavailable'}</div>
+              <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Provider chính: {status.primary_provider ?? 'Chưa cấu hình'}</span>
             </div>
 
             <div className="ds-diagnostic-card">
               <div className="ds-diagnostic-header">
-                <span className="ds-diagnostic-title">Model đã nạp</span>
-                <StatusBadge status={status.omnivoice_model_loaded ? 'success' : 'neutral'} label={status.omnivoice_model_loaded ? 'Loaded' : 'Chưa nạp'} size="sm" />
+                <span className="ds-diagnostic-title">TTS availability</span>
+                <StatusBadge status={providerReady ? 'success' : 'neutral'} label={providerReady ? 'Available' : 'Unavailable'} size="sm" />
               </div>
-              <div className="ds-diagnostic-value">{status.omnivoice_model_loaded ? 'Model Loaded' : 'Chưa nạp model'}</div>
+              <div className="ds-diagnostic-value">{providerReady ? 'Available' : 'Unavailable'}</div>
               <span style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>
-                {status.omnivoice_model_loaded ? 'Sẵn sàng tổng hợp ngay' : 'Sẽ tự nạp ở lần tạo giọng nói đầu tiên'}
+                {providerReady ? 'Sẵn sàng tổng hợp' : 'Chưa có TTS provider'}
               </span>
             </div>
 

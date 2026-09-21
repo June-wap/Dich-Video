@@ -16,10 +16,8 @@ class SystemStatus(BaseModel):
     torch_version: str | None
     cuda_available: bool
     gpu_name: str | None
-    omnivoice_available: bool
-    omnivoice_model_loaded: bool
-    primary_provider: str
-    provider_state: ProviderState
+    primary_provider: str | None
+    provider_state: ProviderState | None
     audio: AudioContract = Field(default_factory=AudioContract)
     runtime_mode: Literal["local"] = "local"
 

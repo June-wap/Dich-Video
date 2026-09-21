@@ -1,0 +1,90 @@
+================================================================================
+               VOCA BASIC — HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG
+          Phần Mềm Thuyết Minh & Nhân Bản Giọng Nói AI Offline 100%
+================================================================================
+
+1. GIỚI THIỆU PHẦN MỀM
+--------------------------------------------------------------------------------
+Voca Basic là giải pháp chuyển đổi văn bản thành giọng nói (Text-To-Speech) và
+nhân bản giọng nói (Voice Cloning) thế hệ mới bằng trí tuệ nhân tạo (AI).
+- Hoạt động 100% Offline trên máy tính, không cần kết nối mạng.
+- Bảo mật dữ liệu tuyệt đối, không giới hạn ký tự.
+- Giọng đọc tự nhiên, chuẩn truyền cảm tiếng Việt, tiếng Anh, tiếng Trung...
+- Nhân bản chất giọng bất kỳ chỉ với 5-15 giây file ghi âm mẫu.
+
+
+2. HƯỚNG DẪN CÀI ĐẶT & GHÉP NỐI DỮ LIỆU (LẦN ĐẦU TIÊN)
+--------------------------------------------------------------------------------
+Bộ cài đặt gồm 2 phần:
+  - Bản Core nhẹ: Voca-Basic-Core.zip (~130 MB)
+  - Bộ 3 gói AI: runtime-main.7z, runtime-chatterbox.7z, models.7z (~8.8 GB)
+
+Các bước cài đặt:
+• BƯỚC 1: Giải nén file "Voca-Basic-Core.zip" vào một thư mục trên ổ đĩa
+          (Khuyên dùng ổ D: hoặc E:, ví dụ: D:\Voca-Basic).
+• BƯỚC 2: Vào trong thư mục vừa giải nén, tạo một thư mục mới tên là:
+          ai-packages (nằm ngay cạnh file Voca Basic.exe).
+• BƯỚC 3: Dùng phần mềm 7-Zip hoặc WinRAR giải nén 3 file .7z vào thư mục
+          ai-packages vừa tạo:
+          + runtime-main.7z       -->  ai-packages\runtime-main\
+          + runtime-chatterbox.7z -->  ai-packages\runtime-chatterbox\
+          + models.7z             -->  ai-packages\models\
+• BƯỚC 4: Nhấp đúp vào file "Tao-Phim-Tat-Desktop.bat" để tạo biểu tượng mở
+          nhanh ngoài màn hình Desktop.
+• BƯỚC 5: Mở "Voca Basic.exe" để bắt đầu sử dụng.
+
+
+3. HƯỚNG DẪN KÍCH HOẠT BẢN QUYỀN
+--------------------------------------------------------------------------------
+• BƯỚC 1: Mở ứng dụng Voca Basic.
+• BƯỚC 2: Nhấp vào huy hiệu màu đỏ "⚠️ Chưa kích hoạt bản quyền" ở góc trên bên
+          phải màn hình, bấm nút "📋 Sao chép mã máy" (dạng: VB-XXXX-XXXX-XXXX-XXXX).
+• BƯỚC 3: Gửi mã máy này cho người bán qua Zalo/Telegram.
+• BƯỚC 4: Khi nhận được License Key từ người bán, dán vào ô "Nhập mã bản quyền"
+          trong ứng dụng và bấm nút "🚀 Kích hoạt ngay".
+• BƯỚC 5: Ứng dụng thông báo kích hoạt thành công, huy hiệu chuyển sang màu xanh
+          lá và mở khóa toàn bộ tính năng sử dụng trọn đời hoặc theo hạn đăng ký!
+
+
+4. HƯỚNG DẪN SỬ DỤNG CÁC TÍNH NĂNG CHÍNH
+--------------------------------------------------------------------------------
+4.1. Chuyển văn bản thành giọng nói (Text-to-Speech):
+  - Chọn mục "Tạo giọng nói" trên thanh menu bên trái.
+  - Nhập hoặc dán đoạn văn bản cần đọc vào ô soạn thảo.
+  - Chọn giọng đọc mong muốn (Nam/Nữ, Bắc/Nam, hoặc giọng nhân bản).
+  - Tùy chỉnh tốc độ (Speed) và âm lượng nếu cần.
+  - Nhấp "Tạo âm thanh" để nghe thử, bấm "Tải về" để lưu file .MP3 / .WAV.
+
+4.2. Thuyết minh văn bản dài (Long-Form TTS):
+  - Dán bài viết, truyện ngắn, hoặc kịch bản dài nhiều trang vào mục "Văn bản dài".
+  - Hệ thống tự động tách câu thông minh, đọc mượt mà không bị ngắt quãng.
+  - Xuất ra 1 file âm thanh hoàn chỉnh cho toàn bộ bài thuyết minh.
+
+4.3. Nhân bản giọng nói AI (Voice Cloning):
+  - Chuẩn bị file ghi âm giọng nói mẫu (5 - 15 giây), định dạng .mp3 hoặc .wav.
+    (Lưu ý: Nói tự nhiên, to rõ, không có nhạc nền hay tiếng ồn).
+  - Vào mục "Nhân bản giọng nói" (Voice Cloning) trên menu.
+  - Tải file ghi âm lên, đặt tên cho giọng đọc (ví dụ: Giọng Anh Nam).
+  - Bấm "Tạo hồ sơ giọng". AI sẽ học chất giọng chỉ trong vài giây.
+  - Vào lại mục "Tạo giọng nói", chọn tên hồ sơ vừa tạo để AI nói bằng chính
+    giọng của bạn!
+
+
+5. KHẮC PHỤC SỰ CỐ & CÂU HỎI THƯỜNG GẶP
+--------------------------------------------------------------------------------
+❓ Lỗi "Missing packaged runtime-main Python (kiểm tra thư mục runtime-main/python.exe)":
+   👉 Trả lời: Do bạn chưa giải nén đủ 3 gói AI hoặc đặt sai vị trí thư mục.
+      Đảm bảo thư mục "ai-packages" nằm ngay cùng cấp với "Voca Basic.exe"
+      và bên trong có đủ 3 thư mục con: runtime-main, runtime-chatterbox, models.
+
+❓ Làm sao để reset phần mềm về bản trắng sạch sẽ?
+   👉 Trả lời: Click đúp vào file "Reset-Data-Ban-Trang.bat" trong thư mục ứng
+      dụng để xóa sạch toàn bộ lịch sử và đưa app về trạng thái trắng ban đầu.
+
+❓ Yêu cầu cấu hình máy tính:
+   👉 Trả lời: Windows 10/11 (64-bit), RAM tối thiểu 8GB (khuyên dùng 16GB),
+      ổ cứng trống tối thiểu 20GB.
+
+================================================================================
+          CẢM ƠN BẠN ĐÃ TIN TƯỞNG VÀ SỬ DỤNG VOCA BASIC!
+================================================================================

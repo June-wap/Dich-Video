@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from starlette.concurrency import run_in_threadpool
 
-from backend.dependencies import get_voice_profile_service
+from backend.dependencies import get_voice_profile_service, require_valid_license
 from backend.schemas.voices import (
     CloneTestRequest,
     CloneTTSResponse,
@@ -14,12 +14,13 @@ from backend.services.voice_profile_service import VoiceProfileService
 router = APIRouter(prefix="/voices", tags=["voices"])
 
 
-@router.post("/profiles", response_model=VoiceProfileResponse)
+@router.post("/profiles", response_model=VoiceProfileResponse, dependencies=[Depends(require_valid_license)])
 async def create_profile(
     service: Annotated[VoiceProfileService, Depends(get_voice_profile_service)],
     file: Annotated[UploadFile | None, File()] = None,
     reference_transcript: Annotated[str | None, Form()] = None,
     name: Annotated[str | None, Form()] = None,
+    language: Annotated[str | None, Form()] = "vi",
 ) -> VoiceProfileResponse:
     from backend.errors import ApplicationError, ErrorCode
     if file is None:
@@ -32,6 +33,7 @@ async def create_profile(
         filename=filename,
         transcript=reference_transcript,
         name=name,
+        language=language or "vi",
     )
 
 
@@ -59,7 +61,7 @@ async def delete_profile(
     return {"ok": True, "data": {"profile_id": profile_id, "deleted": True}}
 
 
-@router.post("/profiles/{profile_id}/test", response_model=CloneTTSResponse)
+@router.post("/profiles/{profile_id}/test", response_model=CloneTTSResponse, dependencies=[Depends(require_valid_license)])
 async def synthesize_clone_test(
     profile_id: str,
     request: CloneTestRequest,

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from backend.config import Settings
 from backend.main import create_app
-from backend.tests.provider_fakes import FakeProvider, FakePiperProvider, registry
+from backend.tests.provider_fakes import FakeAdditionalProvider, FakeProvider, registry
 
 
 def _settings(tmp_path, **overrides):
@@ -55,11 +55,11 @@ def test_enabled_loads_the_primary_provider_in_the_background(tmp_path):
 
 def test_enabled_also_warms_up_other_available_providers(tmp_path):
     fake = FakeProvider()
-    piper = FakePiperProvider()
+    additional = FakeAdditionalProvider()
     settings = _settings(tmp_path, warm_up_on_start=True)
-    app = create_app(settings, provider_service_factory=lambda _: registry(fake, piper_provider=piper))
+    app = create_app(settings, provider_service_factory=lambda _: registry(fake, additional_provider=additional))
     with TestClient(app, base_url="http://127.0.0.1"):
-        assert _wait_until(lambda: fake.is_loaded() and piper.is_loaded())
+        assert _wait_until(lambda: fake.is_loaded() and additional.is_loaded())
 
 
 def test_enabled_skips_unavailable_providers(tmp_path):

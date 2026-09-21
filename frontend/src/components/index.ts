@@ -16,3 +16,4 @@ export * from './SearchInput/SearchInput';
 export * from './FilterBar/FilterBar';
 export * from './DataTable/DataTable';
 export * from './ConfirmDialog/ConfirmDialog';
+export * from './License/LicenseActivationModal';

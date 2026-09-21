@@ -501,7 +501,7 @@ export const ShowcasePage: React.FC = () => {
                 <Card interactive>
                   <CardHeader>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <CardTitle>OmniVoice Core v1.0</CardTitle>
+                      <CardTitle>TTS Provider</CardTitle>
                       <StatusBadge status="success" label="Active Provider" size="sm" />
                     </div>
                     <CardDescription>Primary local inference provider</CardDescription>

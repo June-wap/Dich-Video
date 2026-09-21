@@ -13,6 +13,7 @@ const MAX_CONSECUTIVE_POLL_FAILURES = 5;
 
 export interface TtsFormPayload {
   text: string;
+  sourceLanguage: string;
   language: string;
   voiceId: string | null;
   format: TtsAudioFormat;
@@ -87,6 +88,7 @@ function stableHash(input: string): string {
 function normalizePayloadForKey(payload: TtsFormPayload): string {
   return JSON.stringify({
     text: payload.text.trim(),
+    sourceLanguage: payload.sourceLanguage,
     language: payload.language,
     voiceId: payload.voiceId || null,
     format: payload.format,
@@ -251,6 +253,7 @@ export function useTtsJobRunner(): UseTtsJobRunnerResult {
 
       const body: SubmitTtsJobPayload = {
         text: payload.text,
+        source_language: payload.sourceLanguage,
         language: payload.language,
         voice_id: payload.voiceId || null,
         speed: payload.speed,

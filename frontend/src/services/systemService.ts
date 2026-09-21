@@ -14,10 +14,8 @@ export interface SystemStatus {
   torch_version: string | null;
   cuda_available: boolean;
   gpu_name: string | null;
-  omnivoice_available: boolean;
-  omnivoice_model_loaded: boolean;
-  primary_provider: string;
-  provider_state: ProviderState;
+  primary_provider: string | null;
+  provider_state: ProviderState | null;
   audio: { sample_rate: number; channels: number };
   runtime_mode: 'local';
 }

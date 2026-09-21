@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voca Basic — Hướng Dẫn Cài Đặt & Sử Dụng</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 30px 15px;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: #fff;
+      padding: 36px 30px;
+      text-align: center;
+    }
+    header h1 { font-size: 26px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 8px; }
+    header p { font-size: 15px; opacity: 0.9; }
+    .content { padding: 32px 30px; }
+    h2 {
+      font-size: 19px;
+      color: var(--primary-dark);
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 8px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2:first-of-type { margin-top: 0; }
+    h3 { font-size: 16px; color: #0f172a; margin: 18px 0 8px; }
+    p, li { font-size: 15px; margin-bottom: 10px; color: #334155; }
+    ul, ol { padding-left: 22px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+    .step-card {
+      background: #f1f5f9;
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 14px;
+    }
+    .step-title { font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .alert-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 18px 0;
+    }
+    .alert-warning {
+      background: #fffbeb;
+      border-color: #fde68a;
+    }
+    .code-tag {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 13.5px;
+      font-weight: bold;
+      color: #0f172a;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+    .badge-success { background: var(--success); }
+    .faq-item {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+    }
+    .faq-q { font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    footer {
+      background: #f1f5f9;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>VOCA BASIC — HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG</h1>
+    <p>Phần Mềm Thuyết Minh & Nhân Bản Giọng Nói AI Offline 100%</p>
+  </header>
+
+  <div class="content">
+    <h2>1. Giới Thiệu Phần Mềm</h2>
+    <p><strong>Voca Basic</strong> là ứng dụng chuyển đổi văn bản thành giọng nói (Text-To-Speech) và nhân bản giọng nói (Voice Cloning) bằng trí tuệ nhân tạo (AI) chạy hoàn toàn <strong>Offline</strong> trên máy tính của bạn.</p>
+    <ul>
+      <li><strong>Hoạt động 100% Offline:</strong> Không cần Internet, bảo mật tuyệt đối dữ liệu cá nhân.</li>
+      <li><strong>Không giới hạn ký tự:</strong> Thoải mái đọc các bài văn, truyện, sách nói dài.</li>
+      <li><strong>Chất giọng tự nhiên:</strong> Hỗ trợ đa dạng giọng đọc truyền cảm các miền Bắc - Nam tiếng Việt, tiếng Anh, tiếng Trung...</li>
+      <li><strong>Nhân bản giọng nói (Voice Cloning):</strong> Chỉ cần mẫu ghi âm 5 - 15 giây, AI sẽ nói theo đúng chất giọng của bạn!</li>
+    </ul>
+
+    <h2>2. Hướng Dẫn Cài Đặt & Ghép Nối Dữ Liệu (Lần đầu tiên)</h2>
+    <p>Bộ cài đặt được chia thành <strong>Bản Core nhẹ (~130 MB)</strong> và <strong>Bộ 3 gói AI (~8.8 GB)</strong> để thuận tiện tải về:</p>
+
+    <div class="step-card">
+      <div class="step-title">Bước 1: Chuẩn bị thư mục</div>
+      <p>Giải nén file <span class="code-tag">Voca-Basic-Core.zip</span> vào một ổ đĩa có dung lượng trống từ 20 GB trở lên (Khuyên dùng ổ D: hoặc E:, ví dụ: <code>D:\Voca-Basic</code>).</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title">Bước 2: Tạo thư mục ai-packages</div>
+      <p>Vào thư mục vừa giải nén, tạo một thư mục mới đặt tên chính xác là: <span class="code-tag">ai-packages</span> (nằm cùng cấp với file <code>Voca Basic.exe</code>).</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title">Bước 3: Giải nén 3 gói AI vào ai-packages</div>
+      <p>Dùng 7-Zip hoặc WinRAR giải nén 3 file <span class="code-tag">.7z</span> được cấp vào đúng thư mục <code>ai-packages</code>:</p>
+      <ul>
+        <li><code>runtime-main.7z</code> &rarr; thư mục <code>ai-packages\runtime-main\</code></li>
+        <li><code>runtime-chatterbox.7z</code> &rarr; thư mục <code>ai-packages\runtime-chatterbox\</code></li>
+        <li><code>models.7z</code> &rarr; thư mục <code>ai-packages\models\</code></li>
+      </ul>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title">Bước 4: Tạo lối tắt ngoài Desktop</div>
+      <p>Click đúp file <span class="code-tag">Tao-Phim-Tat-Desktop.bat</span> để tự động tạo biểu tượng ứng dụng ngoài màn hình chính.</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-title">Bước 5: Khởi động</div>
+      <p>Click biểu tượng ngoài Desktop hoặc chạy file <span class="code-tag">Voca Basic.exe</span> để bắt đầu.</p>
+    </div>
+
+    <h2>3. Hướng Dẫn Kích Hoạt Bản Quyền</h2>
+    <div class="alert-box">
+      <p><strong>1. Lấy Mã máy (Machine ID):</strong> Mở ứng dụng, nhìn góc trên bên phải có huy hiệu màu đỏ <span class="code-tag">⚠️ Chưa kích hoạt bản quyền</span>. Nhấp vào đó và bấm <strong>"📋 Sao chép mã máy"</strong> (Mã có dạng: <code>VB-XXXX-XXXX-XXXX-XXXX</code>).</p>
+      <p><strong>2. Gửi mã máy cho người bán:</strong> Gửi mã này qua Zalo/Telegram để nhận chuỗi <strong>License Key</strong>.</p>
+      <p><strong>3. Dán key & kích hoạt:</strong> Copy chuỗi License Key nhận được, dán vào ô nhập trong ứng dụng và bấm <strong>"🚀 Kích hoạt ngay"</strong>.</p>
+      <p><strong>4. Hoàn tất:</strong> Huy hiệu sẽ chuyển sang màu xanh lá <span class="badge badge-success">🛡️ Bản quyền: Vĩnh viễn</span> và mở khóa toàn bộ tính năng sử dụng ngay lập tức!</p>
+    </div>
+
+    <h2>4. Hướng Dẫn Sử Dụng Các Tính Năng Chính</h2>
+    <h3>4.1. Chuyển văn bản thành giọng nói (Text-to-Speech)</h3>
+    <ol>
+      <li>Chọn mục <strong>"Tạo giọng nói"</strong> trên thanh menu bên trái.</li>
+      <li>Nhập hoặc dán đoạn văn bản cần thuyết minh vào khung soạn thảo.</li>
+      <li>Chọn giọng đọc mong muốn trong danh sách.</li>
+      <li>Điều chỉnh <strong>Tốc độ đọc (Speed)</strong> hoặc âm lượng nếu muốn.</li>
+      <li>Bấm <strong>"Tạo âm thanh"</strong> để nghe thử, bấm <strong>"Tải về"</strong> để lưu file MP3 / WAV.</li>
+    </ol>
+
+    <h3>4.2. Thuyết minh văn bản dài (Long-Form)</h3>
+    <p>Đối với kịch bản video, bài báo, sách nói nhiều trang:</p>
+    <ul>
+      <li>Dán toàn bộ nội dung vào mục <strong>"Văn bản dài"</strong>.</li>
+      <li>Hệ thống tự động tách câu thông minh, đọc mượt mà không bị ngắt chữ hay gián đoạn.</li>
+      <li>Xuất toàn bộ bài thuyết minh ra một file âm thanh hoàn chỉnh.</li>
+    </ul>
+
+    <h3>4.3. Nhân bản giọng nói AI (Voice Cloning)</h3>
+    <ol>
+      <li><strong>Chuẩn bị mẫu giọng:</strong> Ghi âm giọng nói mẫu từ 5 đến 15 giây (file .mp3 hoặc .wav), nói rõ tiếng, không có nhạc nền.</li>
+      <li>Vào mục <strong>"Nhân bản giọng nói" (Voice Cloning)</strong> trên menu.</li>
+      <li>Bấm <strong>"Tải lên mẫu âm thanh"</strong> và chọn file ghi âm của bạn.</li>
+      <li>Đặt tên cho hồ sơ giọng (ví dụ: "Giọng của tôi") và bấm <strong>"Tạo hồ sơ giọng"</strong>.</li>
+      <li>Khi tạo giọng đọc, chọn hồ sơ này là AI sẽ đọc bất kỳ văn bản nào bằng chính chất giọng của bạn!</li>
+    </ol>
+
+    <h2>5. Khắc Phục Sự Cố & Câu Hỏi Thường Gặp</h2>
+    <div class="faq-item">
+      <div class="faq-q">❓ Lỗi: "Missing packaged runtime-main Python..."</div>
+      <p>👉 <strong>Cách xử lý:</strong> Do bạn chưa giải nén đủ 3 gói AI hoặc đặt sai vị trí thư mục. Đảm bảo thư mục <code>ai-packages</code> nằm cùng cấp với <code>Voca Basic.exe</code> và bên trong có đủ 3 thư mục con: <code>runtime-main</code>, <code>runtime-chatterbox</code>, <code>models</code>.</p>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Làm sao để reset ứng dụng về bản trắng sạch sẽ?</div>
+      <p>👉 <strong>Cách xử lý:</strong> Đóng ứng dụng và click đúp vào file <span class="code-tag">Reset-Data-Ban-Trang.bat</span> trong thư mục phần mềm. Toàn bộ lịch sử test và bản quyền sẽ được xóa sạch.</p>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">❓ Phần mềm có cần mạng Internet để kiểm tra bản quyền không?</div>
+      <p>👉 <strong>Trả lời:</strong> Hoàn toàn không. Bản quyền được xác thực mật mã Offline theo phần cứng máy tính.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 Voca Basic. Chúc bạn có những trải nghiệm tuyệt vời cùng phần mềm!</p>
+  </footer>
+</div>
+
+</body>
+</html>

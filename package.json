@@ -1,30 +1,53 @@
 {
-  "name": "Tool Dich Cho Khach",
-  "version": "1.0.0",
-  "description": "Local AI Voice Studio for Windows",
+  "name": "voca-basic",
+  "version": "1.0.1",
+  "description": "Voca Basic - Local AI Voice Studio for Windows",
   "main": "desktop/main.cjs",
   "scripts": {
     "test": "npm --prefix frontend test",
+    "test:desktop": "node --test desktop/runtime-paths.test.cjs desktop/frontend-runtime.test.cjs desktop/backend-launch.test.cjs desktop/lifecycle.test.cjs",
     "build:frontend": "npm --prefix frontend run build",
     "stage:runtime": "powershell -ExecutionPolicy Bypass -File scripts/stage_release_runtime.ps1",
-    "package:win": "npm run build:frontend && npm run stage:runtime && electron-builder --win nsis --x64",
-    "start:desktop": "electron ."
+    "stage:cp86": "powershell -ExecutionPolicy Bypass -File scripts/stage_cp86_release.ps1",
+    "package:cp87": "powershell -ExecutionPolicy Bypass -File scripts/build_cp87_installer.ps1",
+    "build:evaluation-python": "powershell -ExecutionPolicy Bypass -File scripts/build_evaluation_python_runtime.ps1",
+    "prepackage:dir": "powershell -ExecutionPolicy Bypass -File scripts/assert_release_not_running.ps1",
+    "package:dir": "npm run build:frontend && electron-builder --dir --x64",
+    "prepackage:win": "powershell -ExecutionPolicy Bypass -File scripts/assert_release_not_running.ps1",
+    "package:win": "npm run build:frontend && npm run stage:runtime && electron-builder --x64",
+    "package:portable": "npm run build:frontend && npm run stage:runtime && electron-builder --win portable --x64 --config.directories.output=release/portable-dist",
+    "package:portable:staged": "npm run build:frontend && electron-builder --win portable --x64 --config.directories.output=release/portable-dist",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:electron": "wait-on http-get://127.0.0.1:5173 && electron .",
+    "start:desktop": "concurrently --kill-others -n VITE,ELECTRON \"npm run dev:frontend\" \"npm run dev:electron\""
   },
   "keywords": [],
   "author": "",
   "license": "UNLICENSED",
   "build": {
-    "appId": "vn.localaivoice.studio",
-    "productName": "Local AI Voice Studio",
+    "appId": "vn.vocabasic.studio",
+    "productName": "Voca Basic",
+    "executableName": "Voca Basic",
     "directories": { "output": "release/dist", "buildResources": "release" },
+    "asar": false,
     "files": ["desktop/**", "package.json"],
     "extraResources": [
       { "from": "frontend/dist", "to": "frontend" },
       { "from": "release/staged-runtime", "to": "runtime" },
       { "from": "release/THIRD_PARTY_NOTICES.md", "to": "THIRD_PARTY_NOTICES.md" }
     ],
-    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }] },
-    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "perMachine": false }
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "release/icon.ico" },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Voca Basic",
+      "runAfterFinish": false,
+      "artifactName": "Voca-Basic-Setup-${version}.exe"
+    }
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

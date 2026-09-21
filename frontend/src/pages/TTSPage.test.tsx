@@ -21,6 +21,14 @@ vi.mock('../services/ttsJobService', async (importOriginal) => {
   };
 });
 
+vi.mock('../services/voiceProfileService', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/voiceProfileService')>();
+  return {
+    ...actual,
+    voiceProfileService: { ...actual.voiceProfileService, list: vi.fn() },
+  };
+});
+
 // TTSPage reads Settings > Audio > Output Format (for its one-time format
 // pre-fill) and Settings > General's notification toggles via useAppSettings()
 // (see AppSettingsContext.tsx) - added after this file's other tests were
@@ -60,20 +68,25 @@ vi.mock('../context/AppSettingsContext', () => ({
 }));
 
 import { ttsJobService } from '../services/ttsJobService';
+import { voiceProfileService } from '../services/voiceProfileService';
 import { API_BASE_URL } from '../services/httpClient';
 import { TTSPage } from './TTSPage';
+import { PRODUCTION_TTS_LANGUAGE_IDS } from '../config/productionLanguages';
 
 const API_ORIGIN = new URL(API_BASE_URL).origin;
 
 const submitMock = ttsJobService.submit as unknown as ReturnType<typeof vi.fn>;
 const getMock = ttsJobService.get as unknown as ReturnType<typeof vi.fn>;
 const listMock = ttsJobService.list as unknown as ReturnType<typeof vi.fn>;
+const profileListMock = voiceProfileService.list as unknown as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   submitMock.mockReset();
   getMock.mockReset();
   listMock.mockReset();
+  profileListMock.mockReset();
   listMock.mockResolvedValue([]); // empty history by default unless a test overrides it
+  profileListMock.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -86,6 +99,36 @@ async function waitForHistoryToSettle() {
 }
 
 describe('TTSPage', () => {
+  it('preserves Vietnamese Unicode through IME composition in the production text editor', async () => {
+    render(<TTSPage />);
+    await waitForHistoryToSettle();
+
+    const editor = screen.getByRole('textbox', { name: /văn bản cần đọc/i });
+    const intermediate = 'Xin chao, toi dang kiem tra tieng Viet.';
+    const composed = 'Xin chào, tôi đang kiểm tra tiếng Việt.';
+
+    fireEvent.compositionStart(editor);
+    fireEvent.change(editor, { target: { value: intermediate } });
+    fireEvent.compositionEnd(editor, { data: composed });
+    fireEvent.change(editor, { target: { value: composed } });
+
+    expect(editor).toHaveValue(composed);
+  });
+
+  it.each([
+    'Xin chào, tôi đang kiểm tra tiếng Việt.',
+    'ă â ê ô ơ ư đ',
+    'Tôi muốn tạo giọng nói tiếng Việt có dấu.',
+  ])('preserves direct Vietnamese Unicode input: %s', async (value) => {
+    render(<TTSPage />);
+    await waitForHistoryToSettle();
+
+    const editor = screen.getByRole('textbox', { name: /văn bản cần đọc/i });
+    fireEvent.change(editor, { target: { value } });
+
+    expect(editor).toHaveValue(value);
+  });
+
   it('renders the form with a WAV default and no fake progress percentage anywhere', async () => {
     render(<TTSPage />);
     await waitForHistoryToSettle();
@@ -93,6 +136,10 @@ describe('TTSPage', () => {
     expect(screen.getByRole('textbox', { name: /văn bản cần đọc/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/định dạng xuất/i)).toHaveValue('wav');
     expect(screen.getByRole('button', { name: /tạo giọng nói/i })).toBeEnabled();
+    const sourceLanguage = screen.getByLabelText(/ngôn ngữ nguồn/i) as HTMLSelectElement;
+    const targetLanguage = screen.getByLabelText(/ngôn ngữ đầu ra/i) as HTMLSelectElement;
+    expect(Array.from(sourceLanguage.options).map((option) => option.value)).toEqual(PRODUCTION_TTS_LANGUAGE_IDS);
+    expect(Array.from(targetLanguage.options).map((option) => option.value)).toEqual(PRODUCTION_TTS_LANGUAGE_IDS);
   });
 
   it('submits, reaches COMPLETED, and renders a real playable + downloadable WAV result (no reconstructed URL)', async () => {
@@ -139,6 +186,67 @@ describe('TTSPage', () => {
     expect(screen.getByText('MP3')).toBeInTheDocument();
     const audioEl = document.querySelector('audio');
     expect(audioEl).toHaveAttribute('src', `${API_ORIGIN}/api/audio/job-mp3-1.mp3`);
+  });
+
+  it('submits Vietnamese by language only, without any engine/provider field', async () => {
+    submitMock.mockResolvedValueOnce({ job_id: 'vi-cp45', status: 'COMPLETED', audio_url: '/api/audio/vi-cp45.wav' } satisfies TtsJob);
+    const user = userEvent.setup(); render(<TTSPage />); await waitForHistoryToSettle();
+    await user.click(screen.getByRole('button', { name: /tạo giọng nói/i }));
+    const payload = submitMock.mock.calls[0][0];
+    expect(payload.language).toBe('vi');
+    expect(payload).toHaveProperty('voice_id', 'vieneu_default');
+    expect(payload).not.toHaveProperty('provider'); expect(payload).not.toHaveProperty('engine');
+  });
+
+  it('submits the canonical VieNeu default voice for Vietnamese baseline', async () => {
+    submitMock.mockResolvedValueOnce({ job_id: 'vi-default', status: 'COMPLETED', audio_url: '/api/audio/vi-default.wav' } satisfies TtsJob);
+    const user = userEvent.setup(); render(<TTSPage />); await waitForHistoryToSettle();
+    await user.click(screen.getByRole('button', { name: /tạo giọng nói/i }));
+    expect(submitMock.mock.calls[0][0]).toEqual(expect.objectContaining({ language: 'vi', voice_id: 'vieneu_default' }));
+    expect(screen.queryByText(/provider được cấu hình/i)).not.toBeInTheDocument();
+  });
+
+  it('submits English by language only and exposes only compatible clone profiles', async () => {
+    submitMock.mockResolvedValueOnce({ job_id: 'en-cp45', status: 'COMPLETED', audio_url: '/api/audio/en-cp45.wav' } satisfies TtsJob);
+    const user = userEvent.setup(); render(<TTSPage />); await waitForHistoryToSettle();
+    await user.selectOptions(screen.getByLabelText(/ngôn ngữ đầu ra/i), 'en');
+    await user.click(screen.getByRole('button', { name: /tạo giọng nói/i }));
+    const payload = submitMock.mock.calls[0][0];
+    expect(payload.language).toBe('en');
+    // TTSPage's domain payload uses camelCase, but this mock receives the
+    // API payload from useTtsJobRunner after the one snake_case conversion.
+    expect(payload).toHaveProperty('voice_id', null);
+    expect(payload).not.toHaveProperty('provider'); expect(screen.getByLabelText(/giọng đọc/i)).toBeInTheDocument();
+    expect(screen.queryByText(/piper/i)).not.toBeInTheDocument();
+  });
+
+  it('submits compatible VieNeu and Chatterbox clone profile UUIDs without an engine selector', async () => {
+    profileListMock.mockResolvedValue([
+      { profile_id: 'vieneu-profile', name: 'Vietnamese clone', provider: 'vieneu', status: 'ready' },
+      { profile_id: 'chatterbox-profile', name: 'English clone', provider: 'chatterbox', status: 'ready' },
+    ]);
+    submitMock
+      .mockResolvedValueOnce({ job_id: 'vi-clone', status: 'COMPLETED', audio_url: '/api/audio/vi-clone.wav' } satisfies TtsJob)
+      .mockResolvedValueOnce({ job_id: 'en-clone', status: 'COMPLETED', audio_url: '/api/audio/en-clone.wav' } satisfies TtsJob);
+    const user = userEvent.setup();
+    render(<TTSPage />); await waitForHistoryToSettle();
+
+    await screen.findByRole('option', { name: 'Vietnamese clone' });
+    expect(screen.queryByRole('option', { name: 'English clone' })).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/giọng đọc/i), 'vieneu-profile');
+    await user.click(screen.getByRole('button', { name: /tạo giọng nói/i }));
+    expect(submitMock.mock.calls[0][0]).toEqual(expect.objectContaining({ language: 'vi', voice_id: 'vieneu-profile' }));
+
+    await user.selectOptions(screen.getByLabelText(/ngôn ngữ đầu ra/i), 'en');
+    await screen.findByRole('option', { name: 'English clone' });
+    expect(screen.queryByRole('option', { name: 'Vietnamese clone' })).not.toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText(/giọng đọc/i), 'chatterbox-profile');
+    await user.click(screen.getByRole('button', { name: /tạo giọng nói/i }));
+    expect(submitMock.mock.calls[1][0]).toEqual(expect.objectContaining({ language: 'en', voice_id: 'chatterbox-profile' }));
+    for (const payload of submitMock.mock.calls.map(([payload]) => payload)) {
+      expect(payload).not.toHaveProperty('provider');
+      expect(payload).not.toHaveProperty('engine');
+    }
   });
 
   it('shows a validation error near the form/action and never calls submit for empty text', async () => {

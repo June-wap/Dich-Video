@@ -54,3 +54,40 @@ Thumbs.db
 # DEFAULT_TOKEN_PATH / checklist-bao-mat-truoc-dong-goi-17-09.md item 1) -
 # regenerated fresh every backend start, never meant to be committed.
 .runtime/
+# Seller licensing private key
+*seller_private_key*.pem
+*.pem
+scripts/licenses/
+tools/keygen/build/
+tools/keygen/dist/
+tools/keygen/*.spec
+Voca-Keygen.exe
+serviceAccountKey.json
+server_keygen/serviceAccountKey.json
+
+# --- AI Assistants & Vendored checkouts ---
+.vendor-vieneu/
+.claude/
+
+# --- Build & release artifacts (large binaries / archives) ---
+release/core-dist/
+release/Voca-Basic-1.0.1-Customer/
+release/Voca-Basic-Core.zip
+release/evaluation-python/
+release/staged-runtime/
+release/Voca Basic Core/
+release/Lib/
+release/runtime-chatterbox/
+release/runtime-main/
+release/AI-Packages/
+release/Voca Basic/
+release/*.zip
+release/*.7z
+release/*.log
+*.log
+
+# --- Scratch & test results ---
+scratch/
+long_audio_stability_results/
+
+

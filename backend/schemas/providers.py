@@ -38,5 +38,5 @@ class ProviderStatus(BaseModel):
 
 
 class ProvidersResponse(BaseModel):
-    primary: str
+    primary: str | None
     providers: list[ProviderStatus]

@@ -9,7 +9,7 @@ const API_ORIGIN = new URL(API_BASE_URL).origin;
 const PROFILE: VoiceProfile = {
   profile_id: 'p1',
   name: 'Giong Mau',
-  provider: 'omnivoice',
+  provider: 'test-provider',
   status: 'ready',
   reference: { duration_seconds: 12.5, sample_rate: 24000, channels: 1 },
 };
@@ -119,7 +119,7 @@ describe('voiceProfileService', () => {
       generation_id: 'g1',
       profile_id: 'p1',
       status: 'completed',
-      provider: 'omnivoice',
+      provider: 'test-provider',
       language: 'vi',
       duration_seconds: 3.2,
       sample_rate: 24000,

@@ -1,10 +1,7 @@
-"""Canonical IDs and scoped OmniVoice validation status. No runtime imports."""
-import json
+"""Canonical language IDs shared by API validation and future TTS routing."""
 from dataclasses import asdict, dataclass
-from pathlib import Path
 
 VERIFIED = "VERIFIED"
-EXPERIMENTAL_UPSTREAM = "EXPERIMENTAL-UPSTREAM"
 UNSUPPORTED = "UNSUPPORTED"
 
 
@@ -28,9 +25,6 @@ LANGUAGES = (
 )
 VERIFIED_LANGUAGE_IDS = tuple(item.id for item in LANGUAGES)
 LANGUAGE_NAMES = {item.id: item.display_name for item in LANGUAGES}
-_UPSTREAM = json.loads(Path(__file__).with_name("omnivoice_upstream_languages.json").read_text(encoding="utf-8"))
-UPSTREAM_LANGUAGE_IDS = frozenset(_UPSTREAM["language_ids"])
-EXPERIMENTAL_LANGUAGE_IDS = tuple(sorted(UPSTREAM_LANGUAGE_IDS - set(VERIFIED_LANGUAGE_IDS)))
 
 
 def language_status(language):
@@ -39,13 +33,11 @@ def language_status(language):
         return UNSUPPORTED
     if language in VERIFIED_LANGUAGE_IDS:
         return VERIFIED
-    if language in UPSTREAM_LANGUAGE_IDS:
-        return EXPERIMENTAL_UPSTREAM
     return UNSUPPORTED
 
 
 def language_metadata():
     return [dict(asdict(item), status=VERIFIED,
-                 verification_scope="CUDA normal short TTS baseline",
-                 cloned_live_verified=item.id == "vi",
+                 verification_scope="No production engine configured during CP1",
+                 cloned_live_verified=False,
                  production_ready=False) for item in LANGUAGES]

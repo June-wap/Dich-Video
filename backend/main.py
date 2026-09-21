@@ -24,14 +24,27 @@ from backend.errors import ErrorCode
 from backend.errors.handlers import error_response, register_handlers, unexpected_error
 from backend.logging_config import configure_logging
 from backend.services.system_service import SystemService
+from backend.services.capability_service import HardwareCapabilityService
 from backend.services.provider_service import ProviderService, create_provider_service
 from backend.services.tts_service import TTSService
 from backend.services.voice_profile_service import VoiceProfileService
-from backend.services.long_form_service import LongFormTTSService
 from backend.services.translation_service import TranslationService
 from backend.services.app_settings_service import AppSettingsService
+from backend.services.license_service import LicenseService
 
 logger = logging.getLogger("backend.lifecycle")
+
+# Security P1 (checklist-bao-mat-truoc-dong-goi-17-09.md muc 7): reject an
+# oversized request BEFORE Starlette/FastAPI ever parses its body (multipart
+# or otherwise) - api/voices.py's create_profile previously called
+# `await file.read()` unconditionally and only checked
+# VoiceProfileService.MAX_REFERENCE_SIZE (15 MiB) afterwards inside
+# create_profile(), so an arbitrarily large upload was fully read into memory
+# before that check ever ran. This ceiling is generous above the one
+# multipart endpoint's own 15 MiB limit (spare room for multipart boundary/
+# form-field overhead); every other endpoint only ever sends small JSON, so
+# this never affects them.
+MAX_REQUEST_BODY_BYTES = 20 * 1024 * 1024
 
 
 def _write_token_file(path: Path, token: str) -> None:
@@ -71,11 +84,13 @@ def create_app(settings: Settings | None = None,
         configure_logging(settings.log_level)
         application.state.provider_service = None
         application.state.system_service = None
+        application.state.capability_service = None
         application.state.tts_service = None
         application.state.voice_profile_service = None
         application.state.long_form_service = None
         application.state.translation_service = None
         application.state.app_settings_service = None
+        application.state.license_service = None
         application.state.local_token = None
         try:
             if settings.require_local_token:
@@ -99,7 +114,14 @@ def create_app(settings: Settings | None = None,
             # rather than hot-swapped into an already-running provider.
             application.state.app_settings_service = app_settings_service_factory(settings)
             effective_settings = application.state.app_settings_service.resolve_effective_settings(settings)
-            providers = provider_service_factory(effective_settings)
+            application.state.license_service = LicenseService(effective_settings, application.state.app_settings_service._db)
+            application.state.capability_service = HardwareCapabilityService(effective_settings)
+            if provider_service_factory is create_provider_service:
+                providers = provider_service_factory(
+                    effective_settings, application.state.capability_service)
+            else:
+                # Test/custom factories historically accept only Settings.
+                providers = provider_service_factory(effective_settings)
             application.state.provider_service = providers
             if settings.warm_up_on_start:
                 # UX: without this, a customer's first "Tạo giọng nói" click
@@ -141,20 +163,16 @@ def create_app(settings: Settings | None = None,
             application.state.tts_service = tts_service_factory(
                 settings, providers, application.state.translation_service,
                 application.state.voice_profile_service, application.state.app_settings_service)
-            application.state.long_form_service = LongFormTTSService(
-                settings, providers, application.state.voice_profile_service,
-                application.state.app_settings_service)
             logger.info("backend_start version=%s", settings.app_version)
             yield
         finally:
-            if application.state.long_form_service is not None:
-                await run_in_threadpool(application.state.long_form_service.close)
-                application.state.long_form_service = None
             if application.state.tts_service is not None:
                 await run_in_threadpool(application.state.tts_service.close)
             try:
                 if application.state.system_service is not None:
                     application.state.system_service.close()
+                if application.state.capability_service is not None:
+                    application.state.capability_service.close()
             finally:
                 # application.state.provider_service (not the local `providers`
                 # variable) is used here because construction can now fail
@@ -167,11 +185,13 @@ def create_app(settings: Settings | None = None,
                     _remove_token_file(settings.token_path)
                     application.state.local_token = None
                 application.state.system_service = None
+                application.state.capability_service = None
                 application.state.provider_service = None
                 application.state.tts_service = None
                 application.state.voice_profile_service = None
                 application.state.translation_service = None
                 application.state.app_settings_service = None
+                application.state.license_service = None
                 logger.info("backend_stop")
 
     application = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
@@ -188,6 +208,18 @@ def create_app(settings: Settings | None = None,
         if request.url.hostname not in settings.allowed_hosts:
             logger.warning("request_rejected code=INVALID_REQUEST reason=host")
             return error_response(ErrorCode.INVALID_REQUEST, 400)
+        content_length = request.headers.get("content-length")
+        if content_length is not None:
+            try:
+                declared_size = int(content_length)
+            except ValueError:
+                declared_size = None
+            if declared_size is not None and declared_size > MAX_REQUEST_BODY_BYTES:
+                logger.warning(
+                    "request_rejected code=REFERENCE_AUDIO_TOO_LARGE reason=content_length size=%d",
+                    declared_size,
+                )
+                return error_response(ErrorCode.REFERENCE_AUDIO_TOO_LARGE, 413)
         if (settings.require_local_token
                 and request.url.path.startswith(settings.api_prefix)
                 and request.url.path != auth_token_path):

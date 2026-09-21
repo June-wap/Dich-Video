@@ -1,0 +1,85 @@
+
+
+Xin chào. Đây là bài kiểm tra độ ổn định của hệ thống tổng hợp giọng nói tiếng Việt. Mục tiêu của bài kiểm tra là phát hiện hiện tượng mất câu, lặp câu, nuốt từ, cắt âm ở cuối câu hoặc thay đổi giọng bất thường khi hệ thống xử lý một văn bản dài.
+
+
+Trời đã sáng. Mọi người bắt đầu làm việc. Cửa hàng đã mở cửa. Một chiếc xe vừa đi qua. Điện thoại đang đổ chuông. Máy tính đã được bật. Hệ thống đang hoạt động. Không có lỗi nào được phát hiện. Công việc tiếp tục. Đây là câu cuối cùng của phần một.
+
+
+
+Buổi sáng hôm nay khá yên tĩnh. Sau khi thức dậy, Minh mở cửa sổ và nhìn ra con đường phía trước nhà, nơi những chiếc xe máy bắt đầu xuất hiện ngày càng nhiều. Anh chuẩn bị một cốc cà phê, kiểm tra lịch làm việc và ghi lại những nhiệm vụ quan trọng cần hoàn thành trong ngày.
+
+Theo kế hoạch đã được chuẩn bị từ tối hôm trước, công việc đầu tiên là kiểm tra hệ thống, công việc thứ hai là xử lý các yêu cầu của khách hàng, sau đó nhóm phát triển sẽ tiến hành thử nghiệm phiên bản mới trước khi tổng hợp kết quả và quyết định những thay đổi cần thực hiện.
+
+Đây là câu cuối cùng của phần hai và câu này bắt buộc phải được đọc đầy đủ.
+
+
+
+Bạn đã sẵn sàng chưa? Nếu đã sẵn sàng, chúng ta bắt đầu! Có ba điều cần kiểm tra: phát âm rõ ràng, ngắt nghỉ tự nhiên và không bỏ sót nội dung.
+
+Một câu có thể chứa dấu phẩy, dấu chấm phẩy, dấu hai chấm và nhiều thành phần khác nhau; tuy nhiên, hệ thống vẫn phải đọc liên tục cho đến khi câu thực sự kết thúc.
+
+Hãy nghe thật kỹ câu này. Sau dấu chấm phải có một khoảng nghỉ tự nhiên. Nhưng khoảng nghỉ không được dài bất thường.
+
+Câu hỏi thứ nhất: hệ thống có đọc đủ không? Câu hỏi thứ hai: hệ thống có lặp lại nội dung không? Câu hỏi thứ ba: âm thanh ở cuối câu có bị cắt hay không?
+
+Đây là câu cuối cùng của phần ba.
+
+
+
+Hôm nay là ngày 16 tháng 9 năm 2026. Cuộc họp đầu tiên bắt đầu lúc 8 giờ 30 phút. Cuộc họp tiếp theo bắt đầu lúc 10 giờ 15 phút. Thời gian nghỉ trưa kéo dài từ 12 giờ đến 13 giờ 30 phút. Công việc dự kiến kết thúc lúc 17 giờ 45 phút.
+
+Sản phẩm thứ nhất có giá 125.000 đồng. Sản phẩm thứ hai có giá 249.000 đồng. Nếu khách hàng mua ba sản phẩm giống nhau với giá 125.000 đồng mỗi sản phẩm thì tổng giá trị đơn hàng là 375.000 đồng.
+
+Mã đơn hàng là 2026-0916-001. Số lượng sản phẩm là 15. Thời gian giao hàng dự kiến là 24 giờ.
+
+Đây là câu cuối cùng của phần bốn.
+
+
+
+Người thứ nhất bước vào căn phòng và đóng cửa lại.
+Người thứ hai bước vào căn phòng và mở cửa sổ.
+Người thứ ba bước vào căn phòng và bật máy tính.
+Người thứ tư bước vào căn phòng và kiểm tra tài liệu.
+Người thứ năm bước vào căn phòng và bắt đầu cuộc họp.
+
+Hệ thống phải đọc câu thứ nhất đúng một lần.
+Hệ thống phải đọc câu thứ hai đúng một lần.
+Hệ thống phải đọc câu thứ ba đúng một lần.
+Hệ thống phải đọc câu thứ tư đúng một lần.
+Hệ thống phải đọc câu thứ năm đúng một lần.
+
+Không được bỏ câu thứ ba.
+Không được lặp câu thứ tư.
+Không được nuốt câu thứ năm.
+
+Đây là câu cuối cùng của phần năm.
+
+
+Alpha bắt đầu tại đây và Alpha kết thúc tại đây. Bravo bắt đầu tại đây và Bravo kết thúc tại đây. Charlie bắt đầu tại đây và Charlie kết thúc tại đây. Delta bắt đầu tại đây và Delta kết thúc tại đây. Echo bắt đầu tại đây và Echo kết thúc tại đây. Foxtrot bắt đầu tại đây và Foxtrot kết thúc tại đây.
+
+Một hai ba bốn năm. Sáu bảy tám chín mười. Mười một mười hai mười ba mười bốn mười lăm. Mười sáu mười bảy mười tám mười chín hai mươi.
+
+Nếu một câu nằm ở cuối một đoạn xử lý, hệ thống vẫn phải đọc đầy đủ phần cuối của câu. Nếu câu tiếp theo nằm ở đầu một đoạn xử lý mới, hệ thống không được lặp lại nội dung của câu trước.
+
+Đây là câu cuối cùng của phần sáu.
+
+
+Trong quá trình xây dựng một hệ thống tổng hợp giọng nói dành cho người dùng thực tế, chúng ta không chỉ quan tâm đến tốc độ tạo âm thanh mà còn phải kiểm tra khả năng phát âm chính xác, duy trì giọng nói ổn định, xử lý dấu câu hợp lý, giữ được nhịp đọc tự nhiên, không bỏ mất các từ nằm ở giữa câu, không cắt mất những âm tiết nằm ở cuối câu, không tự động lặp lại một cụm từ đã được đọc trước đó, đồng thời phải bảo đảm rằng sau khi nhiều đoạn âm thanh riêng biệt được ghép lại với nhau thì người nghe vẫn cảm nhận được đây là một bài đọc liên tục và hoàn chỉnh.
+
+Câu rất dài đã kết thúc. Đây là câu xác nhận ngay sau câu rất dài.
+
+
+
+Công nghệ tổng hợp giọng nói có thể được sử dụng trong nhiều lĩnh vực khác nhau. Người sáng tạo nội dung có thể sử dụng công nghệ này để tạo lời thuyết minh cho video. Giáo viên có thể sử dụng nó để xây dựng tài liệu học tập bằng âm thanh. Các ứng dụng hỗ trợ tiếp cận có thể chuyển văn bản thành tiếng nói cho những người gặp khó khăn khi đọc nội dung trên màn hình.
+
+Tuy nhiên, chất lượng của một hệ thống tổng hợp giọng nói không thể chỉ được đánh giá bằng tốc độ. Một hệ thống tạo ra một phút âm thanh trong vài giây có thể rất nhanh, nhưng nếu hệ thống thỉnh thoảng bỏ mất một câu thì kết quả vẫn không thể được xem là đáng tin cậy. Ngược lại, một hệ thống đọc chính xác toàn bộ nội dung nhưng cần quá nhiều thời gian xử lý cũng có thể gây khó khăn cho người dùng.
+
+Mục tiêu cuối cùng là tìm được sự cân bằng giữa tốc độ, chất lượng và độ ổn định.
+
+
+
+Chúng ta đang tiến gần đến cuối bài kiểm tra. Câu này phải xuất hiện trong audio. Câu tiếp theo cũng phải xuất hiện trong audio. Không được dừng quá trình tổng hợp sớm.
+
+Đây là câu áp chót của toàn bộ bài kiểm tra.
+

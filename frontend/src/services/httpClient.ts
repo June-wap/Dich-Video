@@ -47,7 +47,10 @@ export class ApiError extends Error {
 export class NetworkError extends Error {
   cause?: unknown;
 
-  constructor(message = 'Không thể kết nối tới máy chủ backend cục bộ.', cause?: unknown) {
+  constructor(
+    message = 'Không thể kết nối dịch vụ Voca Basic cục bộ (127.0.0.1:8000). Vui lòng kiểm tra hoặc khởi động lại ứng dụng.',
+    cause?: unknown
+  ) {
     super(message);
     this.name = 'NetworkError';
     this.cause = cause;

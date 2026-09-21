@@ -15,6 +15,7 @@ import {
   StatusBadge,
   DataTable,
   Modal,
+  LicenseActivationModal,
 } from '../components';
 import type { TTSGenerationState } from '../components/GenerationStatus/GenerationStatus';
 import type { ColumnDef } from '../components/DataTable/DataTable';
@@ -22,34 +23,19 @@ import { useTtsJobRunner, useVoiceProfiles } from '../hooks';
 import type { TtsFormPayload } from '../hooks';
 import { ttsJobService } from '../services/ttsJobService';
 import type { TtsAudioFormat, TtsJob } from '../services/ttsJobService';
+import { licenseService, type LicenseStatusResponse } from '../services/licenseService';
 import { useAppSettings } from '../context/AppSettingsContext';
 import { notify } from '../utils/notifications';
+import { PRODUCTION_TTS_LANGUAGES } from '../config/productionLanguages';
+
 
 // Selecting a cloned voice profile here submits its profile_id as voice_id -
 // backend/services/tts_service.py's validate_request()/_run() (updated
 // alongside this dropdown) now accepts that as well as the provider's fixed
 // built-in voice ids, resolving it through VoiceProfileService and calling
-// OmniVoiceProvider.synthesize_cloned() instead of synthesize(). Cloning is
-// exclusively an OmniVoice capability, so this option only exists for
-// non-Piper languages (see isPiperLanguage below).
 const DEFAULT_VOICE_OPTION_VALUE = '';
 
-const LANGUAGES = [
-  { value: 'vi', label: 'Vietnamese (Tiếng Việt)' },
-  { value: 'en', label: 'English (Tiếng Anh)' },
-  { value: 'zh', label: 'Chinese (Tiếng Trung)' },
-  { value: 'ja', label: 'Japanese (Tiếng Nhật)' },
-  { value: 'es', label: 'Spanish (Tây Ban Nha)' },
-  { value: 'pt', label: 'Portuguese (Bồ Đào Nha)' },
-  { value: 'it', label: 'Italian (Tiếng Ý)' },
-  { value: 'fr', label: 'French (Tiếng Pháp)' },
-  { value: 'hi', label: 'Hindi (Tiếng Hindi)' },
-];
-
-// Languages routed to the secondary Piper provider (backend/services/tts_service.py
-// _select_provider). Piper has one fixed voice per language, no cloning - the
-// Voice ID field is hidden for these and the backend auto-selects the voice.
-const PIPER_LANGUAGES = new Set(['en', 'es', 'pt', 'fr', 'it', 'zh']);
+const isVietnamese = (value: string) => value.toLowerCase().replace('_', '-') === 'vi' || value.toLowerCase().replace('_', '-') === 'vi-vn';
 
 const FORMATS: { value: TtsAudioFormat; label: string }[] = [
   { value: 'wav', label: 'WAV (không nén, chất lượng gốc)' },
@@ -67,10 +53,10 @@ const MAX_TEXT_LENGTH = 2000;
 const MAX_IMPORT_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
 
 const DEFAULT_SAMPLE_TEXT =
-  'Xin chào! Chào mừng bạn đến với OmniVoice Local AI Voice Studio. Đây là phần mềm tổng hợp giọng nói trí tuệ nhân tạo chạy hoàn toàn offline trên máy tính của bạn, bảo mật dữ liệu tuyệt đối và không phát sinh chi phí API.';
+  'Xin chào! Chào mừng bạn đến với Voca Basic. Đây là một câu mẫu để tạo giọng nói.';
 
 function languageLabel(code: string): string {
-  return LANGUAGES.find((l) => l.value === code)?.label.split(' (')[0] ?? code;
+  return PRODUCTION_TTS_LANGUAGES.find((l) => l.value === code)?.label.split(' (')[0] ?? code;
 }
 
 /** Displays a cloned profile's name instead of its raw profile_id (a UUID)
@@ -101,6 +87,7 @@ function deriveGenerationState(
 
 export const TTSPage: React.FC = () => {
   // Form controls
+  const [sourceLanguage, setSourceLanguage] = useState('vi');
   const [language, setLanguage] = useState('vi');
   const [voiceId, setVoiceId] = useState('');
   const [format, setFormat] = useState<TtsAudioFormat>('wav');
@@ -160,32 +147,27 @@ export const TTSPage: React.FC = () => {
     reader.readAsText(file, 'utf-8');
   };
 
-  // Piper languages have one fixed voice each - no manual Voice ID and no
-  // cloning. Clear any leftover Voice ID the moment the user switches into
-  // one of these languages, so a stale OmniVoice voice id is never submitted.
-  const isPiperLanguage = PIPER_LANGUAGES.has(language);
-  useEffect(() => {
-    if (isPiperLanguage && voiceId) setVoiceId('');
-  }, [isPiperLanguage, voiceId]);
+  const selectedProfileProvider = isVietnamese(language) ? 'vieneu' : 'chatterbox';
+  const canUseCloneProfile = true;
 
   // Cloned voice profiles (Voice Cloning page) - offered as a dropdown
-  // alongside the language's default voice, non-Piper languages only.
+  // alongside the default voice owned by the selected output language.
   const { profiles: voiceProfiles, loading: voiceProfilesLoading } = useVoiceProfiles();
   const voiceOptions = useMemo(
     () => [
       { value: DEFAULT_VOICE_OPTION_VALUE, label: 'Mặc định (giọng chuẩn của ngôn ngữ)' },
-      ...voiceProfiles.map((p) => ({ value: p.profile_id, label: p.name })),
+      ...voiceProfiles.filter((p) => p.provider === selectedProfileProvider).map((p) => ({ value: p.profile_id, label: p.name })),
     ],
-    [voiceProfiles]
+    [voiceProfiles, selectedProfileProvider]
   );
-  // A profile picked while on a Piper language (before switching away) is
+  // A profile picked before switching to a non-Vietnamese language is
   // already cleared by the effect above; this also covers a profile that
   // was deleted elsewhere (e.g. on /voices) while still selected here.
   useEffect(() => {
-    if (!isPiperLanguage && voiceId && !voiceProfilesLoading && !voiceProfiles.some((p) => p.profile_id === voiceId)) {
+    if (canUseCloneProfile && voiceId && !voiceProfilesLoading && !voiceProfiles.some((p) => p.profile_id === voiceId && p.provider === selectedProfileProvider)) {
       setVoiceId('');
     }
-  }, [isPiperLanguage, voiceId, voiceProfiles, voiceProfilesLoading]);
+  }, [canUseCloneProfile, voiceId, voiceProfiles, voiceProfilesLoading, selectedProfileProvider]);
 
   const { job, phase, requestError, isBusy, submit, retry, canRetry, cancelTracking, lastPayload } =
     useTtsJobRunner();
@@ -293,8 +275,12 @@ export const TTSPage: React.FC = () => {
 
   const buildPayload = (): TtsFormPayload => ({
     text: text.trim(),
+    sourceLanguage,
     language,
-    voiceId: voiceId.trim() || null,
+    // Vietnamese baseline has a canonical VieNeu voice. A selected profile
+    // UUID replaces it; non-Vietnamese Chatterbox intentionally receives no
+    // voice id and selects its own baseline default in the backend.
+    voiceId: voiceId.trim() || (isVietnamese(language) ? 'vieneu_default' : null),
     format,
     speed: 1.0, // backend currently only accepts exactly 1.0 - see Known Limitations
   });
@@ -316,6 +302,19 @@ export const TTSPage: React.FC = () => {
   const genState = deriveGenerationState(phase, job, requestError);
   const errorMessage = requestError?.message ?? job?.error?.message;
   const errorCode = requestError?.code ?? job?.error?.code;
+
+  const [licenseData, setLicenseData] = useState<LicenseStatusResponse | null>(null);
+  const [licenseModalOpen, setLicenseModalOpen] = useState(false);
+
+  useEffect(() => {
+    licenseService.getStatus().then(setLicenseData).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (errorCode && errorCode.startsWith('LICENSE_')) {
+      setLicenseModalOpen(true);
+    }
+  }, [errorCode]);
 
   const currentAudioUrl = job ? ttsJobService.resolveAudioUrl(job) : null;
   const currentFormat = job ? ttsJobService.guessFormat(job) ?? format : format;
@@ -583,12 +582,21 @@ export const TTSPage: React.FC = () => {
 
             <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <Select
-                label="Ngôn ngữ (Language)"
-                options={LANGUAGES}
+                label="Ngôn ngữ nguồn (Source Language)"
+                options={PRODUCTION_TTS_LANGUAGES}
+                value={sourceLanguage}
+                onChange={(e) => setSourceLanguage(e.target.value)}
+                disabled={isBusy}
+                hint="Ngôn ngữ của văn bản bạn nhập"
+              />
+
+              <Select
+                label="Ngôn ngữ đầu ra (Target / Output Language)"
+                options={PRODUCTION_TTS_LANGUAGES}
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 disabled={isBusy}
-                hint="Hỗ trợ 9 ngôn ngữ chuẩn bản địa"
+                hint="Xác định ngôn ngữ giọng đọc đầu ra"
               />
 
               <Select
@@ -600,32 +608,18 @@ export const TTSPage: React.FC = () => {
                 hint="WAV cho chất lượng gốc, MP3 cho dung lượng nhỏ"
               />
 
-              {isPiperLanguage ? (
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: 'var(--neutral-500)',
-                    background: 'var(--neutral-100)',
-                    borderRadius: '6px',
-                    padding: '8px 10px',
-                  }}
-                >
-                  Ngôn ngữ này dùng giọng đọc mặc định cố định (chưa hỗ trợ nhân bản giọng nói / chọn Voice ID).
-                </div>
-              ) : (
-                <Select
-                  label="Giọng đọc"
-                  options={voiceOptions}
-                  value={voiceId || DEFAULT_VOICE_OPTION_VALUE}
-                  onChange={(e) => setVoiceId(e.target.value === DEFAULT_VOICE_OPTION_VALUE ? '' : e.target.value)}
-                  disabled={isBusy || voiceProfilesLoading}
-                  hint={
-                    voiceProfiles.length > 0
-                      ? 'Chọn "Mặc định" hoặc một giọng bạn đã nhân bản ở trang Voice Cloning'
-                      : 'Chưa có giọng nhân bản nào - tạo ở trang Voice Cloning để chọn tại đây'
-                  }
-                />
-              )}
+              <Select
+                label="Giọng đọc"
+                options={voiceOptions}
+                value={voiceId || DEFAULT_VOICE_OPTION_VALUE}
+                onChange={(e) => setVoiceId(e.target.value === DEFAULT_VOICE_OPTION_VALUE ? '' : e.target.value)}
+                disabled={isBusy || voiceProfilesLoading}
+                hint={
+                  voiceOptions.length > 1
+                    ? 'Chọn "Mặc định" hoặc một giọng bạn đã nhân bản ở trang Voice Cloning'
+                    : 'Chưa có giọng nhân bản tương thích - tạo ở trang Voice Cloning để chọn tại đây'
+                }
+              />
 
               <Select
                 label="Tốc độ đọc (Speed)"
@@ -724,6 +718,12 @@ export const TTSPage: React.FC = () => {
           </div>
         )}
       </Modal>
+      <LicenseActivationModal
+        isOpen={licenseModalOpen}
+        onClose={() => setLicenseModalOpen(false)}
+        statusData={licenseData}
+        onActivated={(status) => setLicenseData(status)}
+      />
     </div>
   );
 };

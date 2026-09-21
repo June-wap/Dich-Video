@@ -28,7 +28,7 @@ Fields intentionally NOT here:
   so keeping it would just move the "looks saved, does nothing" problem here.
 
 `device` ("gpu"/"cpu") IS here, unlike an earlier version of this file assumed:
-prototype/providers/omnivoice.py already has a real (if unverified/unbenchmarked)
+the former engine had a real (if unverified/unbenchmarked)
 CPU code path gated behind its own allow_unverified_cpu flag - backend/config.py
 and backend/services/provider_service.py were updated alongside this field to
 honor it. Choosing "cpu" only takes effect on the *next* backend startup (the
@@ -70,7 +70,7 @@ class AppSettings(BaseModel):
 
     # --- Performance ---
     # "cpu" is experimental and unverified for output quality/benchmarking
-    # (prototype/providers/omnivoice.py reports cpu_verified=False even when
+    # (the former provider reported cpu_verified=False even when
     # it runs) and is dramatically slower than CUDA. Requires a backend
     # restart to take effect - see this module's docstring.
     device: Literal["gpu", "cpu"] = "gpu"

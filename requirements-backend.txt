@@ -3,25 +3,18 @@
 # Install the exact CUDA wheels first as documented in docs/backend_runtime.md.
 -c constraints-backend.txt
 
-# One editable installation of the existing source checkout. Its pyproject.toml
-# owns the upstream dependency list. Pins below record the audited baseline.
--e ./external/OmniVoice
-transformers==5.17.0
-accelerate==1.15.0
-numpy==2.5.3
-soundfile==0.14.0
-librosa==1.0.0
-pydub==0.25.1
-gradio==6.27.0
-tensorboardX==2.6.5
-webdataset==1.0.2
-
 # Application/core, forthcoming API, and deterministic regression tests.
 psutil==7.2.2
 fastapi==0.141.1
 uvicorn==0.52.4
 pydantic==2.13.5
 pytest==9.1.1
+
+# CP2: official VieNeu 0.5B integration.  The source revision is immutable;
+# the adapter explicitly selects pnnbao-ump/VieNeu-TTS rather than upstream's
+# 0.3B default.  This dependency is installed at build time, never cloned by
+# the customer runtime.
+vieneu @ git+https://github.com/pnnbao97/VieNeu-TTS.git@b116f820dc9ed8fae70a5570389928ecad233175
 
 # Secondary TTS provider (prototype/providers/piper.py): fixed per-language
 # voices for the six languages whose candidate voice package is PENDING (not
@@ -41,3 +34,27 @@ onnxruntime==1.30.0
 # then-current release at https://pypi.org/project/google-genai/ before
 # installing, and pin an exact version here once confirmed.
 google-genai>=2.0.0
+
+# Cửa sổ desktop thật thay vì tab trình duyệt (scripts/run_app.py, 17/09).
+# `pythonnet` cho phép pywebview dùng renderer WebView2 (Chromium, giống
+# Edge hiện đại) trên Windows thay vì rơi về MSHTML (IE cũ, không render
+# đúng React) - máy đích cần có WebView2 Runtime (thường đã có sẵn trên
+# Windows 10/11 cập nhật, cùng gói với Edge; nếu thiếu, tải tại
+# https://developer.microsoft.com/microsoft-edge/webview2/). Không bắt
+# buộc phải cài 2 gói này - scripts/run_backend.ps1 tự kiểm tra và rơi về
+# mở tab trình duyệt như trước nếu thiếu. Chưa ghim phiên bản chính xác
+# (chưa audit như các gói ở trên) - kiểm tra bản mới nhất trước khi cài.
+pywebview>=5,<6
+pythonnet>=3.0.0
+
+# Windows DPAPI (backend/services/translation_service.py): encrypts the
+# customer's Gemini API key at rest, scoped to the current Windows user
+# account, instead of storing it as plain text in metadata.sqlite3 - see
+# claude/checklist-bao-mat-truoc-dong-goi-17-09.md muc 6. Imported lazily
+# and optionally - if this is not installed, the app falls back to the
+# previous plaintext storage rather than failing, but a real release build
+# must have this installed in the staged runtime before shipping. Not
+# exact-pinned (not audited against constraints-backend.txt like the top
+# block) - verify the latest release at
+# https://pypi.org/project/pywin32/ before installing.
+pywin32>=306

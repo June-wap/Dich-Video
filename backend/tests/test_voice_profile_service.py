@@ -9,7 +9,8 @@ import numpy as np
 import pytest
 import soundfile as sf
 
-from backend.config import OMNIVOICE_PROVIDER_ID, Settings
+from backend.config import Settings
+from backend.tests.provider_fakes import TEST_PROVIDER_ID
 from backend.errors import ApplicationError, ErrorCode
 from backend.schemas.voices import CloneTestRequest
 from backend.services.provider_service import ProviderService
@@ -31,11 +32,18 @@ def make_wav_bytes(duration: float = 5.0, sample_rate: int = 24000, channels: in
 @pytest.fixture
 def service_env():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        settings = Settings(output_dir=Path(tmp_dir))
+        # database_path must be isolated per test like output_dir is: without
+        # it, Repository falls back to Settings.app_data_dir's real,
+        # persistent %LOCALAPPDATA%\Voca Basic\data\metadata.sqlite3 (see
+        # backend/persistence.py), so voice profiles created by every test
+        # run - not just this one - accumulate in the same database (this was
+        # the actual cause of test_profile_retrieval_and_listing expecting 1
+        # profile and getting dozens).
+        settings = Settings(output_dir=Path(tmp_dir), database_path=Path(tmp_dir) / "metadata.sqlite3")
         provider = FakeCloneProvider()
         providers = ProviderService()
         providers.register(provider, device="cuda:0", available=True)
-        providers.select_primary(OMNIVOICE_PROVIDER_ID)
+        providers.select_primary(TEST_PROVIDER_ID)
         vps = VoiceProfileService(settings, providers)
         yield vps, provider, providers, Path(tmp_dir)
 
@@ -56,7 +64,7 @@ def test_create_profile_valid(service_env):
     data = resp.data
     assert uuid.UUID(data.profile_id)  # Safe UUID
     assert data.name == "My Clone Voice"
-    assert data.provider == OMNIVOICE_PROVIDER_ID
+    assert data.provider == TEST_PROVIDER_ID
     assert data.status == "ready"
     assert data.reference is not None
     assert round(data.reference.duration_seconds, 1) == 5.0
@@ -105,8 +113,7 @@ def test_create_profile_accepts_real_mp3(service_env, tmp_path):
 
     Regression test for the INVALID_REFERENCE_AUDIO bug: create_profile()'s
     own pre-validation (_validate_reference_audio) used to try libsndfile
-    before FFmpeg, which is the reverse of OmniVoiceProvider's own, already
-    proven decode order (prototype/providers/omnivoice.py::_decode_reference).
+    before FFmpeg, preserving the established decode order.
     """
     vps, provider, _, _ = service_env
     wav_bytes = make_wav_bytes(duration=5.0)
@@ -135,8 +142,7 @@ def test_create_profile_accepts_aac_disguised_as_mp3(service_env, tmp_path):
     but the file still has a `.mp3` extension. FFmpeg's container detection
     must decode this correctly instead of handing it to a decoder keyed off
     the (wrong) file extension - mirrors
-    prototype/tests/test_omnivoice_cloning.py::test_aac_in_mp3_filename,
-    which already proves OmniVoiceProvider itself handles this; this proves
+    a generic provider fake's reference-audio test, which proves
     the service's own pre-validation gate (the actual site of the reported
     bug - a failure here surfaces as INVALID_REFERENCE_AUDIO before the
     provider is ever reached) does too.
@@ -289,10 +295,10 @@ def test_clone_input_validation(service_env):
         vps.synthesize_clone(pid, CloneTestRequest(text="A" * 2001, language="vi"))
     assert exc.value.code == ErrorCode.TEXT_TOO_LONG
 
-    # Unsupported language
+    # A VieNeu profile cannot be used for a Chatterbox output language.
     with pytest.raises(ApplicationError) as exc:
         vps.synthesize_clone(pid, CloneTestRequest(text="Hello", language="de"))
-    assert exc.value.code == ErrorCode.LANGUAGE_NOT_SUPPORTED
+    assert exc.value.code == ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH
 
     # Speed not 1.0
     for bad_speed in [0.5, 1.5, 2.0, "fast", None]:
@@ -304,6 +310,32 @@ def test_clone_input_validation(service_env):
     with pytest.raises(ApplicationError) as exc:
         vps.synthesize_clone(pid, CloneTestRequest(text="Xin chào", language="vi", format="flac"))
     assert exc.value.code == ErrorCode.INVALID_FORMAT
+
+
+@pytest.mark.parametrize("alias", ["vi", "VI", "vi-VN", "vi_VN", "Vi-vn"])
+def test_clone_accepts_vietnamese_language_aliases(service_env, alias):
+    """CP3 Section 6: vi/VI/vi-VN/vi_VN must all normalize to 'vi'."""
+    vps, provider, _, _ = service_env
+    wav_bytes = make_wav_bytes(duration=5.0)
+    resp = vps.create_profile(wav_bytes, "ref.wav", "Văn bản mẫu.")
+    pid = resp.data.profile_id
+
+    res = vps.synthesize_clone(pid, CloneTestRequest(text="Xin chào", language=alias))
+    assert res.ok is True
+    assert res.data.language == "vi"
+
+
+@pytest.mark.parametrize("other_language", ["en", "fr", "ja", "zh", "es", "pt", "it", "hi"])
+def test_vieneu_clone_rejects_non_vietnamese_languages(service_env, other_language):
+    """CP5: a persisted VieNeu profile cannot cross into Chatterbox output."""
+    vps, _, _, _ = service_env
+    wav_bytes = make_wav_bytes(duration=5.0)
+    resp = vps.create_profile(wav_bytes, "ref.wav", "Văn bản mẫu.")
+    pid = resp.data.profile_id
+
+    with pytest.raises(ApplicationError) as exc:
+        vps.synthesize_clone(pid, CloneTestRequest(text="Hello", language=other_language))
+    assert exc.value.code == ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH
 
 
 def test_deleted_profile_cannot_synthesize(service_env):

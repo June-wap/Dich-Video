@@ -27,10 +27,9 @@ from backend.errors.handlers import MESSAGES
 from backend.schemas.common import ErrorBody
 from backend.schemas.tts import TTSData, TTSRequest, TTSResponse, TTSStatus
 from backend.services.provider_service import ProviderService
-from core.audio_utils import export_mp3
-from core.languages import VERIFIED, language_status
+from backend.core.languages import normalize_production_language, resolve_tts_provider
+from backend.core.audio_utils import export_mp3
 from backend.persistence import Repository
-from providers.piper import PiperProvider
 
 logger = logging.getLogger("backend.tts")
 MAX_TEXT_LENGTH = 2000
@@ -40,10 +39,15 @@ POLL_INTERVAL_SECONDS = 0.01
 # Safety net only: short-TTS generation is expected to finish in well under a
 # second against a real provider. This bounds the legacy synchronous wrapper
 # so a stuck worker cannot hang an HTTP request forever.
-LEGACY_WAIT_TIMEOUT_SECONDS = 60.0
+LEGACY_WAIT_TIMEOUT_SECONDS = 180.0
 
 
-def _idempotency_fingerprint(text: str, language: str, voice_id: str, speed: float, fmt: str) -> str:
+def _normalize_language(language: str) -> str:
+    """Compatibility wrapper for the canonical production normalizer."""
+    return normalize_production_language(language)
+
+
+def _idempotency_fingerprint(text: str, source_language: str, language: str, voice_id: str, speed: float, fmt: str) -> str:
     """Fingerprint of the request fields that determine the synthesis result
     (post-validation/normalization values, not the raw request body). Reusing
     an idempotency_key is only a safe replay when this fingerprint also
@@ -52,7 +56,8 @@ def _idempotency_fingerprint(text: str, language: str, voice_id: str, speed: flo
     unrelated prior job (see ErrorCode.IDEMPOTENCY_KEY_CONFLICT).
     """
     payload = json.dumps(
-        {"text": text, "language": language, "voice_id": voice_id, "speed": speed, "format": fmt},
+        {"text": text, "source_language": source_language, "language": language,
+         "voice_id": voice_id, "speed": speed, "format": fmt},
         sort_keys=True, ensure_ascii=False,
     )
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -96,7 +101,7 @@ class TTSService:
         # Explicit allowlist: do not serialize environment, credentials or auth configuration.
         self._db.put('settings', 'runtime', {
             'primary_tts_provider': settings.primary_tts_provider,
-            'omnivoice_device': settings.omnivoice_device, 'app_version': settings.app_version})
+            'app_version': settings.app_version})
 
         # Global recovery: any job (short/clone/long_form) left QUEUED/RUNNING
         # by a previous process is marked FAILED/INTERRUPTED here, ahead of
@@ -152,14 +157,7 @@ class TTSService:
         return base_dir / artifact_id
 
     def _select_provider(self, language: str):
-        """Route by language: Piper's six dedicated languages go to the Piper
-        provider; everything else (Vietnamese, and any language Piper does not
-        cover) keeps using the primary provider exactly as before this
-        routing existed. Cloning is unaffected - it never calls this method.
-        """
-        if language in PiperProvider.LANGUAGES:
-            return self._provider_service.get_provider(PiperProvider.PROVIDER_ID)
-        return self._provider_service.get_primary_provider()
+        return self._provider_service.get_provider(resolve_tts_provider(language))
 
     def close(self):
         with self._lock:
@@ -169,7 +167,7 @@ class TTSService:
         self._queue.put(None)
         self._thread.join()  # Native inference finishes its current call safely.
 
-    def validate_request(self, request: TTSRequest) -> tuple[str, str, str, float, str, str | None, str | None]:
+    def validate_request(self, request: TTSRequest) -> tuple[str, str, str, str, float, str, str | None, str | None]:
         # Text validation: reject None, non-string, empty, whitespace-only
         text = request.text
         if text is None or not isinstance(text, str) or not text.strip():
@@ -178,28 +176,36 @@ class TTSService:
         if len(cleaned_text) > MAX_TEXT_LENGTH:
             raise ApplicationError(ErrorCode.TEXT_TOO_LONG)
 
-        # Language validation: only canonical verified languages
+        # CP2 accepts the canonical Vietnamese code plus its common locale
+        # aliases, then stores/routes only the canonical "vi" value.
         language = request.language
-        if not isinstance(language, str) or language_status(language) != VERIFIED:
+        if not isinstance(language, str):
             raise ApplicationError(ErrorCode.LANGUAGE_NOT_SUPPORTED)
-
-        # Non-Vietnamese output requires a translation step (see
-        # backend/services/translation_service.py) - checked here, before a
-        # job is even queued, so a customer without a configured key gets an
-        # immediate, clear error instead of a job that fails later in _run().
-        # Vietnamese never reaches this branch - Short TTS/Clone are
-        # unaffected whether or not a key is configured.
-        if language != "vi" and not self._translation.is_configured():
-            raise ApplicationError(ErrorCode.TRANSLATION_KEY_REQUIRED)
-
-        # Voice validation against provider without triggering model load. A
-        # voice_id may also name a previously-created cloned voice profile
-        # (backend/services/voice_profile_service.py) instead of one of the
-        # provider's fixed built-in voices. Cloning is exclusively an
-        # OmniVoice capability (OmniVoiceProvider.capabilities()['voice_cloning']
-        # is True; Piper has none), so a profile id is only ever accepted for
-        # a language that is not routed to Piper.
+        language = _normalize_language(language)
+        # CP7 compatibility: existing CP6 clients had no source_language and
+        # only represented same-language synthesis. Never guess a different
+        # source language; new cross-language clients must send it explicitly.
+        source_language = language if request.source_language is None else request.source_language
+        if not isinstance(source_language, str):
+            raise ApplicationError(ErrorCode.LANGUAGE_NOT_SUPPORTED)
+        source_language = _normalize_language(source_language)
+        # Check persisted owner before registry lookup. This both prevents a
+        # cross-provider clone from becoming baseline synthesis and returns a
+        # deterministic domain error even when an optional runtime is absent.
+        if isinstance(request.voice_id, str) and request.voice_id:
+            try:
+                candidate = self._voice_profiles.get_profile_record(request.voice_id)
+            except ApplicationError:
+                candidate = None
+            if candidate is not None:
+                expected_provider = resolve_tts_provider(language)
+                if candidate.provider_id != expected_provider:
+                    raise ApplicationError(ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH)
         provider = self._select_provider(language)
+
+        # Voice validation against the CP2-routed VieNeu provider without
+        # triggering model load. Clone-profile plumbing is preserved for CP3,
+        # but CP2 does not add or enable new cloning behavior here.
         voices = provider.list_voices(language)
         valid_voices = {v.id for v in voices}
         for voice in voices:
@@ -207,16 +213,19 @@ class TTSService:
         voice_id = request.voice_id
         cloned_profile_id: str | None = None
         if not voice_id:
-            voice_id = PiperProvider.AUTO_VOICE_ID if language in PiperProvider.LANGUAGES else "omnivoice_auto"
+            if language != "vi" and voices:
+                voice_id = voices[0].id
+            else:
+                raise ApplicationError(ErrorCode.VOICE_NOT_FOUND)
         elif not isinstance(voice_id, str):
             raise ApplicationError(ErrorCode.VOICE_NOT_FOUND)
         elif voice_id not in valid_voices:
-            if language in PiperProvider.LANGUAGES:
-                raise ApplicationError(ErrorCode.VOICE_NOT_FOUND)
             try:
-                self._voice_profiles.get_profile_record(voice_id)
+                profile = self._voice_profiles.get_profile_record(voice_id)
             except ApplicationError:
                 raise ApplicationError(ErrorCode.VOICE_NOT_FOUND) from None
+            if profile.provider_id != provider.provider_name():
+                raise ApplicationError(ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH)
             cloned_profile_id = voice_id
 
         # Speed validation: must be a number, 0.5 <= speed <= 2.0 and speed == 1.0
@@ -240,21 +249,22 @@ class TTSService:
                 raise ApplicationError(ErrorCode.INVALID_REQUEST)
             idempotency_key = idempotency_key.strip()
 
-        return cleaned_text, language, voice_id, speed, fmt, idempotency_key, cloned_profile_id
+        return cleaned_text, source_language, language, voice_id, speed, fmt, idempotency_key, cloned_profile_id
 
     # ------------------------------------------------------------------
     # Async job API
     # ------------------------------------------------------------------
 
     def submit(self, request: TTSRequest) -> TTSStatus:
-        text, language, voice_id, speed, fmt, idempotency_key, cloned_profile_id = self.validate_request(request)
+        text, source_language, language, voice_id, speed, fmt, idempotency_key, cloned_profile_id = self.validate_request(request)
         fingerprint = (
-            _idempotency_fingerprint(text, language, voice_id, speed, fmt)
+            _idempotency_fingerprint(text, source_language, language, voice_id, speed, fmt)
             if idempotency_key is not None else None
         )
 
+        routed_provider = self._select_provider(language)
         execution = {
-            'request': request.model_dump(), 'provider_id': self._settings.primary_tts_provider,
+            'request': request.model_dump(), 'provider_id': routed_provider.provider_name(),
             'provider_version': None, 'model_revision': None, 'voice_revision': None, 'seed': None,
             'normalizer_version': 'strip-v1', 'chunker_version': None,
             'audio': {'sample_rate': 24000, 'channels': 1, 'format': fmt},
@@ -280,7 +290,7 @@ class TTSService:
             snapshot = TTSStatus(job_id=job_id, status="QUEUED")
             self._db.create_job(snapshot, execution, kind=JOB_KIND)
             job = _Job(snapshot, params={
-                'text': text, 'language': language, 'voice_id': voice_id, 'speed': speed, 'format': fmt,
+                'text': text, 'source_language': source_language, 'language': language, 'voice_id': voice_id, 'speed': speed, 'format': fmt,
                 'cloned_profile_id': cloned_profile_id,
             })
             self._jobs[job_id] = job
@@ -334,6 +344,7 @@ class TTSService:
     def _run(self, job: _Job):
         params = job.params or {}
         text = params.get('text')
+        source_language = params.get('source_language')
         language = params.get('language')
         voice_id = params.get('voice_id')
         speed = params.get('speed')
@@ -354,7 +365,7 @@ class TTSService:
         # LongFormTTSService's max_retries semantics for the same setting.
         retry_count = self._app_settings.resolve_retry_count() if self._app_settings is not None else 1
         # None lets the provider pick its own per-mode default (16 normal /
-        # 24 cloned - see prototype/providers/omnivoice.py), identical to
+        # clone defaults), identical to
         # never having passed num_step at all.
         num_step = self._app_settings.resolve_num_steps() if self._app_settings is not None else None
         was_translated = False
@@ -365,28 +376,12 @@ class TTSService:
         cloned_record = None
 
         try:
-            # Translate first, before spending time loading a TTS model: the
-            # provider must read out the translated text, not the original
-            # (see backend/services/translation_service.py). validate_request
-            # already refused the job if no key was configured, but the key
-            # can still fail at call time (revoked, rate-limited, network) -
-            # that failure ends the job here, as GENERATION_FAILED-adjacent
-            # TRANSLATION_FAILED, same as any other synthesis failure below.
-            if language != "vi":
-                text = self._translation.translate(text, language)
+            # Translation is deliberately first: an unavailable/failed Gemini
+            # request must never load or invoke a TTS provider with source text.
+            if source_language != language:
+                text = self._translation.translate(text, source_language, language)
                 was_translated = True
-
-            # Ensure the routed provider is loaded (lazy model load). Piper's
-            # six dedicated languages route to the Piper provider; a cloned
-            # voice profile (OmniVoice-only capability - validate_request()
-            # already refused pairing one with a Piper language) and
-            # everything else keep loading the primary provider exactly as
-            # before this routing existed.
-            is_piper = language in PiperProvider.LANGUAGES
-            if is_piper:
-                provider = self._provider_service.ensure_loaded(PiperProvider.PROVIDER_ID)
-            else:
-                provider = self._provider_service.ensure_primary_provider_loaded()
+            provider = self._provider_service.ensure_loaded(self._select_provider(language).provider_name())
 
             if cloned_profile_id is not None:
                 # reserve_profile() also re-confirms the profile still
@@ -399,20 +394,11 @@ class TTSService:
                 cloned_record = self._voice_profiles.reserve_profile(cloned_profile_id)
                 self._voice_profiles.restore_profile(cloned_record)
 
-            # Settings > Audio > "Cắt khoảng lặng" (silence_trim) - trims only
-            # confidently-silent leading/trailing samples. Only OmniVoice
-            # accepts these two extra keyword options; PiperProvider's own
-            # _synthesize() explicitly rejects ANY unrecognized option
-            # (`if options or speed != 1.0: raise ... INVALID_OPTIONS`, see
-            # prototype/providers/piper.py) - passing num_step/trim_silence
-            # to it unconditionally would crash every job in Piper's six
-            # dedicated languages, so they're only added for the primary
-            # (OmniVoice) provider. Voice cloning has no such split: it's an
-            # OmniVoice-only capability (validate_request already refuses
-            # pairing a cloned profile with a Piper language), so
-            # synthesize_cloned() always gets both options unconditionally.
+            # VieNeu alone receives its existing per-job options. Chatterbox
+            # retains its pinned baseline/clone inference contract.
             silence_trim = self._app_settings.resolve_silence_trim() if self._app_settings is not None else False
-            primary_only_options = {} if is_piper else {"num_step": num_step, "trim_silence": silence_trim}
+            provider_options = ({"num_step": num_step, "trim_silence": silence_trim}
+                                if provider.provider_name() == "vieneu" else {})
 
             result = None
             last_exc = None
@@ -420,14 +406,14 @@ class TTSService:
                 last_exc = None
                 try:
                     if cloned_record is not None:
-                        result = provider.synthesize_cloned(
-                            text=text, language=language, profile=cloned_record.provider_profile,
-                            output_path=wav_path, num_step=num_step, trim_silence=silence_trim,
-                        )
+                        clone_options = ({"num_step": num_step, "trim_silence": silence_trim}
+                                         if provider.provider_name() == "vieneu" else {})
+                        result = provider.synthesize_cloned(text=text, language=language,
+                            profile=cloned_record.provider_profile, output_path=wav_path, **clone_options)
                     else:
                         result = provider.synthesize(
                             text=text, language=language, voice=voice_id, output_path=wav_path,
-                            speed=speed, **primary_only_options,
+                            speed=speed, **provider_options,
                         )
                 except Exception as exc:
                     last_exc = exc
@@ -451,6 +437,8 @@ class TTSService:
                 logger.error("tts_generation_failed generation_id=%s provider=%s language=%s error=%s",
                              generation_id, provider.provider_name(), language,
                              result.error if result is not None else None)
+                if result is not None and result.error in {"LOCAL_GPU_UNAVAILABLE", "GPU_RESOURCE_INSUFFICIENT"}:
+                    raise ApplicationError(ErrorCode(result.error))
                 raise ApplicationError(ErrorCode.GENERATION_FAILED)
 
             # Validate generated audio
@@ -460,7 +448,7 @@ class TTSService:
                     sample_rate = wf.getframerate()
                     n_frames = wf.getnframes()
                     duration = n_frames / sample_rate if sample_rate > 0 else 0.0
-                if channels != 1 or sample_rate != 24000 or duration <= 0.0:
+                if channels != 1 or sample_rate != result.sample_rate or duration <= 0.0:
                     raise ValueError("Invalid audio properties")
             except Exception as exc:
                 logger.error("audio_validation_failed generation_id=%s error=%s", generation_id, exc)
@@ -541,7 +529,7 @@ class TTSService:
             data=TTSData(
                 generation_id=snapshot.job_id,
                 status="completed",
-                provider=result.get('provider_id', self._settings.primary_tts_provider),
+                provider=result.get('provider_id', 'vieneu'),
                 language=result.get('language'),
                 voice_id=result.get('voice_id'),
                 duration_seconds=round(result.get('duration_seconds', 0.0), 3),
@@ -551,3 +539,4 @@ class TTSService:
                 audio_url=snapshot.audio_url,
             ),
         )
+

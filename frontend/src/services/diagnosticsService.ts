@@ -9,7 +9,7 @@ export const diagnosticsService = {
       ramUsedGb: 6.4,
       ramTotalGb: 16.0,
       cudaStatus: 'CUDA Available (v12.4, Compute 8.9)',
-      engineStatus: 'OmniVoice Ready (Local Core v1)',
+      engineStatus: 'No TTS provider configured',
       modelStatus: 'Model Loaded (vi_voice_v1.onnx)',
       pythonVersion: 'Python 3.12.3 (64-bit Virtualenv)',
       audioSpec: '24 kHz Mono (16-bit PCM)',

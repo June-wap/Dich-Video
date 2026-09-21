@@ -1,0 +1,50 @@
+﻿{
+    "appId":  "vn.vocabasic.studio",
+    "extraResources":  [
+                           {
+                               "to":  "frontend",
+                               "from":  "frontend/dist"
+                           },
+                           {
+                               "to":  "runtime",
+                               "from":  "F:\\Voca-CP8-Build\\cp86\\staged-runtime"
+                           },
+                           {
+                               "to":  "THIRD_PARTY_NOTICES.md",
+                               "from":  "release/THIRD_PARTY_NOTICES.md"
+                           }
+                       ],
+    "asar":  false,
+    "win":  {
+                "target":  [
+                               {
+                                   "target":  "nsis",
+                                   "arch":  [
+                                                "x64"
+                                            ]
+                               }
+                           ],
+                "icon":  "release/icon.ico"
+            },
+    "nsis":  {
+                 "shortcutName":  "Voca Basic",
+                 "oneClick":  false,
+                 "allowElevation":  true,
+                 "runAfterFinish":  false,
+                 "artifactName":  "Voca-Basic-Setup-${version}.exe",
+                 "allowToChangeInstallationDirectory":  true,
+                 "createDesktopShortcut":  true,
+                 "createStartMenuShortcut":  true,
+                 "perMachine":  true
+             },
+    "files":  [
+                  "desktop/**",
+                  "package.json"
+              ],
+    "directories":  {
+                        "buildResources":  "release",
+                        "output":  "release/cp87-dist"
+                    },
+    "executableName":  "Voca Basic",
+    "productName":  "Voca Basic"
+}

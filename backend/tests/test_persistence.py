@@ -214,7 +214,7 @@ def test_voice_profiles_survive_restart(tmp_path):
     provider = FakeCloneProvider()
     providers = ProviderService()
     providers.register(provider, device="cuda:0", available=True)
-    providers.select_primary("omnivoice")
+    providers.select_primary("test-provider")
 
     # 1. Create profile
     vps1 = VoiceProfileService(settings, providers)
@@ -228,7 +228,7 @@ def test_voice_profiles_survive_restart(tmp_path):
     provider2 = FakeCloneProvider()
     providers2 = ProviderService()
     providers2.register(provider2, device="cuda:0", available=True)
-    providers2.select_primary("omnivoice")
+    providers2.select_primary("test-provider")
 
     vps2 = VoiceProfileService(settings, providers2)
     fetched = vps2.get_profile(pid)

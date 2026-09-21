@@ -41,7 +41,7 @@ export interface SubmitLongFormJobPayload {
   text: string;
   language: string;
   /** Required - Long-form has no "default voice" concept like Short TTS's
-   * omnivoice_auto; every job runs against a real voice-clone profile. */
+   * a provider-specific default; every job runs against a real voice-clone profile. */
   profile_id: string;
   format: LongFormAudioFormat;
 }

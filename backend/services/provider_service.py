@@ -1,4 +1,4 @@
-"""App-scoped registry/lifecycle. No provider construction until lifespan startup.
+﻿"""App-scoped registry/lifecycle. No provider construction until lifespan startup.
 
 One Condition protects application state, load admission and shutdown. Model
 operations run outside it, retaining the adapter's own RLock. Status never waits
@@ -7,17 +7,19 @@ on the model lock and can observe LOADING/UNLOADING without triggering work.
 from __future__ import annotations
 
 from dataclasses import dataclass
-import importlib.util
 import logging
+from pathlib import Path
 from threading import Condition, RLock
 from typing import TYPE_CHECKING
 
-from backend.config import OMNIVOICE_PROVIDER_ID, PIPER_PROVIDER_ID, Settings
+from backend.config import Settings
 from backend.errors import ApplicationError, ErrorCode
 from backend.schemas.providers import ProviderState, ProviderStatus, ProvidersResponse, VerifiedLanguage
+from backend.services.vieneu_adapter import VieNeuAdapter
+from backend.services.chatterbox_worker_provider import ChatterboxWorkerProvider
 
 if TYPE_CHECKING:
-    from providers.base import ManagedTTSProvider
+    from backend.services.provider_base import ManagedTTSProvider
 
 logger = logging.getLogger("backend.providers")
 BUSY = {ProviderState.LOADING, ProviderState.UNLOADING}
@@ -93,8 +95,6 @@ class ProviderService:
 
     def status(self) -> ProvidersResponse:
         with self._condition:
-            if self._primary is None:
-                raise ApplicationError(ErrorCode.PROVIDER_NOT_FOUND)
             return ProvidersResponse(primary=self._primary,
                                      providers=[entry.status for entry in self._entries.values()])
 
@@ -144,6 +144,12 @@ class ProviderService:
             entry.provider.load()
             if not entry.provider.is_loaded():
                 raise RuntimeError("Provider load returned without a loaded model")
+        except ApplicationError as exc:
+            # Capability policy failures are already controlled public errors;
+            # do not collapse LOCAL_GPU_UNAVAILABLE into PROVIDER_LOAD_FAILED.
+            with self._condition:
+                self._transition(entry, ProviderState.ERROR, loaded=False, error=exc.code)
+            raise
         except Exception:
             logger.exception("provider_load_failed provider=%s", provider_id)
             loaded = self._loaded_after_failure(entry)
@@ -206,34 +212,22 @@ class ProviderService:
                 self._condition.notify_all()
 
 
-def create_provider_service(settings: Settings) -> ProviderService:
-    # Adapter import/construction: numpy and metadata only, no Torch/model load.
-    from providers.omnivoice import OmniVoiceProvider
-    from providers.piper import PiperProvider
-
-    # allow_unverified_cpu is the provider's own opt-in gate for its
-    # unbenchmarked CPU code path (see prototype/providers/omnivoice.py). It
-    # is enabled exactly when settings.omnivoice_device is "cpu" - which only
-    # happens when a customer deliberately chose CPU in Settings > Performance
-    # (see AppSettingsService.resolve_effective_settings() in backend/main.py's
-    # lifespan) or set LOCAL_AI_OMNIVOICE_DEVICE=cpu themselves. Either way,
-    # reaching this line with device == "cpu" already *is* the explicit
-    # consent the provider is asking for.
-    provider = OmniVoiceProvider(device=settings.omnivoice_device,
-                                 allow_unverified_cpu=(settings.omnivoice_device == "cpu"))
-    if provider.provider_name() != OMNIVOICE_PROVIDER_ID:
-        raise ApplicationError(ErrorCode.PROVIDER_NOT_FOUND)
+def create_provider_service(settings: Settings, capability_service=None) -> ProviderService:
+    """Construct production providers; routing lives in backend.core.languages."""
     service = ProviderService()
-    available = all(importlib.util.find_spec(name) is not None for name in ("torch", "omnivoice"))
-    service.register(provider, device=settings.omnivoice_device, available=available)
-    service.select_primary(settings.primary_tts_provider)
 
-    # Secondary provider, never primary: does not change the default (VI +
-    # cloning) synthesis path at all. TTSService routes to it only for its
-    # six explicitly-supported languages (see PiperProvider.LANGUAGES).
-    piper_provider = PiperProvider()
-    if piper_provider.provider_name() != PIPER_PROVIDER_ID:
-        raise ApplicationError(ErrorCode.PROVIDER_NOT_FOUND)
-    piper_available = all(importlib.util.find_spec(name) is not None for name in ("piper", "onnxruntime"))
-    service.register(piper_provider, device="cpu", available=piper_available)
+    vieneu = VieNeuAdapter(device="cpu")
+    service.register(
+        vieneu,
+        device="cpu",
+        available=True,
+    )
+    service.select_primary(VieNeuAdapter.PROVIDER_ID)
+
+    chatterbox = ChatterboxWorkerProvider(
+        settings.chatterbox_python, Path(__file__).resolve().parents[2],
+        capability_service=capability_service,
+    )
+    service.register(chatterbox, device="cuda", available=settings.chatterbox_python.is_file())
+
     return service

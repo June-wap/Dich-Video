@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Request
+from backend.dependencies import require_valid_license
 from backend.errors import ApplicationError, ErrorCode
 from backend.schemas.long_form import LongFormRequest, LongFormStatus
 
@@ -12,7 +13,7 @@ def service(request: Request):
     return value
 
 
-@router.post("", response_model=LongFormStatus, status_code=202, response_model_exclude_none=True)
+@router.post("", response_model=LongFormStatus, status_code=202, response_model_exclude_none=True, dependencies=[Depends(require_valid_license)])
 def submit(payload: LongFormRequest, jobs=Depends(service)):
     return jobs.submit(payload)
 

@@ -1,9 +1,9 @@
 # Run from any working directory. No installs, model probes or frontend startup.
 $backendRoot = Split-Path -Parent $PSScriptRoot
-$backendPython = Join-Path $backendRoot 'external\OmniVoice\.venv312\Scripts\python.exe'
+$backendPython = (Get-Command python -ErrorAction Stop).Source
 & $backendPython -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 12) else 1)'
 if ($LASTEXITCODE -ne 0) { throw 'Official Python 3.12 unavailable; see docs/backend_runtime.md.' }
-$env:PYTHONPATH = $backendRoot + [IO.Path]::PathSeparator + (Join-Path $backendRoot 'prototype')
+$env:PYTHONPATH = $backendRoot
 $env:HF_HUB_OFFLINE = '1'
 $env:TRANSFORMERS_OFFLINE = '1'
 # Security P0 (checklist-bao-mat-truoc-dong-goi-17-09.md item 1): this is the
@@ -14,8 +14,8 @@ $env:TRANSFORMERS_OFFLINE = '1'
 # each startup (backend/main.py's lifespan) - never set it to a fixed value
 # here.
 $env:LOCAL_AI_REQUIRE_LOCAL_TOKEN = '1'
-# UX: without this, the primary provider (and Piper, for its 6 languages)
-# only loads its model on the first real TTS request after this process
+# UX: without this, the primary provider only loads its model on the first
+# real TTS request after this process
 # starts - a customer who opens the app and immediately clicks "Tạo giọng
 # nói" would eat that load time as part of their first job. This starts
 # loading in a background thread right away instead (see
@@ -44,12 +44,30 @@ if (-not (Test-Path $frontendIndexHtml)) {
 }
 $env:LOCAL_AI_SERVE_FRONTEND = '1'
 
-# Mở trình duyệt tới đúng origin backend đang phục vụ (127.0.0.1, khớp
-# DEFAULT_API_BASE_URL trong frontend/src/services/httpClient.ts - "localhost"
-# và "127.0.0.1" là hai origin KHÁC NHAU với trình duyệt). Chạy nền, trễ vài
-# giây vì không có cách chờ tín hiệu "Uvicorn đã sẵn sàng" ở đây - nếu trang
-# báo lỗi không kết nối được, tải lại (F5) sau vài giây là được.
-Start-Job -ScriptBlock { Start-Sleep -Seconds 2; Start-Process 'http://127.0.0.1:8000/' } | Out-Null
+# "Cửa sổ app thật" (17/09, scripts/run_app.py): nếu đã cài `pywebview`
+# (thấy trong requirements-backend.txt, tuỳ chọn - không bắt buộc), mở MỘT
+# cửa sổ desktop riêng (không phải tab trình duyệt, không thanh địa chỉ)
+# thay vì mở trình duyệt mặc định. Kiểm tra bằng một tiến trình python RIÊNG
+# chạy `import webview` trước - rẻ, không đụng gì tới CUDA/torch - để quyết
+# định dùng cách nào; chưa cài thì tự rơi về mở tab trình duyệt như cũ,
+# không báo lỗi, không bắt buộc phải cài pywebview mới chạy được sản phẩm.
+& $backendPython -c 'import webview' 2>$null
+$hasWebview = ($LASTEXITCODE -eq 0)
 
-& $backendPython -m backend.main
-if ($LASTEXITCODE -ne 0) { throw 'Backend exited with an error. Review console diagnostics.' }
+if ($hasWebview) {
+    Write-Host 'Đã có pywebview - mở cửa sổ app thật (không phải tab trình duyệt)...'
+    & $backendPython (Join-Path $backendRoot 'scripts\run_app.py')
+    if ($LASTEXITCODE -ne 0) { throw 'App exited with an error. Review console diagnostics.' }
+} else {
+    Write-Host 'Chưa cài pywebview - mở bằng tab trình duyệt như trước (pip install pywebview pythonnet vào .venv312 nếu muốn cửa sổ app thật, xem requirements-backend.txt).'
+    # Mở trình duyệt tới đúng origin backend đang phục vụ (127.0.0.1, khớp
+    # DEFAULT_API_BASE_URL trong frontend/src/services/httpClient.ts -
+    # "localhost" và "127.0.0.1" là hai origin KHÁC NHAU với trình duyệt).
+    # Chạy nền, trễ vài giây vì không có cách chờ tín hiệu "Uvicorn đã sẵn
+    # sàng" ở đây - nếu trang báo lỗi không kết nối được, tải lại (F5) sau
+    # vài giây là được.
+    Start-Job -ScriptBlock { Start-Sleep -Seconds 2; Start-Process 'http://127.0.0.1:8000/' } | Out-Null
+
+    & $backendPython -m backend.main
+    if ($LASTEXITCODE -ne 0) { throw 'Backend exited with an error. Review console diagnostics.' }
+}

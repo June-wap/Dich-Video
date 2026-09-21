@@ -1,0 +1,43 @@
+{
+  "appId": "vn.vocabasic.studio",
+  "productName": "Voca Basic",
+  "executableName": "Voca Basic",
+  "directories": {
+    "output": "release/core-dist",
+    "buildResources": "release"
+  },
+  "asar": false,
+  "files": [
+    "desktop/**",
+    "package.json"
+  ],
+  "extraResources": [
+    {
+      "from": "frontend/dist",
+      "to": "frontend"
+    },
+    {
+      "from": "backend",
+      "to": "backend"
+    },
+    {
+      "from": "requirements-backend.txt",
+      "to": "requirements-backend.txt"
+    },
+    {
+      "from": "release/THIRD_PARTY_NOTICES.md",
+      "to": "THIRD_PARTY_NOTICES.md"
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "dir",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "release/icon.ico"
+  }
+}

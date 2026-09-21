@@ -1,11 +1,9 @@
 # Third-party notices — release gate
 
-This repository's current license review does **not** approve any combined
-runtime and voice/model payload for production distribution.  Therefore the
-installer build intentionally rejects an empty/unapproved model manifest rather
-than silently shipping cached artifacts.
+This package is an **internal, non-commercial evaluation build only**. It is
+not approved for commercial distribution or customer delivery.
 
-Before a commercial release, add one entry per shipped artifact to
+Before a commercial release, replace the evaluation model entry with one entry per shipped artifact and
 `model-manifest.json` with the immutable source, SHA-256, license text/notice,
 redistribution status, and reviewer approval. Include the resulting notices in
 the installer. See `docs/model_license_matrix.md` for the open items.

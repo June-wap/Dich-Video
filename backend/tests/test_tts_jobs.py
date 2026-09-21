@@ -1,18 +1,22 @@
-"""Task 2: short-TTS job + history API.
+﻿"""Task 2: short-TTS job + history API.
 
 Covers the async job endpoints (POST/GET /api/tts/jobs, GET /api/tts/jobs/{id}),
 persistence/restart semantics shared with Task 1, idempotency, and that the
 legacy synchronous POST /api/tts contract is unchanged.
 """
 from concurrent.futures import ThreadPoolExecutor
+import io
 import time
 import uuid
 from unittest.mock import Mock, patch
 
+import numpy as np
 import pytest
+import soundfile as sf
 from fastapi.testclient import TestClient
 
-from backend.config import OMNIVOICE_PROVIDER_ID, Settings
+from backend.config import Settings
+from backend.tests.provider_fakes import TEST_PROVIDER_ID
 from backend.errors import ErrorCode
 from backend.main import create_app
 from backend.persistence import Repository
@@ -29,7 +33,7 @@ def payload(**overrides):
     base = {
         "text": "Xin chào, đây là kiểm tra job TTS.",
         "language": "vi",
-        "voice_id": "omnivoice_auto",
+        "voice_id": "test_auto",
         "speed": 1.0,
         "format": "wav",
     }
@@ -62,11 +66,18 @@ def wait_service(service, job_id, timeout=10):
 @pytest.fixture
 def jobs_env(tmp_path):
     output_dir = tmp_path / "outputs" / "api"
-    settings = Settings(output_dir=output_dir)
+    # database_path must be isolated per test like output_dir is: without it,
+    # Repository falls back to Settings.app_data_dir's real, persistent
+    # %LOCALAPPDATA%\Voca Basic\data\metadata.sqlite3 (see backend/persistence.py),
+    # so jobs created by every test run - not just this one - accumulate in
+    # the same database (this was the actual cause of
+    # test_validation_failure_returns_422_and_creates_no_job expecting
+    # tts_service.history() == [] and getting a long leaked history instead).
+    settings = Settings(output_dir=output_dir, database_path=tmp_path / "metadata.sqlite3")
     provider = FakeCloneProvider()
     provider_service = ProviderService()
     provider_service.register(provider, device=provider.device, available=True)
-    provider_service.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider_service.select_primary(TEST_PROVIDER_ID)
     probe = Mock(return_value=RuntimeInfo(
         python_version="3.12.10", torch_version="2.8.0+cu128",
         cuda_available=True, gpu_name="test GPU",
@@ -231,11 +242,17 @@ def test_restart_read_back(tmp_path):
     provider = ProviderService()
     fake = FakeCloneProvider()
     provider.register(fake, device=fake.device, available=True)
-    provider.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider.select_primary(TEST_PROVIDER_ID)
 
     service1 = TTSService(settings, provider, TranslationService(settings),
                            VoiceProfileService(settings, provider))
-    snapshot = service1.submit(TTSRequest(text="Trước khi khởi động lại.", language="vi"))
+    snapshot = service1.submit(
+    TTSRequest(
+        text="Trước khi khởi động lại.",
+        language="vi",
+        voice_id="test_auto",
+    )
+)
     final = wait_service(service1, snapshot.job_id)
     assert final.status == "COMPLETED"
     service1.close()
@@ -244,7 +261,7 @@ def test_restart_read_back(tmp_path):
     provider2 = ProviderService()
     fake2 = FakeCloneProvider()
     provider2.register(fake2, device=fake2.device, available=True)
-    provider2.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider2.select_primary(TEST_PROVIDER_ID)
     service2 = TTSService(settings, provider2, TranslationService(settings),
                            VoiceProfileService(settings, provider2))
     try:
@@ -282,7 +299,7 @@ def test_interrupted_job_marked_failed_on_restart_not_resumed(tmp_path):
     provider_service = ProviderService()
     fake = FakeCloneProvider()
     provider_service.register(fake, device=fake.device, available=True)
-    provider_service.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider_service.select_primary(TEST_PROVIDER_ID)
 
     service = TTSService(settings, provider_service, TranslationService(settings),
                           VoiceProfileService(settings, provider_service))
@@ -478,3 +495,167 @@ def test_legacy_endpoint_generation_failure_still_500(jobs_env):
     assert response.status_code == 500
     assert response.json()["error"]["code"] == ErrorCode.GENERATION_FAILED.value
     assert list(output_dir.glob("*.wav")) == []
+
+
+# ---------------------------------------------------------------------------
+# CP3: Short-TTS voice_id names a real cloned voice profile
+#
+# jobs_env's app.state.voice_profile_service (built by create_app's own
+# default voice_profile_service_factory) is a SEPARATE VoiceProfileService
+# instance from the one jobs_env manually wired into its own pre-built
+# tts_service - so profiles must be created directly through
+# `tts_service._voice_profiles` (the instance TTSService actually resolves
+# voice_id against), not through POST /api/voices/profiles, or the two
+# instances' in-memory _records would silently diverge despite sharing one
+# database file.
+# ---------------------------------------------------------------------------
+
+def _clone_wav_bytes(duration: float = 5.0, sample_rate: int = 24000) -> bytes:
+    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    sig = (0.2 * np.sin(2 * np.pi * 440 * t)).astype(np.float32)
+    buf = io.BytesIO()
+    sf.write(buf, sig, sample_rate, format="WAV", subtype="PCM_16")
+    return buf.getvalue()
+
+
+def _create_clone_profile(tts_service, transcript="Văn bản mẫu để nhân bản giọng nói."):
+    resp = tts_service._voice_profiles.create_profile(
+        audio_bytes=_clone_wav_bytes(), filename="ref.wav", transcript=transcript,
+    )
+    return resp.data.profile_id
+
+
+def test_short_tts_accepts_existing_clone_profile_as_voice_id(jobs_env):
+    client, provider, _, tts_service, _, output_dir = jobs_env
+    pid = _create_clone_profile(tts_service)
+    assert provider.create_profile_calls == 1
+
+    response = client.post("/api/tts/jobs", json=payload(voice_id=pid))
+    assert response.status_code == 202
+    assert response.json()["status"] == "QUEUED"
+    job_id = response.json()["job_id"]
+
+    final = wait_http(client, job_id)
+    assert final["status"] == "COMPLETED"
+
+    # Routed through synthesize_cloned, never the normal built-in-voice path.
+    assert provider.synthesize_cloned_calls == 1
+    assert provider.synthesize_calls == 0
+
+    wav_file = output_dir / f"{job_id}.wav"
+    assert wav_file.is_file()
+    assert wav_file.stat().st_size > 0
+
+
+def test_short_tts_rejects_arbitrary_uuid_as_voice_id(jobs_env):
+    client, provider, _, _, _, _ = jobs_env
+    response = client.post("/api/tts/jobs", json=payload(voice_id=str(uuid.uuid4())))
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == ErrorCode.VOICE_NOT_FOUND.value
+    # An unknown profile id must never trigger a real model load just to be rejected.
+    assert provider.load_calls == 0
+
+
+def test_short_tts_rejects_malformed_voice_id(jobs_env):
+    client, provider, _, _, _, _ = jobs_env
+    response = client.post("/api/tts/jobs", json=payload(voice_id="not-a-real-voice-or-uuid"))
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == ErrorCode.VOICE_NOT_FOUND.value
+    assert provider.load_calls == 0
+
+
+def test_short_tts_vieneu_clone_rejects_non_vietnamese_language(jobs_env):
+    client, provider, _, tts_service, _, _ = jobs_env
+    pid = _create_clone_profile(tts_service)
+    # _create_clone_profile() above already loads the provider for real (a
+    # voice profile is created by actually encoding the reference audio) -
+    # so load_calls is legitimately 1 by this point. What must never happen
+    # is the language-rejected request itself touching synthesis.
+    assert provider.load_calls == 1
+    response = client.post("/api/tts/jobs", json=payload(voice_id=pid, language="en"))
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH.value
+    assert provider.load_calls == 1  # No additional load triggered by the rejected request.
+    assert provider.synthesize_calls == 0
+    assert provider.synthesize_cloned_calls == 0
+
+
+def test_short_tts_clone_diagnostics_marks_cloned_true(jobs_env):
+    client, provider, _, tts_service, _, _ = jobs_env
+    pid = _create_clone_profile(tts_service)
+    response = client.post("/api/tts/jobs", json=payload(voice_id=pid))
+    job_id = response.json()["job_id"]
+    wait_http(client, job_id)
+
+    job = tts_service._get(job_id)
+    assert job.diagnostics["result"]["cloned"] is True
+
+
+def test_baseline_vieneu_default_voice_unaffected_by_clone_routing(jobs_env):
+    """A clone profile existing must not change normal built-in-voice routing."""
+    client, provider, _, tts_service, _, _ = jobs_env
+    _create_clone_profile(tts_service)
+
+    response = client.post("/api/tts/jobs", json=payload())
+    job_id = response.json()["job_id"]
+    final = wait_http(client, job_id)
+    assert final["status"] == "COMPLETED"
+    assert provider.synthesize_calls == 1
+    assert provider.synthesize_cloned_calls == 0
+
+
+def test_short_tts_clone_generation_failure_marks_job_failed_and_releases_profile(jobs_env):
+    client, provider, _, tts_service, _, _ = jobs_env
+    pid = _create_clone_profile(tts_service)
+    provider.fail_synthesize_cloned = True
+
+    response = client.post("/api/tts/jobs", json=payload(voice_id=pid))
+    job_id = response.json()["job_id"]
+    final = wait_http(client, job_id)
+    assert final["status"] == "FAILED"
+    assert final["error"]["code"] == ErrorCode.GENERATION_FAILED.value
+
+    # reserve_profile()/release_profile() must stay paired even on failure -
+    # the finally block in TTSService._run() is what guarantees this.
+    record = tts_service._voice_profiles.get_profile_record(pid)
+    assert record.active_jobs == 0
+
+
+def test_short_tts_clone_restore_after_restart(tmp_path):
+    """CP3 Section 8-G: provider_profile is never persisted (see
+    VoiceProfileService._persist). A fresh process must rebuild it lazily
+    from reference_path + transcript, via provider.create_voice_profile(),
+    before a Short TTS job naming that profile can synthesize."""
+    settings = Settings(output_dir=tmp_path / "clone_restart", database_path=tmp_path / "clone_restart.sqlite3")
+    provider1 = ProviderService()
+    fake1 = FakeCloneProvider()
+    provider1.register(fake1, device=fake1.device, available=True)
+    provider1.select_primary(TEST_PROVIDER_ID)
+    vps1 = VoiceProfileService(settings, provider1)
+    service1 = TTSService(settings, provider1, TranslationService(settings), vps1)
+
+    resp = vps1.create_profile(_clone_wav_bytes(), "ref.wav", "Văn bản mẫu để nhân bản giọng nói.")
+    pid = resp.data.profile_id
+    assert fake1.create_profile_calls == 1
+    service1.close()
+
+    # Simulate a backend restart: fresh service/provider registry, same DB/output dir.
+    provider2 = ProviderService()
+    fake2 = FakeCloneProvider()
+    provider2.register(fake2, device=fake2.device, available=True)
+    provider2.select_primary(TEST_PROVIDER_ID)
+    vps2 = VoiceProfileService(settings, provider2)
+    service2 = TTSService(settings, provider2, TranslationService(settings), vps2)
+    try:
+        record = vps2.get_profile_record(pid)
+        assert record.provider_profile is None  # Never deserialized/persisted verbatim.
+        assert fake2.create_profile_calls == 0  # Not rebuilt until actually needed.
+
+        snapshot = service2.submit(TTSRequest(text="Sau khi khởi động lại.", language="vi", voice_id=pid))
+        final = wait_service(service2, snapshot.job_id)
+        assert final.status == "COMPLETED"
+        # restore_profile() rebuilt provider_profile via create_voice_profile(reference_path, transcript).
+        assert fake2.create_profile_calls == 1
+        assert fake2.synthesize_cloned_calls == 1
+    finally:
+        service2.close()

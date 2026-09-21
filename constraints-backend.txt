@@ -2,3 +2,4 @@
 # see docs/backend_runtime.md. These are constraints, not an index override.
 torch==2.8.0+cu128
 torchaudio==2.8.0+cu128
+torchao==0.13.0

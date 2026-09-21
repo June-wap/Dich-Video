@@ -1,4 +1,4 @@
-"""Durable profile metadata and references with lazy provider conditioning."""
+﻿"""Durable profile metadata and references with lazy provider conditioning."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -28,9 +28,9 @@ from backend.schemas.voices import (
     VoiceProfileResponse,
 )
 from backend.services.provider_service import ProviderService
+from backend.core.languages import normalize_production_language, resolve_tts_provider
 from backend.services.execution import serialized_inference
-from core.audio_utils import export_mp3
-from core.languages import VERIFIED, language_status
+from backend.core.audio_utils import export_mp3
 from backend.persistence import Repository, checksum
 
 logger = logging.getLogger("backend.voices")
@@ -48,7 +48,7 @@ class VoiceProfileRecord:
     profile_id: str
     name: str
     provider_id: str
-    provider_profile: Any  # Opaque VoiceProfile object from OmniVoiceProvider
+    provider_profile: Any  # Opaque provider-owned voice-profile object
     duration_seconds: float
     sample_rate: int
     channels: int
@@ -67,7 +67,12 @@ class VoiceProfileService:
         self._provider_service = provider_service
         self._output_dir = Path(settings.output_dir)
         self._output_dir.mkdir(parents=True, exist_ok=True)
-        self._temp_dir = self._output_dir / "temp_profiles"
+        # Legacy explicit Settings(output_dir=...) call sites (tests and
+        # developer harnesses) retain an isolated sibling reference store.
+        # Production Settings.from_env always supplies the canonical path.
+        self._reference_dir = Path(settings.reference_audio_dir or (self._output_dir / "references"))
+        self._reference_dir.mkdir(parents=True, exist_ok=True)
+        self._temp_dir = Path(settings.temp_dir or (self._output_dir / "temp_profiles")) / "profiles"
         self._temp_dir.mkdir(parents=True, exist_ok=True)
         self._records: dict[str, VoiceProfileRecord] = {}
         self._lock = threading.Lock()
@@ -87,11 +92,11 @@ class VoiceProfileService:
         with self._provider_service.inference_lock:
             if record.provider_profile is not None:
                 return
-            root = (self._output_dir / 'references').resolve()
+            root = self._reference_dir.resolve()
             path = Path(record.reference_path).resolve() if record.reference_path else root
             if not path.is_relative_to(root) or not path.is_file() or checksum(path) != record.reference_checksum:
                 raise ApplicationError(ErrorCode.VOICE_PROFILE_NOT_READY)
-            provider = self._provider_service.ensure_primary_provider_loaded()
+            provider = self._provider_service.ensure_loaded(record.provider_id)
             if provider.provider_name() != record.provider_id:
                 raise ApplicationError(ErrorCode.VOICE_PROFILE_NOT_READY)
             try:
@@ -109,10 +114,7 @@ class VoiceProfileService:
     def _validate_reference_audio(self, temp_path: Path) -> tuple[float, int, int]:
         """Validate audio decodability, duration, finite samples, and metrics.
 
-        Decodes in exactly the same order as OmniVoiceProvider._decode_reference
-        (prototype/providers/omnivoice.py) - the primary provider's own,
-        already-tested reference-audio decoder (see
-        prototype/tests/test_omnivoice_cloning.py::test_aac_in_mp3_filename).
+        Uses the provider-compatible reference-audio decode order.
         FFmpeg does container detection FIRST. This is not cosmetic: this
         function used to try libsndfile (`sf.read`) first and only fall back
         to FFmpeg if that raised. libsndfile's own MP3 decoding does
@@ -124,8 +126,7 @@ class VoiceProfileService:
         garbage decode slip past the `except Exception` fallback entirely
         and only get caught later by the amplitude/finite-sample check below
         - by which point a real, valid reference file had already been
-        rejected as INVALID_REFERENCE_AUDIO, even though the OmniVoice
-        provider this profile is destined for decodes the identical file
+        rejected as INVALID_REFERENCE_AUDIO, even though a provider may decode the identical file
         correctly. WAV/FLAC remain decodable via a signature-checked
         libsndfile fallback, but ONLY when FFmpeg itself is not installed (a
         narrow FileNotFoundError catch) - not on any other decode failure,
@@ -168,8 +169,9 @@ class VoiceProfileService:
         self,
         audio_bytes: bytes,
         filename: str,
-        transcript: str,
+        transcript: str | None,
         name: str | None = None,
+        language: str = "vi",
     ) -> VoiceProfileResponse:
         # 1. Validate upload size
         if len(audio_bytes) > MAX_REFERENCE_SIZE:
@@ -178,11 +180,15 @@ class VoiceProfileService:
         if len(audio_bytes) == 0:
             raise ApplicationError(ErrorCode.INVALID_REFERENCE_AUDIO)
 
-        # 2. Validate transcript
-        if transcript is None or not isinstance(transcript, str) or not transcript.strip():
+        normalized_language = normalize_production_language(language)
+        provider_id = resolve_tts_provider(normalized_language)
+        # VieNeu's existing profile contract requires the transcript. Pinned
+        # Chatterbox V3 conditions from audio alone, so its transcript is
+        # optional and only retained as user metadata when supplied.
+        if transcript is not None and (not isinstance(transcript, str) or len(transcript.strip()) > MAX_TRANSCRIPT_LENGTH):
             raise ApplicationError(ErrorCode.INVALID_REFERENCE_TRANSCRIPT)
-        cleaned_transcript = transcript.strip()
-        if len(cleaned_transcript) > MAX_TRANSCRIPT_LENGTH:
+        cleaned_transcript = transcript.strip() if isinstance(transcript, str) and transcript.strip() else None
+        if provider_id == "vieneu" and not cleaned_transcript:
             raise ApplicationError(ErrorCode.INVALID_REFERENCE_TRANSCRIPT)
 
         # 3. Write to temporary backend-controlled file
@@ -197,7 +203,7 @@ class VoiceProfileService:
             duration, rate, channels = self._validate_reference_audio(temp_file)
 
             # 5. Ensure provider loaded & create profile via provider
-            provider = self._provider_service.ensure_primary_provider_loaded()
+            provider = self._provider_service.ensure_loaded(provider_id)
             try:
                 provider_profile = provider.create_voice_profile(temp_file, cleaned_transcript)
             except ApplicationError:
@@ -224,9 +230,15 @@ class VoiceProfileService:
             )
 
             with self._lock:
-                reference = self._output_dir / 'references' / f'{profile_id}{suffix}'
+                # UUID ownership, not the user-supplied filename, controls
+                # the durable path; suffix is retained only for decoding.
+                reference = self._reference_dir / f'{profile_id}{suffix}'
                 reference.parent.mkdir(parents=True, exist_ok=True)
                 reference.write_bytes(audio_bytes)
+                if record.provider_id == "chatterbox":
+                    # The temporary upload is removed below. Persist an opaque
+                    # durable reference for the worker's lazy V3 conditioning.
+                    record.provider_profile = {"reference_audio": str(reference.resolve())}
                 record.reference_path = str(reference.resolve())
                 record.reference_checksum = checksum(reference)
                 record.transcript = cleaned_transcript
@@ -239,7 +251,7 @@ class VoiceProfileService:
 
             logger.info(
                 "voice_profile_created profile_id=%s provider=%s duration=%.2f rate=%d channels=%d transcript_len=%d",
-                profile_id, record.provider_id, duration, rate, channels, len(cleaned_transcript),
+                profile_id, record.provider_id, duration, rate, channels, len(cleaned_transcript or ""),
             )
 
             return VoiceProfileResponse(
@@ -325,12 +337,12 @@ class VoiceProfileService:
 
         if record.reference_path:
             reference = Path(record.reference_path).resolve()
-            if reference.is_relative_to((self._output_dir / 'references').resolve()):
+            if reference.is_relative_to(self._reference_dir.resolve()):
                 reference.unlink(missing_ok=True)
 
         # Release provider prompt if provider has internal _profiles dict
         try:
-            provider = self._provider_service.get_primary_provider()
+            provider = self._provider_service.get_provider(record.provider_id)
             prov_profiles = getattr(provider, "_profiles", None)
             if isinstance(prov_profiles, dict) and hasattr(record.provider_profile, "profile_id"):
                 prov_profiles.pop(record.provider_profile.profile_id, None)
@@ -368,8 +380,12 @@ class VoiceProfileService:
             raise ApplicationError(ErrorCode.TEXT_TOO_LONG)
 
         language = request.language
-        if not isinstance(language, str) or language_status(language) != VERIFIED:
+        if not isinstance(language, str):
             raise ApplicationError(ErrorCode.LANGUAGE_NOT_SUPPORTED)
+        language = normalize_production_language(language)
+        expected_provider = resolve_tts_provider(language)
+        if record.provider_id != expected_provider:
+            raise ApplicationError(ErrorCode.VOICE_PROFILE_PROVIDER_MISMATCH)
 
         speed = request.speed
         if speed is None or isinstance(speed, bool) or not isinstance(speed, (int, float)):
@@ -397,8 +413,8 @@ class VoiceProfileService:
     def _generate_clone(self, record, cleaned_text, language, fmt, job):
         profile_id = record.profile_id
 
-        # 3. Ensure primary provider loaded
-        provider = self._provider_service.ensure_primary_provider_loaded()
+        # 3. Load the persisted profile owner, not the current primary.
+        provider = self._provider_service.ensure_loaded(record.provider_id)
 
         self.restore_profile(record)
 

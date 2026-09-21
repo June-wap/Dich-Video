@@ -20,7 +20,7 @@ from backend.errors import ApplicationError, ErrorCode
 from backend.errors.handlers import MESSAGES
 from backend.schemas.common import ErrorBody
 from backend.schemas.long_form import LongFormRequest, LongFormStatus
-from core.languages import VERIFIED, language_status
+from backend.core.languages import VERIFIED, language_status
 from core.tts_manager import TTSManager
 from core.long_text import ChunkingConfig, build_chunks
 from backend.persistence import Repository
@@ -33,7 +33,7 @@ TERMINAL = {"COMPLETED", "FAILED", "CANCELLED"}
 # full-file WAV re-validation per chunk, an extra disk copy, three DB writes)
 # without touching inference itself: num_step, the model and the provider are
 # all unchanged. Measured on the fixed long-form Vietnamese corpus against the
-# production TTSManager + OmniVoiceProvider path (not just the vendored
+# production provider path (not just the vendored
 # package): 15 chunks / 26.613s / RTF 0.2895 (old default 100/160/1) versus
 # 7 chunks / 16.727s / RTF 0.1822 (this config) -- ~37% faster wall time,
 # text integrity PASS, valid WAV/MP3, model_load_count stayed 1, peak VRAM
@@ -191,6 +191,32 @@ class LongFormTTSService:
                     self._db.save_job(job.snapshot, job.diagnostics)
                 self._run(job)
 
+    def _cleanup_job_dirs(self, job_id, work):
+        """Remove every per-job on-disk scratch/retention artifact for job_id.
+
+        Called explicitly BEFORE each of _run()'s three _finish() calls below
+        (not only from `finally`) - a caller polling status() must never be
+        able to observe a terminal status while this cleanup is still
+        pending. `finally` still calls this too, as a safety net for any exit
+        path that somehow bypasses all three explicit call sites (e.g. an
+        unexpected error inside _finish() itself); rmtree(ignore_errors=True)
+        on an already-removed directory is a harmless no-op, so calling this
+        twice in the normal case costs nothing.
+        """
+        # work is built solely from an internal UUID beneath private staging.
+        if work.resolve().is_relative_to(self._staging.resolve()):
+            shutil.rmtree(work, ignore_errors=True)
+        # persisted_chunks/{job_id}/ (phan-tich-bao-mat-du-an-17-09.md finding
+        # #1): synthesize() below copies every valid chunk here (originally a
+        # debugging aid) but nothing ever read it back or cleaned it up -
+        # left alone, every long-form job leaves its per-chunk speech audio
+        # (can be a cloned voice) on disk forever. job_id is always a bare
+        # UUID (see submit()), so this can never escape persisted_chunks/ -
+        # the containment check is kept anyway, purely for defense in depth.
+        persisted_chunks_dir = self._output / 'persisted_chunks' / job_id
+        if persisted_chunks_dir.resolve().is_relative_to((self._output / 'persisted_chunks').resolve()):
+            shutil.rmtree(persisted_chunks_dir, ignore_errors=True)
+
     def _run(self, job):
         job_id = job.snapshot.job_id
         request, record = job.request, job.record
@@ -205,12 +231,7 @@ class LongFormTTSService:
         # retry) when no AppSettingsService is wired in.
         max_retries = max(0, self._app_settings.resolve_retry_count() - 1) if self._app_settings is not None else 0
         num_step = self._app_settings.resolve_num_steps() if self._app_settings is not None else None
-        # Long-form always synthesizes through OmniVoice's synthesize_cloned()
-        # (cloning is the only path here, unlike TTSService which also routes
-        # some languages to PiperProvider) so this can be passed
-        # unconditionally - no INVALID_OPTIONS risk the way TTSService has to
-        # guard against for Piper. See prototype/providers/omnivoice.py's
-        # `_trim_silence` for what this actually does per chunk.
+        # Long-form is unsupported until CP2 supplies an engine with cloning.
         silence_trim = self._app_settings.resolve_silence_trim() if self._app_settings is not None else False
         try:
             self._profiles.restore_profile(record)
@@ -276,7 +297,7 @@ class LongFormTTSService:
                     self._db.save_job(job.snapshot, job.diagnostics)
 
             result = manager.synthesize_long_text(
-                request.text, request.language, "omnivoice_auto",
+                request.text, request.language, "",
                 filename="final.wav", chunk_config=LONG_FORM_CHUNK_CONFIG,
                 max_retries=max_retries, chunk_synthesizer=synthesize,
                 audio_validator=validate_wav, export_mp3_enabled=request.format == "mp3",
@@ -292,6 +313,7 @@ class LongFormTTSService:
                 if result["status"] == "FAILED":
                     raise ApplicationError(ErrorCode.GENERATION_FAILED)
                 if job.cancel.is_set() or result["status"] == "CANCELLED":
+                    self._cleanup_job_dirs(job_id, work)
                     self._finish(job, "CANCELLED")
                     return
                 if result["status"] != "COMPLETED" or generation_indices != list(range(count)):
@@ -311,15 +333,18 @@ class LongFormTTSService:
                         fmt = "mp3"
                 job.diagnostics.update(audio=audio, elapsed_seconds=time.perf_counter() - started,
                                        mp3_export_failed=request.format == "mp3" and fmt == "wav")
+                # Published artifacts (target/mp3 above) are already moved out
+                # of `work` by this point, so cleaning it up now - before the
+                # job becomes observably COMPLETED - is safe.
+                self._cleanup_job_dirs(job_id, work)
                 self._finish(job, "COMPLETED", audio_url=f"{self._settings.api_prefix}/audio/{artifact_id}.{fmt}", outputs=published)
         except Exception as exc:
             for path in published:
                 path.unlink(missing_ok=True)
             code = exc.code if isinstance(exc, ApplicationError) else ErrorCode.GENERATION_FAILED
             logger.error("long_form_failed job_id=%s error_code=%s", job_id, code.value)
+            self._cleanup_job_dirs(job_id, work)
             with self._lock:
                 self._finish(job, "FAILED", error=ErrorBody(code=code.value, message=MESSAGES[code]))
         finally:
-            # work is built solely from an internal UUID beneath private staging.
-            if work.resolve().is_relative_to(self._staging.resolve()):
-                shutil.rmtree(work, ignore_errors=True)
+            self._cleanup_job_dirs(job_id, work)

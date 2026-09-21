@@ -4,7 +4,7 @@ Prototype được sửa tiếp trên mã và model hiện có. Không tải l�
 
 ## Runtime chính thức từ CP0.3B-0
 
-Backend, OmniVoice và test suite dùng duy nhất `external/OmniVoice/.venv312`
+Backend và test suite cần môi trường Python được cấu hình riêng.
 (Python 3.12.10). Hướng dẫn cài đặt/audit: [Backend runtime](../docs/backend_runtime.md).
 Các môi trường `.cp0` chỉ còn là môi trường nghiên cứu lịch sử.
 
@@ -15,7 +15,7 @@ python scripts\audit_backend_runtime.py
 ```
 
 `app.py` bên dưới là entrypoint prototype cũ, vẫn đăng ký Sherpa/Japanese/VieNeu.
-CP0.3B-0 không tích hợp OmniVoice vào entrypoint này và không xác minh live inference
+CP0.3B-0 không tích hợp công cụ TTS này vào entrypoint và không xác minh live inference
 của các engine cũ trong runtime chính thức. Mô tả tính năng bên dưới là của prototype
 cũ; không phải bằng chứng backend FastAPI đã có.
 

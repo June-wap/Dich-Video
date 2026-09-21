@@ -16,7 +16,7 @@ export interface AppSettings {
   pause_policy_ms: number;
   silence_trim: boolean;
   output_dir: string | null;
-  // "cpu" is experimental/unverified for OmniVoice output quality and only
+  // CPU device selection is reserved for a future configured provider and only
   // takes effect on the next backend startup - see backend/schemas/
   // app_settings.py's own docstring on this field, and SettingsPage.tsx's
   // Performance > Device control, which reads/writes it.

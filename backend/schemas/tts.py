@@ -8,8 +8,12 @@ class TTSRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     text: Any = None
+    # Input-text language.  Omitted requests retain CP6's same-language
+    # behavior (the service treats it as `language`); cross-language requests
+    # must supply this explicitly.
+    source_language: Any = None
     language: Any = None
-    voice_id: Any = "omnivoice_auto"
+    voice_id: Any = None
     speed: Any = 1.0
     format: Any = "wav"
     # Optional client-supplied idempotency token. When set, resubmitting the

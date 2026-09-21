@@ -8,6 +8,7 @@ import {
   CardFooter,
   Button,
   Input,
+  TextArea,
   Select,
   StatusBadge,
   ErrorState,
@@ -17,6 +18,7 @@ import { useAppSettings } from '../context/AppSettingsContext';
 import { useT } from '../i18n';
 import { translationSettingsService } from '../services/translationSettingsService';
 import { healthService } from '../services/healthService';
+import { licenseService, type LicenseStatusResponse } from '../services/licenseService';
 import { ApiError } from '../services/httpClient';
 import type { AppSettings } from '../services/appSettingsService';
 import {
@@ -25,7 +27,7 @@ import {
   type NotificationPermissionState,
 } from '../utils/notifications';
 
-type SettingsTab = 'general' | 'audio' | 'performance' | 'storage' | 'advanced' | 'translation';
+type SettingsTab = 'general' | 'audio' | 'performance' | 'storage' | 'advanced' | 'translation' | 'license';
 
 function formatBytes(bytes: number): string {
   if (bytes <= 0) return '0 B';
@@ -128,10 +130,48 @@ export const SettingsPage: React.FC = () => {
     }
   };
 
+  // License state and handlers
+  const [licenseData, setLicenseData] = useState<LicenseStatusResponse | null>(null);
+  const [licenseKeyInput, setLicenseKeyInput] = useState('');
+  const [licenseLoading, setLicenseLoading] = useState(false);
+  const [licenseError, setLicenseError] = useState<string | null>(null);
+  const [licenseSuccess, setLicenseSuccess] = useState(false);
+  const [licenseCopied, setLicenseCopied] = useState(false);
+
+  useEffect(() => {
+    licenseService.getStatus().then(setLicenseData).catch(() => {});
+  }, []);
+
+  const handleCopyMachineId = () => {
+    if (!licenseData?.machine_id) return;
+    navigator.clipboard.writeText(licenseData.machine_id);
+    setLicenseCopied(true);
+    setTimeout(() => setLicenseCopied(false), 3000);
+  };
+
+  const handleActivateLicense = async () => {
+    if (!licenseKeyInput.trim()) return;
+    setLicenseLoading(true);
+    setLicenseError(null);
+    setLicenseSuccess(false);
+    try {
+      const res = await licenseService.activate(licenseKeyInput.trim());
+      setLicenseData(res.status);
+      setLicenseSuccess(true);
+      setLicenseKeyInput('');
+      setTimeout(() => setLicenseSuccess(false), 4000);
+    } catch (err) {
+      setLicenseError(err instanceof ApiError ? err.message : 'Không thể kích hoạt bản quyền.');
+    } finally {
+      setLicenseLoading(false);
+    }
+  };
+
   // --- General/Audio/Performance/Storage/Advanced: one real save handler,
   // shared by both the header "Lưu thay đổi" button and the Advanced tab's
   // own footer button - both persist the exact same full settings object.
   const patch = (partial: Partial<AppSettings>) => setForm((prev) => (prev ? { ...prev, ...partial } : prev));
+
 
   // "Quality preset" only has a real effect through num_steps (the diffusion
   // step count already fully wired end-to-end into TTSService/LongFormTTSService
@@ -237,6 +277,9 @@ export const SettingsPage: React.FC = () => {
           </button>
           <button type="button" className={`ds-settings-nav-btn ${activeTab === 'translation' ? 'ds-settings-nav-btn--active' : ''}`} onClick={() => setActiveTab('translation')}>
             <span>{t('settings.tab.translation')}</span>
+          </button>
+          <button type="button" className={`ds-settings-nav-btn ${activeTab === 'license' ? 'ds-settings-nav-btn--active' : ''}`} onClick={() => setActiveTab('license')}>
+            <span>Bản quyền</span>
           </button>
         </nav>
 
@@ -703,6 +746,128 @@ export const SettingsPage: React.FC = () => {
                   style={{ marginLeft: 'auto' }}
                 >
                   Lưu API key
+                </Button>
+              </CardFooter>
+            </Card>
+          )}
+
+          {/* ============================= LICENSE ============================= */}
+          {activeTab === 'license' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Bản quyền phần mềm (Offline License)</CardTitle>
+                <CardDescription>
+                  Quản lý giấy phép sử dụng ứng dụng Voca Basic offline theo mã máy.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Machine ID info box */}
+                <div
+                  style={{
+                    background: 'var(--neutral-50, #f8fafc)',
+                    border: '1px solid var(--neutral-200, #e2e8f0)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                  }}
+                >
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--neutral-600, #475569)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                    Mã máy của bạn (Machine ID)
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: 'monospace', fontSize: '20px', fontWeight: 700, color: 'var(--primary-700, #1d4ed8)', letterSpacing: '1px' }}>
+                      {licenseData?.machine_id || 'Đang lấy...'}
+                    </span>
+                    <Button variant={licenseCopied ? 'secondary' : 'outline'} size="sm" onClick={handleCopyMachineId}>
+                      {licenseCopied ? '✓ Đã sao chép' : 'Sao chép mã máy'}
+                    </Button>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--neutral-500, #64748b)', marginTop: '8px', marginBottom: 0 }}>
+                    💡 Khi mua hoặc gia hạn bản quyền, hãy gửi Mã máy này cho người bán để nhận License Key.
+                  </p>
+                </div>
+
+                {/* Current License Details */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                  <div style={{ padding: '12px', borderRadius: '6px', border: '1px solid var(--neutral-200, #e2e8f0)' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Trạng thái</div>
+                    <div style={{ fontSize: '15px', fontWeight: 600, marginTop: '4px', color: licenseData?.is_active ? 'var(--success-600, #16a34a)' : 'var(--danger-600, #dc2626)' }}>
+                      {licenseData ? (licenseData.is_active ? 'Đã kích hoạt' : 'Chưa kích hoạt') : 'Đang kiểm tra...'}
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '12px', borderRadius: '6px', border: '1px solid var(--neutral-200, #e2e8f0)' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Gói bản quyền</div>
+                    <div style={{ fontSize: '15px', fontWeight: 600, marginTop: '4px', color: 'var(--neutral-800)' }}>
+                      {licenseData?.is_trial
+                        ? `Dùng thử Trial (Còn ${licenseData.time_left_str ?? '1 giờ'})`
+                        : licenseData?.license_type === 'lifetime'
+                        ? 'Vĩnh viễn (Trọn đời)'
+                        : licenseData?.license_type === 'time_limited'
+                        ? `Có thời hạn (Còn ${licenseData.time_left_str ?? `${licenseData.days_left ?? 0} ngày`})`
+                        : 'Không có'}
+                    </div>
+                  </div>
+
+                  {licenseData?.customer_name && (
+                    <div style={{ padding: '12px', borderRadius: '6px', border: '1px solid var(--neutral-200, #e2e8f0)' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Người sở hữu</div>
+                      <div style={{ fontSize: '15px', fontWeight: 600, marginTop: '4px', color: 'var(--neutral-800)' }}>
+                        {licenseData.customer_name}
+                      </div>
+                    </div>
+                  )}
+
+                  {licenseData?.expires_at && (
+                    <div style={{ padding: '12px', borderRadius: '6px', border: '1px solid var(--neutral-200, #e2e8f0)' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--neutral-500)' }}>Hạn sử dụng</div>
+                      <div style={{ fontSize: '15px', fontWeight: 600, marginTop: '4px', color: 'var(--neutral-800)' }}>
+                        {licenseData.expires_at}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input for new / update key */}
+                <div style={{ borderTop: '1px solid var(--neutral-200, #e2e8f0)', paddingTop: '16px' }}>
+                  <label htmlFor="settings-license-key" style={{ display: 'block', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+                    Nhập mã kích hoạt mới hoặc gia hạn
+                  </label>
+                  <TextArea
+                    id="settings-license-key"
+                    rows={3}
+                    placeholder="Dán mã bản quyền (License Key) vào đây để kích hoạt..."
+                    value={licenseKeyInput}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                      setLicenseKeyInput(e.target.value);
+                      setLicenseError(null);
+                    }}
+                    style={{ fontFamily: 'monospace', fontSize: '12px' }}
+                  />
+                </div>
+
+                {licenseError && (
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 14px', borderRadius: '6px', fontSize: '13px' }}>
+                    ⚠️ {licenseError}
+                  </div>
+                )}
+
+                {licenseSuccess && (
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '10px 14px', borderRadius: '6px', fontSize: '13px' }}>
+                    🎉 Kích hoạt bản quyền thành công!
+                  </div>
+                )}
+              </CardContent>
+
+              <CardFooter style={{ justifyContent: 'flex-end' }}>
+                <Button
+                  variant="primary"
+                  size="md"
+                  isLoading={licenseLoading}
+                  disabled={!licenseKeyInput.trim() || licenseLoading}
+                  onClick={handleActivateLicense}
+                >
+                  Kích hoạt bản quyền
                 </Button>
               </CardFooter>
             </Card>

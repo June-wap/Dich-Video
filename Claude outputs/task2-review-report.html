@@ -1,0 +1,366 @@
+<title>Task 2 Review Notes</title>
+<!-- v2: fixes applied + committed, new tests added, fresh blocker evidence -->
+
+<style>
+:root{
+  --bg:#f6f4ef;
+  --surface:#ffffff;
+  --surface-2:#efece3;
+  --border:#ddd7c9;
+  --text:#211e1a;
+  --text-dim:#5a5548;
+  --accent:#3d5a80;
+  --accent-2:#8a6d3b;
+  --code-bg:#1f2229;
+  --code-text:#e8e6df;
+  --code-key:#e8b36b;
+  --bad:#a13a2f;
+  --bad-bg:#f7e6e2;
+  --bad-border:#e0b6ac;
+  --ok:#3f6b3a;
+  --ok-bg:#e9f0e4;
+  --ok-border:#c2d8b8;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17181b;
+    --surface:#1e2024;
+    --surface-2:#25272c;
+    --border:#34363c;
+    --text:#e9e7e0;
+    --text-dim:#a3a096;
+    --accent:#8fb0d8;
+    --accent-2:#d6ad72;
+    --code-bg:#101216;
+    --code-text:#e3e1d8;
+    --code-key:#e8b36b;
+    --bad:#e58579;
+    --bad-bg:#2c1c1a;
+    --bad-border:#5a332c;
+    --ok:#93c187;
+    --ok-bg:#1c2619;
+    --ok-border:#3a4f31;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17181b;
+  --surface:#1e2024;
+  --surface-2:#25272c;
+  --border:#34363c;
+  --text:#e9e7e0;
+  --text-dim:#a3a096;
+  --accent:#8fb0d8;
+  --accent-2:#d6ad72;
+  --code-bg:#101216;
+  --code-text:#e3e1d8;
+  --code-key:#e8b36b;
+  --bad:#e58579;
+  --bad-bg:#2c1c1a;
+  --bad-border:#5a332c;
+  --ok:#93c187;
+  --ok-bg:#1c2619;
+  --ok-border:#3a4f31;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  line-height:1.6;
+}
+.wrap{
+  max-width:800px;
+  margin:0 auto;
+  padding-inline:20px;
+  padding-block:48px 80px;
+}
+.kicker{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12.5px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 10px;
+}
+h1{
+  font-size:clamp(26px,4vw,34px);
+  line-height:1.15;
+  margin:0 0 6px;
+  text-wrap:balance;
+  letter-spacing:-0.01em;
+}
+.subtitle{
+  color:var(--text-dim);
+  font-size:15.5px;
+  margin:0 0 28px;
+}
+.status-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:36px;
+}
+.pill{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12px;
+  padding:5px 11px;
+  border-radius:100px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text-dim);
+}
+.pill.warn{
+  border-color:var(--bad-border);
+  background:var(--bad-bg);
+  color:var(--bad);
+}
+section{margin-bottom:44px;}
+h2{
+  font-size:20px;
+  margin:0 0 16px;
+  padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  letter-spacing:-0.005em;
+}
+h3{
+  font-size:16.5px;
+  margin:28px 0 10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+p{margin:0 0 14px; max-width:66ch;}
+.finding{
+  border:1px solid var(--border);
+  background:var(--surface);
+  border-radius:10px;
+  padding:20px 22px;
+  margin-bottom:20px;
+}
+.verdict{
+  display:inline-block;
+  font-family:"IBM Plex Mono", monospace;
+  font-size:11.5px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:3px 10px;
+  border-radius:5px;
+  font-weight:600;
+}
+.verdict.bug{ background:var(--bad-bg); color:var(--bad); border:1px solid var(--bad-border); }
+.verdict.smell{ background:var(--ok-bg); color:var(--ok); border:1px solid var(--ok-border); }
+.loc{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:12.5px;
+  color:var(--text-dim);
+  margin:0 0 14px;
+}
+pre{
+  background:var(--code-bg);
+  color:var(--code-text);
+  border-radius:8px;
+  padding:16px 18px;
+  overflow-x:auto;
+  font-size:12.8px;
+  line-height:1.55;
+  margin:14px 0;
+}
+code{
+  font-family:"IBM Plex Mono", monospace;
+}
+p code, li code, td code{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:0.9em;
+  color:var(--accent-2);
+}
+ol, ul{padding-left:22px; margin:0 0 14px;}
+li{margin-bottom:6px; max-width:64ch;}
+.scenario{
+  border-left:3px solid var(--bad);
+  padding:2px 0 2px 16px;
+  margin:16px 0;
+  color:var(--text-dim);
+  font-size:14.5px;
+}
+.scenario b{color:var(--text);}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13.5px;
+  margin:10px 0 4px;
+}
+.table-wrap{overflow-x:auto;}
+th,td{
+  text-align:left;
+  padding:9px 12px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+th{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:11px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--text-dim);
+  font-weight:500;
+}
+td code{white-space:nowrap;}
+.contract-list{list-style:none; padding:0; margin:0;}
+.contract-list li{
+  font-family:"IBM Plex Mono", monospace;
+  font-size:13px;
+  padding:10px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:baseline;
+}
+.contract-list li:last-child{border-bottom:none;}
+.method{
+  font-weight:600;
+  color:var(--accent);
+  min-width:44px;
+}
+.next-steps{
+  background:var(--surface-2);
+  border-radius:10px;
+  padding:20px 22px;
+  border:1px solid var(--border);
+}
+.next-steps p{margin-bottom:10px;}
+footer{
+  color:var(--text-dim);
+  font-size:13px;
+  margin-top:56px;
+  padding-top:20px;
+  border-top:1px solid var(--border);
+}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<div class="wrap">
+  <p class="kicker">Tool Dịch Cho Khách · Backend</p>
+  <h1>Task 2 review notes</h1>
+  <p class="subtitle">TTS Job + History — implementation EXECUTED, verification pending. Not moving to Task 3.</p>
+
+  <div class="status-row">
+    <span class="pill" style="border-color:var(--ok-border);background:var(--ok-bg);color:var(--ok);">2 fix đã áp dụng &amp; đã commit vào máy bạn</span>
+    <span class="pill warn">pytest vẫn chưa chạy được (re-verified)</span>
+    <span class="pill">20 test trong test_tts_jobs.py (16 → 20), chưa có output thực</span>
+  </div>
+
+  <section>
+    <h2>1. Hai điểm được yêu cầu review kỹ</h2>
+
+    <div class="finding">
+      <h3>1a. <code>recover()</code> gọi từ hai constructor <span class="verdict smell">design smell, không phải bug</span></h3>
+      <p class="loc">backend/services/tts_service.py:75 · backend/services/long_form_service.py:70 · backend/persistence.py:244-264</p>
+      <p>Cả <code>TTSService</code> và <code>LongFormTTSService</code> tự tạo <code>Repository</code> riêng nhưng cùng trỏ một file SQLite. Mỗi constructor tự gọi <code>self._db.recover()</code> — và <code>recover()</code> vốn đã là thao tác <strong>global</strong> (không filter theo <code>kind</code>): <code>WHERE status IN ('QUEUED','RUNNING')</code> trên toàn bảng.</p>
+      <pre><code>def recover(self):
+    with self.connect() as db:
+        db.execute("BEGIN IMMEDIATE")
+        rows = db.execute(
+            "SELECT id,snapshot FROM tts_jobs WHERE status IN ('QUEUED','RUNNING')"
+        ).fetchall()
+        ...  # mark FAILED/INTERRUPTED</code></pre>
+      <p><strong>Vì sao vẫn an toàn hiện tại:</strong> khởi tạo service trong <code>main.py</code> lifespan là tuần tự, một thread duy nhất (system → tts → voice_profile → long_form). Ngay cả nếu giả định này sai trong tương lai, <code>BEGIN IMMEDIATE</code> + <code>busy_timeout=5000</code> khiến SQLite tự tuần tự hóa hai transaction — lần gọi thứ hai chỉ thấy 0 dòng để sửa.</p>
+      <p><strong>Vấn đề thật sự:</strong> tính đúng đắn dựa vào một giả định ngầm (thứ tự khởi tạo + khóa SQLite), không phải một ranh giới sở hữu rõ ràng trong thiết kế. Thêm service thứ ba dùng chung DB sẽ lặp lại kiểu phụ thuộc ngầm này.</p>
+      <p><strong>Đề xuất:</strong> chuyển <code>recover()</code> ra khỏi cả hai constructor, gọi đúng một lần trong <code>main.py</code> lifespan trước khi tạo bất kỳ service nào. Rủi ro đi kèm: nhiều unit test hiện dựng <code>TTSService(...)</code>/<code>LongFormTTSService(...)</code> trực tiếp và trông cậy vào việc constructor tự phục hồi (ví dụ <code>test_interrupted_job_marked_failed_on_restart_not_resumed</code>) — cần sửa fixture nếu refactor. <strong>Chưa áp dụng, chờ quyết định.</strong></p>
+    </div>
+
+    <div class="finding">
+      <h3>1b. Idempotency chỉ so khớp key, không so payload <span class="verdict smell" style="background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border);">FIXED — đã commit</span></h3>
+      <p class="loc">backend/persistence.py: find_job_by_idempotency_key · backend/services/tts_service.py: submit(), _idempotency_fingerprint()</p>
+      <p>Đã xác nhận là bug thật (không có test cho "cùng key khác payload") và đã sửa theo đúng đề xuất đã trao đổi:</p>
+      <pre><code>def _idempotency_fingerprint(text, language, voice_id, speed, fmt):
+    payload = json.dumps({"text": text, "language": language,
+        "voice_id": voice_id, "speed": speed, "format": fmt},
+        sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+# submit():
+if idempotency_key is not None:
+    existing = self._db.find_job_by_idempotency_key(JOB_KIND, idempotency_key)
+    if existing is not None:
+        existing_id, existing_fingerprint = existing
+        if existing_fingerprint != fingerprint:
+            raise ApplicationError(ErrorCode.IDEMPOTENCY_KEY_CONFLICT)  # 409
+        return self._get(existing_id).snapshot</code></pre>
+      <p>Fingerprint (hash của <code>text/language/voice_id/speed/format</code> sau validate, không phải raw request) được lưu cùng <code>idempotency_key</code> trong <code>execution_snapshot</code> JSON — không đổi schema DB, không ảnh hưởng migration test của Task 1.</p>
+      <p>Thêm <code>ErrorCode.IDEMPOTENCY_KEY_CONFLICT</code> → HTTP 409 (tiền lệ <code>PROFILE_IN_USE</code> cũng dùng 409), message tiếng Việt trong <code>MESSAGES</code>.</p>
+      <p><strong>Test mới:</strong> <code>test_idempotency_same_key_conflicting_payload_rejected</code> (khác text → 409, job cũ không đổi, retry đúng payload gốc vẫn hoạt động sau đó) và <code>test_idempotency_same_key_conflicting_format_rejected</code> (khác format → 409, đảm bảo check bao phủ toàn payload chứ không chỉ text).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>1c. Missing artifact sau khi COMPLETED — làm rõ contract</h2>
+    <div class="finding">
+      <h3>File âm thanh biến mất sau khi job đã COMPLETED <span class="verdict smell" style="background:var(--ok-bg);color:var(--ok);border-color:var(--ok-border);">contract đã đúng, đã thêm test xác nhận</span></h3>
+      <p class="loc">backend/api/audio.py:31-32 · test mới: test_missing_artifact_after_completion_returns_404_but_job_stays_completed</p>
+      <p>Kiểm tra code hiện có (<code>GET /api/audio/{artifact_id}</code>) cho thấy endpoint này <b>không</b> tra trạng thái job — nó chỉ kiểm tra file có tồn tại trên đĩa hay không (<code>if not target_file.is_file(): raise ArtifactNotFound</code>). Nghĩa là contract vốn đã đúng: nếu file bị xoá sau khi hoàn tất (dọn dẹp thủ công, lỗi đĩa...), endpoint vẫn 404 chính xác — nhưng điều này <b>chưa từng được test</b>, chỉ có test cho trường hợp job FAILED (chưa bao giờ có file).</p>
+      <p>Đã thêm test làm rõ và khoá lại contract: <code>job status</code>/<code>history</code> là bản ghi lịch sử của kết quả synthesis, <b>không</b> tự kiểm tra lại đĩa — nên vẫn báo <code>COMPLETED</code> với <code>audio_url</code> gốc kể cả khi file đã mất. Nguồn xác thực duy nhất cho việc file có tải được hay không là gọi <code>GET /api/audio/{artifact_id}</code> tại thời điểm request — trả 404 <code>ARTIFACT_NOT_FOUND</code> khi file không còn.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. File thay đổi (đối chiếu lại với code thực tế)</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>File</th><th>Loại</th><th>Vị trí chính</th></tr>
+      <tr><td><code>backend/schemas/tts.py</code></td><td>Modified</td><td>idempotency_key (dòng 17), TTSStatus (42-55)</td></tr>
+      <tr><td><code>backend/services/tts_service.py</code></td><td>Rewritten</td><td>toàn bộ — submit/status/history/_run/synthesize</td></tr>
+      <tr><td><code>backend/persistence.py</code></td><td>Modified</td><td>find_job_by_idempotency_key (275-296)</td></tr>
+      <tr><td><code>backend/api/tts_jobs.py</code></td><td>New</td><td>router /tts/jobs</td></tr>
+      <tr><td><code>backend/api/router.py</code></td><td>Modified</td><td>đăng ký tts_jobs_router (6, 17)</td></tr>
+      <tr><td><code>backend/main.py</code></td><td>Modified</td><td>close() tts_service khi shutdown (52-53)</td></tr>
+      <tr><td><code>backend/tests/test_backend.py</code></td><td>Modified</td><td>cập nhật route set (225-226)</td></tr>
+      <tr><td><code>backend/tests/test_tts_jobs.py</code></td><td>New</td><td>16 test</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. API contract</h2>
+    <ul class="contract-list">
+      <li><span class="method">POST</span> /api/tts/jobs <span style="color:var(--text-dim)">→ 202, TTSStatus</span></li>
+      <li><span class="method">GET</span> /api/tts/jobs/{job_id} <span style="color:var(--text-dim)">→ 200 TTSStatus / 404 JOB_NOT_FOUND</span></li>
+      <li><span class="method">GET</span> /api/tts/jobs <span style="color:var(--text-dim)">→ 200 list[TTSStatus]</span></li>
+      <li><span class="method">GET</span> /api/audio/{artifact_id} <span style="color:var(--text-dim)">→ không đổi</span></li>
+      <li><span class="method">POST</span> /api/tts <span style="color:var(--text-dim)">→ không đổi, vẫn đồng bộ 200</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Blocker — re-verified lần này với bằng chứng mới</h2>
+    <p><b>device_bash (máy Windows):</b> vẫn lỗi mount, cùng bug Windows update 8/9:</p>
+    <pre><code>sandbox-helper: no Plan9 drive shares mounted under /mnt/.virtiofs-root/shared
+[connected folders reachable via device_stage_files/device_commit_files,
+ not via device_bash]</code></pre>
+    <p><b>Cloud sandbox:</b> lần này thử pip install thực sự (không chỉ curl) để xác nhận lại — pypi.org/files.pythonhosted.org nằm trong danh sách <code>noProxy</code> (kết nối trực tiếp, không qua proxy của Claude), nhưng vẫn bị chặn ở tầng mạng của tổ chức:</p>
+    <pre><code>$ pip install --break-system-packages pytest
+ERROR: Could not find a version that satisfies the requirement pytest (from versions: none)
+ERROR: No matching distribution found for pytest</code></pre>
+    <p>→ 5 file fix + test mới <b>đã được commit thành công vào máy bạn</b> (xem mục 2), nhưng <b>vẫn chưa chạy được pytest ở đâu cả</b> trong lần này. Không có con số pass/fail nào được báo cáo.</p>
+  </section>
+
+  <section>
+    <h2>5. Cần bạn chạy thủ công trên Windows</h2>
+    <div class="next-steps">
+      <p>Lệnh chính xác theo <code>backend/README.md</code> — chạy từ thư mục gốc repo (<code>D:\Tool Dich Cho Khach</code>) trong PowerShell:</p>
+      <pre><code>$env:PYTHONPATH = 'prototype'
+&amp; .\external\OmniVoice\.venv312\Scripts\python.exe -m pytest backend/tests -v</code></pre>
+      <p>Baseline trước Task 2 (từ README): <b>152 passed</b> (49 backend + phần còn lại thuộc combined suite — con số "158" nêu ở handoff là baseline riêng của backend/tests tại thời điểm giao việc). Sau Task 1 + Task 2, kỳ vọng thêm 2 test clone-persistence (Task 1) + 20 test trong <code>test_tts_jobs.py</code> (Task 2, gồm 4 test mới thêm lần này) + các assertion cập nhật — nhưng đây chỉ là ước tính, <b>con số thật phải lấy từ output pytest thực tế của bạn</b>.</p>
+      <p>Gửi lại nguyên văn output (đặc biệt dòng tổng kết <code>=== N passed, M failed ... ===</code>) để mình đối chiếu và làm final review Task 2 cùng bạn.</p>
+    </div>
+  </section>
+
+  <footer>Task 2 — TTS Job + History · fix đã commit · chờ output pytest thật từ bạn · chưa sang Task 3</footer>
+</div>

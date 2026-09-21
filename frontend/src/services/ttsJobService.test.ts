@@ -18,14 +18,14 @@ describe('ttsJobService', () => {
     const controller = new AbortController();
 
     const result = await ttsJobService.submit(
-      { text: 'hi', language: 'vi', speed: 1.0, format: 'wav', idempotency_key: 'abc' },
+      { text: 'hi', source_language: 'vi', language: 'vi', speed: 1.0, format: 'wav', idempotency_key: 'abc' },
       controller.signal
     );
 
     expect(result).toEqual({ job_id: 'j1', status: 'QUEUED' });
     expect(apiFetchSpy).toHaveBeenCalledWith('/tts/jobs', {
       method: 'POST',
-      body: { text: 'hi', language: 'vi', speed: 1.0, format: 'wav', idempotency_key: 'abc' },
+      body: { text: 'hi', source_language: 'vi', language: 'vi', speed: 1.0, format: 'wav', idempotency_key: 'abc' },
       signal: controller.signal,
     });
   });

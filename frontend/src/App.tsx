@@ -8,7 +8,6 @@ import {
   VoicesPage,
   HistoryPage,
   SettingsPage,
-  DiagnosticsPage,
 } from './pages';
 
 export function App() {
@@ -24,13 +23,15 @@ export function App() {
             <Route path="voices" element={<VoicesPage />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="diagnostics" element={<DiagnosticsPage />} />
-            {/* /showcase (internal design-system demo) and /long-form,
+            {/* /showcase (internal design-system demo), /long-form,
                 /projects, /projects/:id (dead since the Short-only scope
-                decision - see pages/index.ts) were removed here: none of
-                them had a Sidebar entry any more, so a customer landing on
-                one only by guessing the URL saw an internal/unfinished page
-                with no way back except the browser's own Back button. */}
+                decision - see pages/index.ts), and /diagnostics (17/09 -
+                reveals which TTS model/GPU is running underneath, which the
+                business does not want a customer to see) were removed here:
+                none of them had a Sidebar entry any more, so a customer
+                landing on one only by guessing the URL saw an
+                internal/unfinished page with no way back except the
+                browser's own Back button. */}
 
             {/* Catch-all fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

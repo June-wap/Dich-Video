@@ -14,7 +14,7 @@ const MOCK_PROJECTS: ProjectItem[] = [
   },
   {
     id: 'proj-002',
-    name: 'Lời chào tiếp thị sản phẩm OmniVoice v1',
+    name: 'Lời chào tiếp thị sản phẩm',
     type: 'Text to Speech',
     voice: 'Nam Anh (Nam Miền Bắc)',
     language: 'Vietnamese',

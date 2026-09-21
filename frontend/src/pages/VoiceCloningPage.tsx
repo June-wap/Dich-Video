@@ -14,11 +14,14 @@ import {
   StatusBadge,
   AudioPlayer,
   ErrorState,
+  LicenseActivationModal,
 } from '../components';
 import { useVoiceProfiles } from '../hooks';
 import { voiceProfileService } from '../services/voiceProfileService';
 import type { VoiceProfile, CloneAudioFormat, CloneTTSResult } from '../services/voiceProfileService';
+import { licenseService, type LicenseStatusResponse } from '../services/licenseService';
 import { ApiError, NetworkError } from '../services/httpClient';
+import { PRODUCTION_TTS_LANGUAGES } from '../config/productionLanguages';
 
 type CloneWorkflowStage = 'SETUP' | 'PREVIEW';
 type HumanReviewState = 'PENDING' | 'ACCEPTED' | 'REJECTED';
@@ -31,13 +34,6 @@ const MAX_REFERENCE_SIZE_BYTES = 15 * 1024 * 1024;
 const ACCEPTED_AUDIO_EXTENSIONS = ['.wav', '.mp3'];
 const MAX_TRANSCRIPT_LENGTH = 2000;
 const MAX_TEST_TEXT_LENGTH = 2000;
-
-const LANGUAGES = [
-  { value: 'vi', label: 'Vietnamese (Tiếng Việt)' },
-  { value: 'en', label: 'English (Tiếng Anh)' },
-  { value: 'zh', label: 'Chinese (Tiếng Trung)' },
-  { value: 'ja', label: 'Japanese (Tiếng Nhật)' },
-];
 
 const FORMATS: { value: CloneAudioFormat; label: string }[] = [
   { value: 'wav', label: 'WAV (không nén, chất lượng gốc)' },
@@ -85,6 +81,7 @@ export const VoiceCloningPage: React.FC = () => {
   // Step 3: Voice Info (name is optional server-side; the backend defaults
   // to "Voice Profile {id[:8]}" when omitted)
   const [voiceName, setVoiceName] = useState('');
+  const [profileLanguage, setProfileLanguage] = useState('vi');
 
   // POST /api/voices/profiles (multipart) - single request, no job/poll cycle
   const [creating, setCreating] = useState(false);
@@ -106,10 +103,18 @@ export const VoiceCloningPage: React.FC = () => {
   const [playbackError, setPlaybackError] = useState(false);
   const [humanReview, setHumanReview] = useState<HumanReviewState>('PENDING');
 
+  const [licenseData, setLicenseData] = useState<LicenseStatusResponse | null>(null);
+  const [licenseModalOpen, setLicenseModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    licenseService.getStatus().then(setLicenseData).catch(() => {});
+  }, []);
+
   // Validation
   const isAudioValid = Boolean(selectedFile && !fileError);
   const transcriptCharCount = transcript.trim().length;
-  const isTranscriptValid = transcriptCharCount > 0 && transcript.length <= MAX_TRANSCRIPT_LENGTH;
+  const isTranscriptRequired = profileLanguage === 'vi';
+  const isTranscriptValid = (!isTranscriptRequired || transcriptCharCount > 0) && transcript.length <= MAX_TRANSCRIPT_LENGTH;
   const canCreateProfile = isAudioValid && isTranscriptValid && !creating;
 
   const handleFilePicked = (file: File | null) => {
@@ -148,6 +153,7 @@ export const VoiceCloningPage: React.FC = () => {
         file: selectedFile,
         referenceTranscript: transcript.trim(),
         name: voiceName.trim() || null,
+        language: profileLanguage,
       });
       setProfile(created);
       setStage('PREVIEW');
@@ -156,6 +162,9 @@ export const VoiceCloningPage: React.FC = () => {
       void reloadProfiles(); // so LongFormPage's voice picker sees it immediately
     } catch (err) {
       setCreateError(describeError(err));
+      if (err instanceof ApiError && err.code.startsWith('LICENSE_')) {
+        setLicenseModalOpen(true);
+      }
     } finally {
       setCreating(false);
     }
@@ -186,6 +195,9 @@ export const VoiceCloningPage: React.FC = () => {
       setHumanReview('PENDING');
     } catch (err) {
       setTestError(describeError(err));
+      if (err instanceof ApiError && err.code.startsWith('LICENSE_')) {
+        setLicenseModalOpen(true);
+      }
     } finally {
       setIsGeneratingTest(false);
     }
@@ -345,7 +357,7 @@ export const VoiceCloningPage: React.FC = () => {
                     {transcript.length} / {MAX_TRANSCRIPT_LENGTH} ký tự
                   </span>
                 </div>
-                <CardDescription>Nội dung chính xác được đọc trong audio mẫu.</CardDescription>
+                <CardDescription>{isTranscriptRequired ? 'Nội dung chính xác được đọc trong audio mẫu (bắt buộc cho tiếng Việt).' : 'Tùy chọn cho profile Chatterbox; V3 condition trực tiếp từ audio mẫu.'}</CardDescription>
               </CardHeader>
 
               <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -359,7 +371,7 @@ export const VoiceCloningPage: React.FC = () => {
                   error={transcript.length > MAX_TRANSCRIPT_LENGTH ? `Vượt quá ${MAX_TRANSCRIPT_LENGTH} ký tự.` : undefined}
                 />
 
-                {transcriptCharCount === 0 ? (
+                {transcriptCharCount === 0 && isTranscriptRequired ? (
                   <span className="ds-hint">Vui lòng nhập văn bản chính xác khớp với file ghi âm mẫu.</span>
                 ) : isTranscriptValid ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--success-text)' }}>
@@ -379,6 +391,13 @@ export const VoiceCloningPage: React.FC = () => {
               </CardHeader>
 
               <CardContent style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <Select
+                  label="Ngôn ngữ đầu ra"
+                  options={PRODUCTION_TTS_LANGUAGES}
+                  value={profileLanguage}
+                  onChange={(e) => { setProfileLanguage(e.target.value); setTestLanguage(e.target.value); }}
+                  hint="Ngôn ngữ đầu ra quyết định profile tương thích; không chọn engine."
+                />
                 <Input
                   label="Voice Name (Tên giọng)"
                   placeholder="e.g. Giọng Thầy Minh (Truyền cảm)"
@@ -501,7 +520,7 @@ export const VoiceCloningPage: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <Select
                     label="Ngôn ngữ đầu ra của bản thử"
-                    options={LANGUAGES}
+                    options={PRODUCTION_TTS_LANGUAGES}
                     value={testLanguage}
                     onChange={(e) => setTestLanguage(e.target.value)}
                     hint="Hồ sơ giọng không gắn với một ngôn ngữ cố định - chọn ngôn ngữ cho từng bản thử"
@@ -546,7 +565,7 @@ export const VoiceCloningPage: React.FC = () => {
                   <AudioPlayer
                     title={`Mẫu giọng thử nghiệm: ${profile.name}`}
                     voice={profile.name}
-                    language={LANGUAGES.find((l) => l.value === testResult.language)?.label.split(' (')[0] ?? testResult.language}
+                    language={PRODUCTION_TTS_LANGUAGES.find((l) => l.value === testResult.language)?.label.split(' (')[0] ?? testResult.language}
                     src={testAudioUrl}
                     format={testResult.format}
                     onError={() => setPlaybackError(true)}
@@ -631,6 +650,12 @@ export const VoiceCloningPage: React.FC = () => {
           </Card>
         </div>
       )}
+      <LicenseActivationModal
+        isOpen={licenseModalOpen}
+        onClose={() => setLicenseModalOpen(false)}
+        statusData={licenseData}
+        onActivated={(status) => setLicenseData(status)}
+      />
     </div>
   );
 };

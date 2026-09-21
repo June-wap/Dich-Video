@@ -40,7 +40,13 @@ def wait(jobs, job_id):
 
 @pytest.fixture
 def harness(tmp_path):
-    settings = Settings(output_dir=tmp_path / "âm thanh")
+    # database_path must be isolated per test like output_dir is: without it,
+    # Repository falls back to Settings.app_data_dir's real, persistent
+    # %LOCALAPPDATA%\Voca Basic\data\metadata.sqlite3 (see backend/persistence.py),
+    # so every job/profile created by every test run - not just this one -
+    # accumulates in the same database and leaks into later assertions
+    # (this was the actual cause of this file's test_validation[...] failures).
+    settings = Settings(output_dir=tmp_path / "âm thanh", database_path=tmp_path / "metadata.sqlite3")
     provider = FakeCloneProvider()
     providers = registry(provider)
     app = create_app(settings, provider_service_factory=lambda _: providers)
@@ -99,6 +105,11 @@ def test_create_order_identity_merge_and_artifact(harness, monkeypatch):
             if value and sum(1 for _ in samples) > 2400]
     assert runs == list(range(1, len(calls) + 1))
     assert not list((settings.output_dir / "long_form_private").rglob("chunk_*.wav"))
+    # Regression guard (phan-tich-bao-mat-du-an-17-09.md finding #1): every
+    # per-chunk copy synthesize() made along the way must be gone once the
+    # job reaches COMPLETED, not just the "long_form_private" staging copy
+    # above - see long_form_service.py's _run()'s finally block.
+    assert not (settings.output_dir / "persisted_chunks" / result.job_id).exists()
     assert set(client.get(f"/api/tts/long-form/{result.job_id}").json()) == {
         "job_id", "status", "progress_percent", "audio_url"}
     assert client.delete(f"/api/tts/long-form/{result.job_id}").json()["status"] == "COMPLETED"
@@ -194,6 +205,11 @@ def test_chunk_failure_never_skips_or_merges(harness, monkeypatch, caplog, fault
     assert call_count == 2 and merge.call_count == 0
     assert "SECRET_CUSTOMER_TEXT" not in caplog.text and "C:/private" not in caplog.text
     assert not list(settings.output_dir.glob("*.wav"))
+    # Regression guard (phan-tich-bao-mat-du-an-17-09.md finding #1): a FAILED
+    # job must not leave its already-copied chunk(s) behind either - the
+    # first chunk here succeeded (call_count reaches 2 before failing) and
+    # would have been copied into persisted_chunks/ before the failure.
+    assert not (settings.output_dir / "persisted_chunks" / result.job_id).exists()
     assert profiles.get_profile_record(pid).active_jobs == 0
 
 
@@ -299,7 +315,7 @@ def test_short_and_clone_share_execution_gate(harness, monkeypatch):
 
 
 def test_cancel_last_chunk_never_merges(harness, monkeypatch):
-    _, jobs, provider, _, pid, _ = harness
+    _, jobs, provider, _, pid, settings = harness
     entered, release = threading.Event(), threading.Event()
     original = provider.synthesize_cloned
     def blocked(**kw):
@@ -316,6 +332,11 @@ def test_cancel_last_chunk_never_merges(harness, monkeypatch):
         release.set()
         assert wait(jobs, job.job_id).status == "CANCELLED"
         assert merge.call_count == 0
+        # Regression guard (phan-tich-bao-mat-du-an-17-09.md finding #1): the
+        # one chunk that did finish synthesizing before cancellation landed
+        # would have been copied into persisted_chunks/ - it must not survive
+        # a CANCELLED job either.
+        assert not (settings.output_dir / "persisted_chunks" / job.job_id).exists()
     finally:
         release.set()
 

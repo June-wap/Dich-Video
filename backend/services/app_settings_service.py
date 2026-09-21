@@ -107,14 +107,6 @@ class AppSettingsService:
         is instead resolved live, per request, straight from this service -
         see TTSService._run() and LongFormTTSService._run().
         """
-        stored = self._db.get_setting(SETTINGS_KEY, default={}) or {}
-        if stored.get("device") == "cpu" and base.omnivoice_device != "cpu":
-            import dataclasses
-
-            try:
-                return dataclasses.replace(base, omnivoice_device="cpu")
-            except ValueError:
-                logger.warning("app_settings_invalid_device_override_ignored")
         return base
 
     def resolve_retry_count(self) -> int:
@@ -135,8 +127,7 @@ class AppSettingsService:
         return value if isinstance(value, int) and 1 <= value <= 3 else 2
 
     def resolve_silence_trim(self) -> bool:
-        """Real per-job input to OmniVoiceProvider's trim_silence= parameter
-        (see prototype/providers/omnivoice.py's `_trim_silence`) - trims only
+        """Optional per-job silence trimming parameter - trims only
         confidently-silent leading/trailing samples from the generated clip.
         Legacy behavior (before this setting existed) never trimmed anything,
         so an untouched install must resolve to False here, matching
@@ -152,16 +143,8 @@ class AppSettingsService:
 
     def resolve_num_steps(self) -> int | None:
         # Same "never saved yet" reasoning as resolve_retry_count() above -
-        # and it matters more here: the provider's own per-mode default is
-        # NOT uniform (16 for normal TTS, 24 for voice cloning - see
-        # DEFAULT_NORMAL_NUM_STEP/DEFAULT_CLONE_NUM_STEP in
-        # prototype/providers/omnivoice.py). Returning None lets
-        # TTSService/LongFormTTSService pass num_step=None straight through
-        # to the provider, which then picks the right default for whichever
-        # mode is running - returning a hardcoded 16 here would silently
-        # downgrade every cloned synthesis on a fresh install from 24 steps
-        # to 16 the moment AppSettingsService is wired in, with no user
-        # action at all. Once the user has saved Settings at least once, a
+        # and a future provider may select its own mode-specific default.
+        # Once the user has saved Settings at least once, a
         # missing/out-of-range value also falls back to None here (not a
         # guessed 16) for the same reason.
         stored = self._db.get_setting(SETTINGS_KEY, default=None)

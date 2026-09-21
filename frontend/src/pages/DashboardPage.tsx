@@ -20,7 +20,7 @@ export const DashboardPage: React.FC = () => {
     };
   }, []);
 
-  const omnivoiceReady = status?.omnivoice_available && status.omnivoice_model_loaded;
+  const providerReady = Boolean(status?.primary_provider && status.provider_state === 'READY');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -40,9 +40,9 @@ export const DashboardPage: React.FC = () => {
         {status && (
           <div className="ds-system-compact-bar">
             <div className="ds-system-compact-items">
-              <span className={`ds-system-pill ${omnivoiceReady ? 'ds-system-pill--success' : ''}`}>
+              <span className={`ds-system-pill ${providerReady ? 'ds-system-pill--success' : ''}`}>
                 <span className="ds-sidebar-status-dot" aria-hidden="true" />
-                {omnivoiceReady ? t('dashboard.status.omnivoiceReady') : t('dashboard.status.omnivoiceDegraded')}
+                {providerReady ? 'TTS provider ready' : 'No TTS provider available'}
               </span>
               {status.gpu_name && <span className="ds-system-pill">{status.gpu_name}</span>}
               <span className={`ds-system-pill ${status.cuda_available ? 'ds-system-pill--success' : ''}`}>

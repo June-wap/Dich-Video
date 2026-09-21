@@ -1,4 +1,4 @@
-from concurrent.futures import ThreadPoolExecutor
+﻿from concurrent.futures import ThreadPoolExecutor
 import logging
 from pathlib import Path
 import re
@@ -11,7 +11,8 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from backend.config import OMNIVOICE_PROVIDER_ID, Settings
+from backend.config import Settings
+from backend.tests.provider_fakes import TEST_PROVIDER_ID
 from backend.errors import ErrorCode
 from backend.main import create_app
 from backend.services.provider_service import ProviderService
@@ -20,7 +21,7 @@ from backend.services.translation_service import TranslationService
 from backend.services.tts_service import TTSService
 from backend.services.voice_profile_service import VoiceProfileService
 from backend.tests.provider_fakes import FakeProvider
-from providers.base import AudioSynthResult
+from backend.services.provider_base import AudioSynthResult
 
 
 class FakeTTSProvider(FakeProvider):
@@ -29,7 +30,7 @@ class FakeTTSProvider(FakeProvider):
         self.fail_synthesize = False
         self.synthesize_calls = 0
 
-    def synthesize(self, text, language, voice="omnivoice_auto", output_path=None, speed=1.0, **options):
+    def synthesize(self, text, language, voice="test_auto", output_path=None, speed=1.0, **options):
         self.synthesize_calls += 1
         if self.fail_synthesize:
             return AudioSynthResult(
@@ -67,11 +68,15 @@ class FakeTTSProvider(FakeProvider):
 @pytest.fixture
 def tts_app_env(tmp_path):
     output_dir = tmp_path / "outputs" / "api"
-    settings = Settings(output_dir=output_dir)
+    # database_path must be isolated per test like output_dir is - see the
+    # identical fix/comment in test_tts_jobs.py's jobs_env fixture; this
+    # fixture had the same gap (never observed as a failure here only because
+    # this file's assertions don't check exact history/profile counts).
+    settings = Settings(output_dir=output_dir, database_path=tmp_path / "metadata.sqlite3")
     provider = FakeTTSProvider()
     provider_service = ProviderService()
     provider_service.register(provider, device=provider.device, available=True)
-    provider_service.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider_service.select_primary(TEST_PROVIDER_ID)
     probe = Mock(return_value=RuntimeInfo(
         python_version="3.12.10", torch_version="2.8.0+cu128",
         cuda_available=True, gpu_name="test GPU",
@@ -111,7 +116,7 @@ def test_valid_tts_request_wav(tts_app_env):
     response = client.post("/api/tts", json={
         "text": "Xin chào, đây là bài kiểm tra giọng nói.",
         "language": "vi",
-        "voice_id": "omnivoice_auto",
+        "voice_id": "test_auto",
         "speed": 1.0,
         "format": "wav",
     })
@@ -120,9 +125,9 @@ def test_valid_tts_request_wav(tts_app_env):
     assert data["ok"] is True
     res = data["data"]
     assert res["status"] == "completed"
-    assert res["provider"] == "omnivoice"
+    assert res["provider"] == TEST_PROVIDER_ID
     assert res["language"] == "vi"
-    assert res["voice_id"] == "omnivoice_auto"
+    assert res["voice_id"] == "test_auto"
     assert res["sample_rate"] == 24000
     assert res["channels"] == 1
     assert res["format"] == "wav"
@@ -144,7 +149,7 @@ def test_valid_tts_request_wav(tts_app_env):
 
 def test_second_request_reuses_provider(tts_app_env):
     client, provider, _, _, _ = tts_app_env
-    payload = {"text": "Xin chào một lần nữa.", "language": "vi"}
+    payload = {"text": "Xin chào một lần nữa.", "language": "vi", "voice_id": "test_auto"}
 
     res1 = client.post("/api/tts", json=payload)
     assert res1.status_code == 200
@@ -194,7 +199,15 @@ def test_invalid_voice_rejected(tts_app_env):
 @pytest.mark.parametrize("invalid_speed", [0.4, 2.1, 1.5, -1.0, 0, "fast", True, False])
 def test_invalid_speed_rejected(tts_app_env, invalid_speed):
     client, provider, _, _, _ = tts_app_env
-    response = client.post("/api/tts", json={"text": "Hello", "language": "vi", "speed": invalid_speed})
+    response = client.post(
+        "/api/tts",
+        json={
+            "text": "Hello",
+            "language": "vi",
+            "voice_id": "test_auto",
+            "speed": invalid_speed,
+        },
+    )
     assert response.status_code == 422
     assert response.json()["error"]["code"] == ErrorCode.INVALID_SPEED.value
     assert provider.load_calls == 0
@@ -203,7 +216,15 @@ def test_invalid_speed_rejected(tts_app_env, invalid_speed):
 @pytest.mark.parametrize("invalid_format", ["ogg", "flac", "aac", "raw", 123])
 def test_invalid_format_rejected(tts_app_env, invalid_format):
     client, provider, _, _, _ = tts_app_env
-    response = client.post("/api/tts", json={"text": "Hello", "language": "vi", "format": invalid_format})
+    response = client.post(
+        "/api/tts",
+        json={
+            "text": "Hello",
+            "language": "vi",
+            "voice_id": "test_auto",
+            "format": invalid_format,
+        },
+    )
     assert response.status_code == 422
     assert response.json()["error"]["code"] == ErrorCode.INVALID_FORMAT.value
     assert provider.load_calls == 0
@@ -212,7 +233,7 @@ def test_invalid_format_rejected(tts_app_env, invalid_format):
 def test_provider_load_failure_normalized(tts_app_env):
     client, provider, provider_service, _, _ = tts_app_env
     provider.fail_load = True
-    response = client.post("/api/tts", json={"text": "Hello", "language": "vi"})
+    response = client.post("/api/tts", json={"text": "Hello", "language": "vi", "voice_id": "test_auto"})
     assert response.status_code == 503
     assert response.json()["error"]["code"] == ErrorCode.PROVIDER_LOAD_FAILED.value
     assert "private" not in response.text
@@ -222,7 +243,7 @@ def test_provider_load_failure_normalized(tts_app_env):
 def test_generation_failure_normalized(tts_app_env):
     client, provider, _, _, output_dir = tts_app_env
     provider.fail_synthesize = True
-    response = client.post("/api/tts", json={"text": "Hello", "language": "vi"})
+    response = client.post("/api/tts", json={"text": "Hello", "language": "vi", "voice_id": "test_auto"})
     assert response.status_code == 500
     assert response.json()["error"]["code"] == ErrorCode.GENERATION_FAILED.value
     assert "Internal model synthesis error" not in response.text
@@ -239,7 +260,7 @@ def test_mp3_export_success(tts_app_env):
             return mp3_path
         mock_export.side_effect = fake_export
 
-        response = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "format": "mp3"})
+        response = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "voice_id": "test_auto", "format": "mp3"})
         assert response.status_code == 200
         data = response.json()["data"]
         assert data["format"] == "mp3"
@@ -251,7 +272,7 @@ def test_mp3_export_success(tts_app_env):
 def test_mp3_export_failure_retains_wav(tts_app_env):
     client, _, _, _, output_dir = tts_app_env
     with patch("backend.services.tts_service.export_mp3", return_value=None):
-        response = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "format": "mp3"})
+        response = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "voice_id": "test_auto", "format": "mp3"})
         assert response.status_code == 500
         assert response.json()["error"]["code"] == ErrorCode.AUDIO_EXPORT_FAILED.value
         # WAV must be retained for diagnostics
@@ -262,7 +283,7 @@ def test_mp3_export_failure_retains_wav(tts_app_env):
 def test_audio_retrieval_and_media_types(tts_app_env):
     client, _, _, _, output_dir = tts_app_env
     # Generate WAV
-    res = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "format": "wav"})
+    res = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "voice_id": "test_auto", "format": "wav"})
     assert res.status_code == 200
     gen_id = res.json()["data"]["generation_id"]
 
@@ -305,7 +326,7 @@ def test_path_traversal_blocked(tts_app_env, traversal_attempt):
 
 def test_no_absolute_paths_returned(tts_app_env):
     client, _, _, _, output_dir = tts_app_env
-    res = client.post("/api/tts", json={"text": "Xin chào", "language": "vi"})
+    res = client.post("/api/tts", json={"text": "Xin chào", "language": "vi", "voice_id": "test_auto"})
     assert res.status_code == 200
     text_content = res.text
     assert str(output_dir) not in text_content
@@ -316,7 +337,7 @@ def test_customer_text_not_logged(tts_app_env, caplog):
     client, _, _, _, _ = tts_app_env
     secret_text = "SECRET_CUSTOMER_CONFIDENTIAL_123456789"
     with caplog.at_level(logging.INFO):
-        res = client.post("/api/tts", json={"text": secret_text, "language": "vi"})
+        res = client.post("/api/tts", json={"text": secret_text, "language": "vi", "voice_id": "test_auto"})
         assert res.status_code == 200
     assert secret_text not in caplog.text
     # text_length should be logged
@@ -325,11 +346,12 @@ def test_customer_text_not_logged(tts_app_env, caplog):
 
 def test_concurrent_first_requests_do_not_double_load(tmp_path):
     output_dir = tmp_path / "concurrent_api"
-    settings = Settings(output_dir=output_dir)
+    # database_path isolated per test - see tts_app_env fixture's comment above.
+    settings = Settings(output_dir=output_dir, database_path=tmp_path / "metadata.sqlite3")
     provider = FakeTTSProvider()
     provider_service = ProviderService()
     provider_service.register(provider, device=provider.device, available=True)
-    provider_service.select_primary(OMNIVOICE_PROVIDER_ID)
+    provider_service.select_primary(TEST_PROVIDER_ID)
     tts_service = TTSService(settings, provider_service, TranslationService(settings),
                               VoiceProfileService(settings, provider_service))
     sys_service = SystemService(provider_service, Mock(return_value=RuntimeInfo("3.12.10", "2.8.0+cu128", True, "GPU")))
@@ -340,7 +362,7 @@ def test_concurrent_first_requests_do_not_double_load(tmp_path):
     with TestClient(app, base_url="http://127.0.0.1") as client:
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [
-                executor.submit(client.post, "/api/tts", json={"text": f"Request {i}", "language": "vi"})
+                executor.submit(client.post, "/api/tts", json={"text": f"Request {i}", "language": "vi", "voice_id": "test_auto"})
                 for i in range(4)
             ]
             responses = [f.result() for f in futures]
@@ -351,3 +373,4 @@ def test_concurrent_first_requests_do_not_double_load(tmp_path):
 
     # After shutdown, provider is unloaded
     assert provider_service.status().providers[0].state.value == "NOT_LOADED"
+

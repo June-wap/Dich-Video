@@ -54,6 +54,15 @@ async function fetchToken(): Promise<string> {
           return data.token;
         }
       }
+      // The backend deliberately returns 404 when local-token auth is
+      // disabled (direct developer startup). That is a terminal, valid
+      // contract—not a transient startup race—so do not hammer it 40 times.
+      if (response.status === 404) {
+        cachedToken = '';
+        return cachedToken;
+      }
+      // Auth policy/origin errors cannot recover through retries either.
+      if (response.status === 401 || response.status === 403) break;
     } catch (err) {
       lastError = err;
     }
@@ -67,7 +76,8 @@ async function fetchToken(): Promise<string> {
 }
 
 /** Resolves once the token is available; safe to call from many places -
- * only the very first caller actually triggers a network request. */
+ * only the very first caller actually triggers a network request. An empty
+ * value means the backend explicitly reported that local-token auth is off. */
 export function getLocalToken(): Promise<string> {
   if (IS_TEST_ENV) return Promise.resolve(TEST_TOKEN);
   if (cachedToken) return Promise.resolve(cachedToken);

@@ -12,6 +12,11 @@ export function useKeyDown(targetKey: string, handler: () => void, enabled: bool
     if (!enabled) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // IMEs use keyboard events while composing a character.  Global
+      // shortcuts must leave those events alone so the browser/IME can finish
+      // the composition before application behavior is considered.
+      if (event.isComposing) return;
+
       if (event.key === targetKey) {
         handler();
       }
@@ -40,7 +45,7 @@ export function useDisclosure(initialState: boolean = false) {
 export function useDeveloperMode() {
   const [isDevMode, setIsDevMode] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('omnivoice_dev_mode') === 'true';
+      return localStorage.getItem('voca_dev_mode') === 'true';
     } catch {
       return false;
     }
@@ -49,7 +54,7 @@ export function useDeveloperMode() {
   const setDevMode = (val: boolean) => {
     setIsDevMode(val);
     try {
-      localStorage.setItem('omnivoice_dev_mode', String(val));
+      localStorage.setItem('voca_dev_mode', String(val));
       window.dispatchEvent(new Event('dev_mode_change'));
     } catch {
       // ignore
@@ -59,7 +64,7 @@ export function useDeveloperMode() {
   useEffect(() => {
     const handleStorageChange = () => {
       try {
-        setIsDevMode(localStorage.getItem('omnivoice_dev_mode') === 'true');
+        setIsDevMode(localStorage.getItem('voca_dev_mode') === 'true');
       } catch {
         setIsDevMode(false);
       }

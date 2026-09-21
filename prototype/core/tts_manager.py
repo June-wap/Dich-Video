@@ -1270,7 +1270,7 @@ class TTSManager:
         """
         Legacy cloning path.
 
-        OmniVoice cloning is currently handled
+        Voice cloning is currently handled
         through its newer provider API and is
         not forced through this legacy contract.
         """

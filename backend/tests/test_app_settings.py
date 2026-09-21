@@ -5,7 +5,6 @@ backend/api/app_settings.py. Mirrors test_backend.py's harness style.
 Deliberately does NOT touch backend/api/settings.py (Gemini BYOK translation
 key) - that has its own tests and its own security handling.
 """
-import dataclasses
 from unittest.mock import Mock
 
 import pytest
@@ -112,24 +111,23 @@ def test_custom_output_dir_bytes_computed_for_the_configured_directory(harness, 
 
 
 # ---------------------------------------------------------------------------
-# resolve_effective_settings(): Task 6's device override, applied only at
-# startup (never hot-swapped) - see backend/main.py's lifespan.
+# CP2 keeps the validated VieNeu CPU path fixed.  The persisted UI preference
+# remains storage-only until a future device-selection release defines a
+# supported provider-routing contract.
 # ---------------------------------------------------------------------------
 
-def test_resolve_effective_settings_overrides_device_only_when_cpu_chosen(tmp_path):
+def test_resolve_effective_settings_does_not_change_cp2_provider_device(tmp_path):
     settings = Settings(output_dir=tmp_path / "out", database_path=tmp_path / "settings.sqlite3")
     service = AppSettingsService(settings)
 
-    # Default ("gpu") leaves the configured settings untouched.
+    # An untouched setting leaves the startup configuration untouched.
     assert service.resolve_effective_settings(settings) is settings
 
     from backend.schemas.app_settings import AppSettings
     service.save(AppSettings(device="cpu"))
-    effective = service.resolve_effective_settings(settings)
-    assert effective.omnivoice_device == "cpu"
-    assert effective is not settings
-    # Nothing else about the settings object changed.
-    assert effective == dataclasses.replace(settings, omnivoice_device="cpu")
+    # Persisting the legacy UI preference must not silently change CP2 from
+    # its validated CPU execution path or manufacture a Settings.device field.
+    assert service.resolve_effective_settings(settings) is settings
 
 
 # ---------------------------------------------------------------------------
@@ -142,7 +140,7 @@ def test_resolve_helpers_preserve_legacy_behavior_when_nothing_ever_saved(tmp_pa
     written anything - must get IDENTICAL behavior to before this endpoint
     existed: single-attempt synthesis (no retry loop) and the provider's own
     per-mode num_step default (16 for normal TTS, 24 for voice cloning - see
-    prototype/providers/omnivoice.py), not a uniform retry_count=2/num_steps=16
+    generic provider defaults), not a uniform retry_count=2/num_steps=16
     the instant AppSettingsService is constructed. See this module's schema
     docstring and resolve_retry_count()/resolve_num_steps()'s own comments.
     """

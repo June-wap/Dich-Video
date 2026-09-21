@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-17",
+  "generated_by": "Claude (Cowork) — computed directly from the binaries already staged in release/staged-runtime/ on 2026-09-17. This records what IS currently staged; it does not itself certify where those files were originally downloaded from — the user reported downloading/installing both manually without keeping the original source note.",
+  "note_for_release_gate": "Before the final commercial installer is signed, confirm the FFmpeg source (gyan.dev) and Python source (python.org) below match what was actually downloaded, or re-stage from a freshly verified download and recompute these hashes.",
+  "python": {
+    "reported_version": "3.12.10",
+    "evidence": "Version string '3.12.10' extracted directly from python312.dll (embedded CPython version marker).",
+    "layout": "Full python.org Windows installer layout (DLLs/, Lib/, include/, libs/, Scripts/, tcl/ all present) — not the python.org 'embeddable' zip.",
+    "likely_source": "https://www.python.org/downloads/release/python-31210/ (Windows x86-64 installer) — NOT independently re-verified against a fresh download; user to confirm.",
+    "files": {
+      "python.exe": {
+        "size_bytes": 104952,
+        "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+      },
+      "python312.dll": {
+        "size_bytes": 6945272,
+        "sha256": "9a0e3435aaa680d868150f87ab3e388ad2eebc22f87e036155c7b4eda8cd2120"
+      }
+    }
+  },
+  "ffmpeg": {
+    "reported_version": "2025-06-02-git-688f3944ce-full_build-www.gyan.dev",
+    "evidence": "Version string extracted directly from both ffmpeg.exe and ffprobe.exe binaries.",
+    "source": "gyan.dev FFmpeg Windows builds, 'full_build' variant (https://www.gyan.dev/ffmpeg/builds/) — matches the earlier known local path C:\\ffv2\\bin mentioned in project notes. NOT independently re-verified against a fresh download; user to confirm this is the actual origin.",
+    "license_note": "gyan.dev full_build bundles GPL-licensed components (e.g. libx264, libx265) — see LICENSE files inside the build; confirm this is acceptable for the chosen distribution license before commercial release.",
+    "files": {
+      "ffmpeg.exe": {
+        "size_bytes": 153774592,
+        "sha256": "5e16cfd831f19d27314403d62d77f2f943fa7fc7d11fecbfd8dd8f29ab0af26d"
+      },
+      "ffprobe.exe": {
+        "size_bytes": 153579520,
+        "sha256": "118856109555f97803ce7047b84335320a1795aefdbaf54a11bde9dcc7581c9f"
+      }
+    }
+  }
+}
