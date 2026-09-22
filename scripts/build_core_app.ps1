@@ -73,9 +73,16 @@ chcp 65001 >nul
 title Reset Du Lieu - Voca Basic
 setlocal
 
-echo Dang dong Voca Basic neu dang chay...
-taskkill /F /IM "Voca Basic.exe" >nul 2>&1
-taskkill /F /IM "python.exe" >nul 2>&1
+tasklist /FI "IMAGENAME eq Voca Basic.exe" 2>nul | find /I "Voca Basic.exe" >nul
+if not errorlevel 1 (
+    echo.
+    echo [LOI] Voca Basic dang chay.
+    echo Hay dong ung dung Voca Basic binh thuong, sau do chay lai file nay.
+    echo Khong co tien trinh nao bi buoc dung boi cong cu reset.
+    echo.
+    pause
+    exit /b 1
+)
 
 set "TARGET_DIR=%LOCALAPPDATA%\Voca Basic"
 
