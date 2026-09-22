@@ -81,6 +81,11 @@ coverage/
 *.zip
 *.exe
 *.msi
+*.dll
+*.whl
+*.pyd
+release-candidates/
+release/vm-isolation-test/
 release/core-dist/
 release/Voca-Basic-1.0.1-Customer/
 release/Voca-Basic-Core.zip

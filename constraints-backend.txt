@@ -3,3 +3,4 @@
 torch==2.8.0+cu128
 torchaudio==2.8.0+cu128
 torchao==0.13.0
+sentencepiece==0.2.1

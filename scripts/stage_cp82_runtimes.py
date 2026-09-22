@@ -25,10 +25,62 @@ def _ignore(directory: str, names: list[str]) -> set[str]:
     return ignored
 
 
+VC_RUNTIME_DLLS = (
+    "vcruntime140.dll",
+    "vcruntime140_1.dll",
+    "vcruntime140_threads.dll",
+    "msvcp140.dll",
+    "msvcp140_1.dll",
+    "msvcp140_2.dll",
+    "msvcp140_atomic_wait.dll",
+    "msvcp140_codecvt_ids.dll",
+    "concrt140.dll",
+    "vccorlib140.dll",
+)
+
+
+def _find_vc_redist_dlls(base: Path) -> dict[str, Path]:
+    """Resolve full Visual C++ runtime DLLs to make portable runtimes self-contained."""
+    found: dict[str, Path] = {}
+    search_dirs: list[Path] = []
+
+    # Check Visual Studio redist paths if available on build machine
+    vs_redist_roots = [
+        Path(r"C:\Program Files\Microsoft Visual Studio"),
+        Path(r"C:\Program Files (x86)\Microsoft Visual Studio"),
+    ]
+    for vs_root in vs_redist_roots:
+        if vs_root.exists():
+            for crt_dir in sorted(vs_root.glob("**/x64/Microsoft.VC14*.CRT"), reverse=True):
+                if crt_dir.is_dir():
+                    search_dirs.append(crt_dir)
+
+    # Base python directory
+    search_dirs.append(base)
+
+    # Check System32 as fallback
+    system32 = Path(r"C:\Windows\System32")
+    if system32.exists():
+        search_dirs.append(system32)
+
+    for dll_name in VC_RUNTIME_DLLS:
+        for sdir in search_dirs:
+            candidate = sdir / dll_name
+            if candidate.is_file():
+                found[dll_name] = candidate
+                break
+    return found
+
+
 def _copy_base(base: Path, target: Path) -> None:
     target.mkdir(parents=True, exist_ok=True)
-    for name in ("python.exe", "pythonw.exe", "python3.dll", "python312.dll", "vcruntime140.dll", "vcruntime140_1.dll"):
+    for name in ("python.exe", "pythonw.exe", "python3.dll", "python312.dll"):
         shutil.copy2(base / name, target / name)
+
+    vc_dlls = _find_vc_redist_dlls(base)
+    for dll_name, dll_path in vc_dlls.items():
+        shutil.copy2(dll_path, target / dll_name)
+
     for name in ("DLLs", "Lib", "tcl"):
         source = base / name
         if source.exists():
