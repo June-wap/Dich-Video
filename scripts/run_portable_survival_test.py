@@ -1,4 +1,4 @@
-"""Portable Backend Survival Test for runtime-main-combined-test.
+﻿"""Portable Backend Survival Test for runtime-main-combined-test.
 
 Validates:
 1. Spawns <PORTABLE_COPY_PATH>\\python.exe -m backend.main
@@ -13,6 +13,7 @@ Validates:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -24,20 +25,24 @@ import wave
 from pathlib import Path
 
 
-def run_survival_test(portable_python: Path, repo_root: Path) -> bool:
+def run_survival_test(portable_python: Path, project_root: Path, output_wav: Path, chatterbox_python: Path | None = None) -> bool:
     print("=================================================================")
     print("           PORTABLE BACKEND SURVIVAL & REAL TTS TEST             ")
     print(f" Python Executable: {portable_python}")
-    print(f" Project Root:      {repo_root}")
+    print(f" Project Root:      {project_root}")
     print("=================================================================")
 
     if not portable_python.is_file():
         print(f"[FAIL] Portable python not found: {portable_python}", file=sys.stderr)
         return False
+    if not (project_root / "backend").is_dir():
+        print(f"[FAIL] Project root does not contain backend/: {project_root}", file=sys.stderr)
+        return False
 
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(repo_root)
-    env["LOCAL_AI_CHATTERBOX_PYTHON"] = str(repo_root / ".venv-chatterbox" / "Scripts" / "python.exe")
+    env["PYTHONPATH"] = str(project_root)
+    if chatterbox_python and chatterbox_python.is_file():
+        env["LOCAL_AI_CHATTERBOX_PYTHON"] = str(chatterbox_python)
     env["HF_HUB_OFFLINE"] = "1"
     env["TRANSFORMERS_OFFLINE"] = "1"
     # Ensure local token is disabled or matched if required
@@ -47,7 +52,7 @@ def run_survival_test(portable_python: Path, repo_root: Path) -> bool:
     print(f"\n[1/5] Launching backend process: {' '.join(cmd)}")
     proc = subprocess.Popen(
         cmd,
-        cwd=str(repo_root),
+        cwd=str(project_root),
         env=env,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -119,7 +124,8 @@ def run_survival_test(portable_python: Path, repo_root: Path) -> bool:
 
         # Step 4: Download and validate WAV
         print(f"\n[4/5] Downloading generated audio from {full_audio_url}...")
-        test_wav = repo_root / "release-candidates" / "survival_test.wav"
+        test_wav = output_wav.resolve()
+        test_wav.parent.mkdir(parents=True, exist_ok=True)
         with urllib.request.urlopen(full_audio_url, timeout=30) as audio_resp:
             test_wav.write_bytes(audio_resp.read())
 
@@ -177,10 +183,20 @@ def run_survival_test(portable_python: Path, repo_root: Path) -> bool:
 
 
 def main() -> None:
-    repo_root = Path(__file__).resolve().parent.parent
-    portable_python = repo_root / "release-candidates" / "runtime-main-combined-test" / "python.exe"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--runtime-python", type=Path, required=True, help="Path to portable runtime python.exe")
+    parser.add_argument("--project-root", type=Path, required=True, help="Path to project root containing backend/")
+    parser.add_argument("--output-wav", type=Path, required=True, help="Path to save the generated test audio")
+    parser.add_argument("--chatterbox-python", type=Path, default=None, help="Optional path to Chatterbox python.exe")
 
-    ok = run_survival_test(portable_python, repo_root)
+    args = parser.parse_args()
+
+    ok = run_survival_test(
+        portable_python=args.runtime_python.resolve(),
+        project_root=args.project_root.resolve(),
+        output_wav=args.output_wav.resolve(),
+        chatterbox_python=args.chatterbox_python.resolve() if args.chatterbox_python else None
+    )
     sys.exit(0 if ok else 1)
 
 

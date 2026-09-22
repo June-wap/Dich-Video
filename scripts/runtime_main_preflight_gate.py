@@ -1,4 +1,4 @@
-"""Automated fail-closed preflight and release gate for portable runtime-main on Windows x64.
+﻿"""Automated fail-closed preflight and release gate for portable runtime-main on Windows x64.
 
 Enforces strict verification across six sequential native child processes:
 - Gate A1: import sentencepiece._sentencepiece; print("NATIVE_SENTENCEPIECE_OK")
@@ -363,23 +363,31 @@ _dump_loaded_crt_modules()
 
 
 def _find_backend_root(explicit_root: Path | None, py_exe: Path) -> Path:
-    candidates = []
-    if explicit_root and explicit_root.is_dir():
-        candidates.append(explicit_root)
-    candidates.extend([
-        Path(__file__).resolve().parent.parent,
+    if explicit_root is not None:
+        explicit_root = explicit_root.resolve()
+        if (explicit_root / "backend").is_dir():
+            return explicit_root
+        raise RuntimeError(f"FAIL CLOSED: --project-root {explicit_root} does not contain backend/ directory.")
+
+    candidates = [
         Path.cwd(),
+        Path.cwd() / "resources" / "app",
         Path.cwd() / "resources",
+        py_exe.parent.parent.parent / "resources" / "app",
         py_exe.parent.parent.parent / "resources",
+        py_exe.parent.parent / "resources" / "app",
         py_exe.parent.parent / "resources",
+        py_exe.parent / "resources" / "app",
         py_exe.parent / "resources",
         py_exe.parent,
-        Path(r"D:\Tool Dich Cho Khach"),
-    ])
+        Path(__file__).resolve().parent.parent,
+    ]
     for c in candidates:
-        if (c / "backend").is_dir():
-            return c.resolve()
-    return (explicit_root or Path(__file__).resolve().parent.parent).resolve()
+        resolved = c.resolve()
+        if (resolved / "backend").is_dir():
+            return resolved
+
+    raise RuntimeError("FAIL CLOSED: Could not deterministically find project root containing backend/ directory. Provide --project-root explicitly.")
 
 
 def main() -> None:

@@ -10,7 +10,9 @@ uvicorn==0.52.4
 pydantic==2.13.5
 pytest==9.1.1
 # Pinned SentencePiece for VieNeu/NeuCodec/torchtune compatibility.
-# 0.2.2 introduced pybind11/mod_gil_not_used with MSVC 14.51 causing 0xC0000005 crashes on clean VMs.
+# sentencepiece==0.2.1 is the current validated release candidate for
+# clean-VM compatibility testing. The exact root cause of the 0.2.2 native
+# crash remains under isolation investigation.
 sentencepiece==0.2.1
 
 # CP2: official VieNeu 0.5B integration.  The source revision is immutable;
