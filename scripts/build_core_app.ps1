@@ -14,9 +14,11 @@ try {
     Pop-Location
 }
 
-Write-Host "=== 2. Cleaning Previous Core Output ===" -ForegroundColor Cyan
-if (Test-Path -LiteralPath $outputBase) {
-    Remove-Item -LiteralPath $outputBase -Recurse -Force -ErrorAction SilentlyContinue
+Write-Host "=== 2. Preparing Isolated Staging Environment ===" -ForegroundColor Cyan
+New-Item -ItemType Directory -Force -Path $outputBase | Out-Null
+$unpacked = Join-Path $outputBase 'win-unpacked'
+if (Test-Path -LiteralPath $unpacked) {
+    Remove-Item -LiteralPath $unpacked -Recurse -Force
 }
 
 Write-Host "=== 3. Packaging Voca Basic Core with electron-builder ===" -ForegroundColor Cyan
@@ -28,23 +30,35 @@ try {
     Pop-Location
 }
 
-$unpacked = Join-Path $outputBase 'win-unpacked'
 if (-not (Test-Path -LiteralPath $unpacked)) {
     throw "Expected unpacked directory not found: $unpacked"
 }
 
-if (Test-Path -LiteralPath $finalCoreDir) {
-    Remove-Item -LiteralPath $finalCoreDir -Recurse -Force
+$gitHash = "candidate"
+try {
+    $resolvedHash = (git rev-parse --short HEAD 2>$null)
+    if ($resolvedHash) { $gitHash = $resolvedHash.Trim() }
+} catch {}
+
+$candidateName = "Voca Basic Core $gitHash"
+$candidateDir = Join-Path $outputBase $candidateName
+
+if (Test-Path -LiteralPath $candidateDir) {
+    Remove-Item -LiteralPath $candidateDir -Recurse -Force -ErrorAction SilentlyContinue
+    if (Test-Path -LiteralPath $candidateDir) {
+        $candidateName = "Voca Basic Core $gitHash-" + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+        $candidateDir = Join-Path $outputBase $candidateName
+    }
 }
-Rename-Item -LiteralPath $unpacked -NewName 'Voca Basic Core'
+Rename-Item -LiteralPath $unpacked -NewName $candidateName
 
 Write-Host "=== 4. Adding AI Package Config and Desktop Shortcut Helper ===" -ForegroundColor Cyan
 $defaultConfig = @{
     ai_packages_dir = "./ai-packages"
     description = "Duong dan den thu muc AI Packages. Mac dinh: ./ai-packages (nam canh Voca Basic.exe)"
 } | ConvertTo-Json -Depth 4
-Set-Content -LiteralPath (Join-Path $finalCoreDir 'ai-package-config.json') -Value $defaultConfig -Encoding utf8
-Set-Content -LiteralPath (Join-Path $finalCoreDir 'resources\ai-package-config.json') -Value $defaultConfig -Encoding utf8
+Set-Content -LiteralPath (Join-Path $candidateDir 'ai-package-config.json') -Value $defaultConfig -Encoding utf8
+Set-Content -LiteralPath (Join-Path $candidateDir 'resources\ai-package-config.json') -Value $defaultConfig -Encoding utf8
 
 $batContent = @'
 @echo off
@@ -65,7 +79,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 
 timeout /t 3 >nul 2>&1
 '@
-Set-Content -LiteralPath (Join-Path $finalCoreDir 'Tao-Phim-Tat-Desktop.bat') -Value $batContent -Encoding ascii
+Set-Content -LiteralPath (Join-Path $candidateDir 'Tao-Phim-Tat-Desktop.bat') -Value $batContent -Encoding ascii
 
 $resetContent = @'
 @echo off
@@ -102,9 +116,27 @@ if exist "%TARGET_DIR%" (
 echo.
 pause
 '@
-Set-Content -LiteralPath (Join-Path $finalCoreDir 'Reset-Data-Ban-Trang.bat') -Value $resetContent -Encoding ascii
+Set-Content -LiteralPath (Join-Path $candidateDir 'Reset-Data-Ban-Trang.bat') -Value $resetContent -Encoding ascii
 
-$coreSizeMB = [math]::Round(((Get-ChildItem -LiteralPath $finalCoreDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB), 2)
+Write-Host "=== 5. Promoting Candidate to Standard Core Directory ===" -ForegroundColor Cyan
+$activeCoreDir = $candidateDir
+try {
+    if (Test-Path -LiteralPath $finalCoreDir) {
+        $backupName = "Voca Basic Core.old." + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+        $backupPath = Join-Path $outputBase $backupName
+        Rename-Item -LiteralPath $finalCoreDir -NewName $backupName -ErrorAction Stop
+        Remove-Item -LiteralPath $backupPath -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    Copy-Item -LiteralPath $candidateDir -Destination $finalCoreDir -Recurse -Force -ErrorAction Stop
+    $activeCoreDir = $finalCoreDir
+    Write-Host "=== Successfully promoted to: $finalCoreDir ===" -ForegroundColor Green
+} catch {
+    Write-Host "[WARN] Could not update standard directory '$finalCoreDir' (likely locked by another process): $_" -ForegroundColor Yellow
+    Write-Host "Validated candidate core is preserved at: $candidateDir" -ForegroundColor Yellow
+}
+
+$coreSizeMB = [math]::Round(((Get-ChildItem -LiteralPath $activeCoreDir -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB), 2)
 Write-Host "=== Voca Basic Core App built successfully ===" -ForegroundColor Green
-Write-Host "Location: $finalCoreDir"
-Write-Host "Size: $coreSizeMB MB"
+Write-Host "Candidate Location: $candidateDir"
+Write-Host "Active Location:    $activeCoreDir"
+Write-Host "Size:               $coreSizeMB MB"
