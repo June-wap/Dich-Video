@@ -1,4 +1,4 @@
-﻿"""Pinned official VieNeu adapter for the approved Vietnamese 0.5B model."""
+"""Pinned official VieNeu adapter for the approved Vietnamese 0.5B model."""
 from __future__ import annotations
 
 import os
@@ -81,10 +81,53 @@ class VieNeuAdapter:
             local_files_only=offline,
         )
 
+    @classmethod
+    def _ensure_offline_model_store(cls) -> Path | None:
+        """Auto-resolve offline HuggingFace model store if not explicitly set."""
+        hf_home = os.environ.get("HF_HOME")
+        if hf_home:
+            home_path = Path(hf_home)
+            if (home_path / "hub").is_dir() or (home_path / "models--pnnbao-ump--VieNeu-TTS").is_dir():
+                return home_path
+
+        candidates: list[Path] = []
+        try:
+            exe_parent = Path(sys.executable).resolve().parent
+            candidates.extend([
+                exe_parent.parent / "ai-packages" / "models" / "huggingface",
+                exe_parent.parent / "models" / "huggingface",
+                exe_parent / "models" / "huggingface",
+                exe_parent.parent / "release" / "AI-Packages" / "models" / "huggingface",
+            ])
+        except Exception:
+            pass
+
+        try:
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            candidates.extend([
+                repo_root / "ai-packages" / "models" / "huggingface",
+                repo_root / "models" / "huggingface",
+                repo_root / "release" / "AI-Packages" / "models" / "huggingface",
+            ])
+        except Exception:
+            pass
+
+        for cand in candidates:
+            if cand.is_dir():
+                hub = cand / "hub"
+                if hub.is_dir() or (cand / "models--pnnbao-ump--VieNeu-TTS").is_dir():
+                    os.environ["HF_HOME"] = str(cand)
+                    os.environ["HF_HUB_CACHE"] = str(hub if hub.is_dir() else cand)
+                    return cand
+
+        return None
+
     def load(self):
         with self._lock:
             if self._runtime is not None:
                 return self
+
+            self._ensure_offline_model_store()
 
             from vieneu.core import VieNeuTTS
             from transformers import AutoModelForCausalLM, AutoTokenizer

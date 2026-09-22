@@ -98,6 +98,9 @@ def _resolve_vc_redist_dir(explicit_dir: Path | None, base_python: Path) -> Path
         candidate = explicit_dir.resolve()
         if not candidate.is_dir():
             raise RuntimeError(f"FAIL CLOSED: --vc-redist-dir is not a directory: {candidate}")
+        cand_str = str(candidate).lower()
+        if "system32" in cand_str or "syswow64" in cand_str:
+            raise RuntimeError(f"FAIL CLOSED: System32/SysWOW64 is forbidden as VC redist source: {candidate}")
         return candidate
 
     vs_redist_roots = [
@@ -106,9 +109,12 @@ def _resolve_vc_redist_dir(explicit_dir: Path | None, base_python: Path) -> Path
     ]
     for vs_root in vs_redist_roots:
         if vs_root.exists():
-            crt_dirs = sorted(vs_root.glob("**/x64/Microsoft.VC14*.CRT"), reverse=True)
+            crt_dirs = [
+                d.resolve() for d in vs_root.glob("**/x64/Microsoft.VC14*.CRT")
+                if "onecore" not in str(d).lower()
+            ]
             if crt_dirs:
-                return crt_dirs[0].resolve()
+                return sorted(crt_dirs, reverse=True)[0]
 
     base_python = base_python.resolve()
     if (base_python / "vcruntime140.dll").is_file():
@@ -229,9 +235,36 @@ def _manifest(runtime: Path, output: Path, vc_metadata: list[dict]) -> None:
         "vc_runtime_dlls": vc_metadata,
         "files": files,
     }
+    sp_metadata = list(site.glob("sentencepiece-*.dist-info/METADATA"))
+    if sp_metadata:
+        payload["sentencepiece_version"] = version("sentencepiece")
+        sp_pyd = site / "sentencepiece" / "_sentencepiece.cp312-win_amd64.pyd"
+        if sp_pyd.is_file():
+            payload["sentencepiece_native_pyd_sha256"] = _sha256(sp_pyd)
     if torchao_metadata:
         payload["torchao_version"] = version("torchao")
     output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+LOCKED_SP_VERSION = "0.2.1"
+LOCKED_SP_PYD_SHA256 = "f1069eaa45cfa5d6d81f7b46876b80860fe9147d28d84c7057ed952e84b064e5"
+
+
+def _verify_main_runtime(runtime: Path) -> None:
+    site = runtime / "Lib" / "site-packages"
+    sp_dir = site / "sentencepiece"
+    sp_pyd = sp_dir / "_sentencepiece.cp312-win_amd64.pyd"
+    if not sp_pyd.is_file():
+        raise RuntimeError(f"FAIL CLOSED: _sentencepiece.cp312-win_amd64.pyd missing in {sp_dir}")
+    actual_hash = _sha256(sp_pyd).lower()
+    if actual_hash != LOCKED_SP_PYD_SHA256:
+        raise RuntimeError(
+            f"FAIL CLOSED: SentencePiece native pyd hash mismatch!\n"
+            f"Expected: {LOCKED_SP_PYD_SHA256}\n"
+            f"Actual:   {actual_hash}"
+        )
+    if (site / "sentencepiece-0.2.2.dist-info").exists():
+        raise RuntimeError("FAIL CLOSED: sentencepiece-0.2.2.dist-info residue found in staged runtime!")
 
 
 def build(base: Path, venv: Path, project: Path, target: Path, vc_dlls: dict[str, dict], *, main: bool) -> None:
@@ -242,6 +275,8 @@ def build(base: Path, venv: Path, project: Path, target: Path, vc_dlls: dict[str
     _copy_base(base, target, vc_dlls)
     _copy_site_packages(venv, target, main=main)
     _copy_backend(project, target)
+    if main:
+        _verify_main_runtime(target)
 
 
 def main() -> None:

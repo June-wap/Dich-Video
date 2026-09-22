@@ -1,4 +1,4 @@
-﻿"""Automated fail-closed preflight and release gate for portable runtime-main on Windows x64.
+"""Automated fail-closed preflight and release gate for portable runtime-main on Windows x64.
 
 Enforces strict verification across six sequential native child processes:
 - Gate A1: import sentencepiece._sentencepiece; print("NATIVE_SENTENCEPIECE_OK")
@@ -109,6 +109,8 @@ def _run_single_gate(
         cmd.extend(extra_args)
 
     merged_env = os.environ.copy()
+    merged_env["PYTHONUTF8"] = "1"
+    merged_env["PYTHONIOENCODING"] = "utf-8"
     if env:
         merged_env.update(env)
 
@@ -132,6 +134,8 @@ def _run_single_gate(
             env=merged_env,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout_sec,
         )
         elapsed = time.time() - t0
@@ -216,11 +220,33 @@ def run_gates(
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    model_store_resolved: Path | None = None
+    hf_home_env = os.environ.get("HF_HOME")
+    if hf_home_env and Path(hf_home_env).is_dir():
+        model_store_resolved = Path(hf_home_env)
+    else:
+        candidates = [
+            python_exe.parent.parent / "ai-packages" / "models" / "huggingface",
+            python_exe.parent / "models" / "huggingface",
+            project_root / "release" / "AI-Packages" / "models" / "huggingface",
+            Path.home() / ".cache" / "huggingface",
+        ]
+        for cand in candidates:
+            if cand.is_dir() and ((cand / "hub").is_dir() or (cand / "models--pnnbao-ump--VieNeu-TTS").is_dir()):
+                model_store_resolved = cand
+                break
+
     base_env = {
         "PYTHONPATH": str(project_root),
+        "PYTHONUTF8": "1",
+        "PYTHONIOENCODING": "utf-8",
         "HF_HUB_OFFLINE": "1",
         "TRANSFORMERS_OFFLINE": "1",
     }
+    if model_store_resolved:
+        base_env["HF_HOME"] = str(model_store_resolved)
+        hub_path = model_store_resolved / "hub"
+        base_env["HF_HUB_CACHE"] = str(hub_path if hub_path.is_dir() else model_store_resolved)
 
     # Gate A1: Native SentencePiece import
     code_a1 = f"""{DIAGNOSTIC_SNIPPET}

@@ -22,6 +22,8 @@ function spawnBackendProcess({ layout, data, uiPort, apiPort, spawn = childProce
     LOCAL_AI_CORS_ORIGINS: `http://127.0.0.1:${uiPort}`,
     LOCAL_AI_HOST: '127.0.0.1', LOCAL_AI_PORT: String(apiPort),
     PYTHONPATH: `${moduleRoot}${path.delimiter}${sourceRoot}`,
+    PYTHONUTF8: '1',
+    PYTHONIOENCODING: 'utf-8',
     HF_HOME: modelStore,
     HF_HUB_CACHE: path.join(modelStore, 'hub'),
     HF_HUB_OFFLINE: '1', TRANSFORMERS_OFFLINE: '1',

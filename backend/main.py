@@ -10,8 +10,20 @@ import logging
 import os
 from pathlib import Path
 import secrets
+import sys
 import threading
 from typing import Callable
+
+# Reconfigure standard streams to UTF-8 on Windows to prevent UnicodeEncodeError
+# when third-party libraries (e.g. vieneu) print unicode/emoji messages to console.
+if sys.platform == "win32":
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
