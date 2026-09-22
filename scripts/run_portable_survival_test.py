@@ -1,4 +1,4 @@
-﻿"""Portable Backend Survival Test for runtime-main-combined-test.
+"""Portable Backend Survival Test for runtime-main-combined-test.
 
 Validates:
 1. Spawns <PORTABLE_COPY_PATH>\\python.exe -m backend.main
@@ -41,6 +41,17 @@ def run_survival_test(portable_python: Path, project_root: Path, output_wav: Pat
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(project_root)
+    if not chatterbox_python or not chatterbox_python.is_file():
+        candidates = [
+            project_root / ".venv-chatterbox" / "Scripts" / "python.exe",
+            portable_python.parent.parent / "runtime-chatterbox" / "python.exe",
+            portable_python.parent / "runtime-chatterbox" / "python.exe",
+        ]
+        for c in candidates:
+            if c.is_file():
+                chatterbox_python = c
+                break
+
     if chatterbox_python and chatterbox_python.is_file():
         env["LOCAL_AI_CHATTERBOX_PYTHON"] = str(chatterbox_python)
     env["HF_HUB_OFFLINE"] = "1"

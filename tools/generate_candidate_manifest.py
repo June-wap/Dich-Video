@@ -95,7 +95,7 @@ def generate(candidate_root: Path, output_json: Path, output_txt: Path) -> None:
             "size": pyd.stat().st_size,
             "sha256": _sha256(pyd),
             "linker_version": "Unknown (extracted)",
-            "binding_framework": "SWIG",
+            "binding_framework": "unknown/not_measured",
         }
 
     for f in sorted(vc_dir.glob("*.dll")):
