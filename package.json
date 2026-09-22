@@ -5,7 +5,7 @@
   "main": "desktop/main.cjs",
   "scripts": {
     "test": "npm --prefix frontend test",
-    "test:desktop": "node --test desktop/runtime-paths.test.cjs desktop/frontend-runtime.test.cjs desktop/backend-launch.test.cjs desktop/lifecycle.test.cjs",
+    "test:desktop": "node --test desktop/runtime-paths.test.cjs desktop/frontend-runtime.test.cjs desktop/backend-launch.test.cjs desktop/lifecycle.test.cjs desktop/customer-package-scripts.test.cjs",
     "build:frontend": "npm --prefix frontend run build",
     "stage:runtime": "powershell -ExecutionPolicy Bypass -File scripts/stage_release_runtime.ps1",
     "stage:cp86": "powershell -ExecutionPolicy Bypass -File scripts/stage_cp86_release.ps1",

@@ -95,6 +95,19 @@ foreach ($pkg in $expectedAiPackages.Keys) {
 
 # 6. Write Updated Customer Batch Files
 Write-Host "`n=== Writing Customer Installation & Verification Batch Files ===" -ForegroundColor Cyan
+
+function Write-CustomerBatFile([string]$path, [string]$content) {
+    $crlfContent = $content.Replace("`r`n", "`n").Replace("`n", "`r`n")
+    $enc = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($path, $crlfContent, $enc)
+}
+
+function Write-CustomerTextFile([string]$path, [string]$content) {
+    $crlfContent = $content.Replace("`r`n", "`n").Replace("`n", "`r`n")
+    $enc = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($path, $crlfContent, $enc)
+}
+
 $caiDatBat = @'
 @echo off
 chcp 65001 >nul
@@ -286,7 +299,7 @@ echo.
 pause
 exit /b 1
 '@
-Set-Content -LiteralPath (Join-Path $vocaBasicDir 'Cai-Dat-AI-Packages.bat') -Value $caiDatBat -Encoding utf8
+Write-CustomerBatFile (Join-Path $vocaBasicDir 'Cai-Dat-AI-Packages.bat') $caiDatBat
 
 $kiemTraBat = @'
 @echo off
@@ -361,6 +374,8 @@ if exist "%TARGET_DIR%\runtime-main\python.exe" (
 
 if exist "%TARGET_DIR%\runtime-chatterbox\python.exe" (
     echo   [OK] ai-packages\runtime-chatterbox\python.exe
+) else (
+    echo   [LOI] Khong tim thay ai-packages\runtime-chatterbox\python.exe
     set "ERRORS=1"
 )
 
@@ -396,7 +411,7 @@ echo.
 pause
 if "%ERRORS%"=="0" (exit /b 0) else (exit /b 1)
 '@
-Set-Content -LiteralPath (Join-Path $vocaBasicDir 'Kiem-Tra-Cai-Dat.bat') -Value $kiemTraBat -Encoding utf8
+Write-CustomerBatFile (Join-Path $vocaBasicDir 'Kiem-Tra-Cai-Dat.bat') $kiemTraBat
 
 # 7. Update HUONG-DAN.txt
 $huongDan = @'
@@ -404,15 +419,20 @@ $huongDan = @'
                     HƯỚNG DẪN CÀI ĐẶT & SỬ DỤNG VOCA BASIC 1.0.1
 ================================================================================
 
-1. YÊU CẦU HỆ THỐNG
+1. YÊU CẦU HỆ THỐNG & NGUYÊN TẮC HOẠT ĐỘNG
 --------------------------------------------------------------------------------
 - Hệ điều hành: Windows 10 hoặc Windows 11 (64-bit).
 - Dung lượng ổ đĩa trống: Tối thiểu 20 GB khả dụng trên ổ đĩa cài đặt.
-- Card đồ họa (GPU): Khuyến nghị NVIDIA GPU (VRAM >= 4GB) để kích hoạt tăng tốc
-  phần cứng CUDA cho giọng đọc Chatterbox Multilingual V3.
-  (Nếu không có GPU rời, phần mềm tự động sử dụng giọng VieNeu trên CPU).
+- Phân bổ xử lý giọng đọc AI (Offline 100% trên máy):
+  + Tiếng Việt (giọng đọc VieNeu): Chạy cục bộ trực tiếp trên CPU.
+  + Các ngôn ngữ quốc tế hỗ trợ khác: Sử dụng bộ máy Chatterbox Multilingual V3.
+  + Yêu cầu phần cứng Chatterbox: Bắt buộc trang bị card đồ họa rời NVIDIA hỗ trợ
+    CUDA (khuyến nghị VRAM >= 4GB).
+  + Lưu ý quan trọng: Chatterbox KHÔNG hỗ trợ chạy trên CPU và hệ thống KHÔNG tự
+    động fallback âm thầm sang engine khác. Nếu máy không có NVIDIA CUDA, các tác
+    vụ tạo giọng ngoại ngữ sẽ báo lỗi phần cứng để người dùng nhận biết rõ ràng.
 - Kết nối Internet: Cần thiết khi sử dụng tính năng Dịch thuật Gemini BYOK.
-  (Các giọng đọc VieNeu và Chatterbox chạy 100% OFFLINE trên máy).
+  (Các mô hình TTS đọc văn bản chạy 100% OFFLINE trên máy).
 
 2. CẤU TRÚC GÓI SẢN PHẨM
 --------------------------------------------------------------------------------
@@ -483,8 +503,8 @@ Bước 4: Nhấp đúp vào "Voca Basic.exe" để mở và sử dụng phần 
                           VOCA BASIC - PHIÊN BẢN 1.0.1
 ================================================================================
 '@
-Set-Content -LiteralPath (Join-Path $vocaBasicDir 'HUONG-DAN.txt') -Value $huongDan -Encoding utf8
-Set-Content -LiteralPath (Join-Path $customerRoot 'HUONG-DAN.txt') -Value $huongDan -Encoding utf8
+Write-CustomerTextFile (Join-Path $vocaBasicDir 'HUONG-DAN.txt') $huongDan
+Write-CustomerTextFile (Join-Path $customerRoot 'HUONG-DAN.txt') $huongDan
 
 # 8. Compute Authoritative SHA256SUMS.txt
 Write-Host "`n=== Generating Authoritative SHA256SUMS.txt ===" -ForegroundColor Cyan
