@@ -1,4 +1,4 @@
-﻿"""Durable profile metadata and references with lazy provider conditioning."""
+"""Durable profile metadata and references with lazy provider conditioning."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -31,6 +31,7 @@ from backend.services.provider_service import ProviderService
 from backend.core.languages import normalize_production_language, resolve_tts_provider
 from backend.services.execution import serialized_inference
 from backend.core.audio_utils import export_mp3
+from backend.core.ffmpeg_resolver import resolve_ffmpeg_path
 from backend.persistence import Repository, checksum
 
 logger = logging.getLogger("backend.voices")
@@ -134,8 +135,11 @@ class VoiceProfileService:
         """
         try:
             try:
+                ffmpeg_bin = resolve_ffmpeg_path()
+                if ffmpeg_bin is None or not ffmpeg_bin.is_file():
+                    raise FileNotFoundError("FFmpeg binary not available")
                 decoded = subprocess.run(
-                    ["ffmpeg", "-v", "error", "-nostdin", "-i", str(temp_path.resolve()),
+                    [str(ffmpeg_bin), "-v", "error", "-nostdin", "-i", str(temp_path.resolve()),
                      "-map", "0:a:0", "-f", "wav", "-acodec", "pcm_f32le", "pipe:1"],
                     capture_output=True, timeout=30, check=True
                 )

@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 function spawnBackendProcess({ layout, data, uiPort, apiPort, spawn = childProcess.spawn, baseEnvironment = process.env }) {
-  const { python, backend: sourceRoot, modelStore, chatterbox } = layout;
+  const { python, backend: sourceRoot, modelStore, chatterbox, ffmpeg, development } = layout;
   const moduleRoot = fs.existsSync(path.join(sourceRoot, 'backend'))
     ? sourceRoot
     : path.dirname(sourceRoot);
@@ -17,6 +17,9 @@ function spawnBackendProcess({ layout, data, uiPort, apiPort, spawn = childProce
     LOCAL_AI_TEMP_DIR: path.join(data.root, 'temp'),
     LOCAL_AI_TOKEN_PATH: data.token,
     LOCAL_AI_CHATTERBOX_PYTHON: chatterbox,
+    ...(ffmpeg ? { LOCAL_AI_FFMPEG_PATH: ffmpeg } : {}),
+    LOCAL_AI_PRODUCTION: development ? '0' : '1',
+    LOCAL_AI_PACKAGED: development ? '0' : '1',
     LOCAL_AI_REQUIRE_LOCAL_TOKEN: '1',
     LOCAL_AI_WARM_UP_ON_START: '1',
     LOCAL_AI_CORS_ORIGINS: `http://127.0.0.1:${uiPort}`,

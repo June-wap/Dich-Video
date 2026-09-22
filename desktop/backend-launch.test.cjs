@@ -43,5 +43,7 @@ test('spawns backend with the resolved packaged Chatterbox interpreter', (t) => 
   assert.equal(received.command, layout.python);
   assert.deepEqual(received.args, ['-m', 'backend.main']);
   assert.equal(received.options.env.LOCAL_AI_CHATTERBOX_PYTHON, layout.chatterbox);
+  assert.equal(received.options.env.LOCAL_AI_PRODUCTION, '1');
+  assert.equal(received.options.env.LOCAL_AI_FFMPEG_PATH, layout.ffmpeg);
   assert.equal(received.options.env.HF_TOKEN, undefined);
 });

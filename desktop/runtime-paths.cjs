@@ -47,10 +47,41 @@ function resolveRuntimeRoot({ isPackaged, resourcesPath, projectRoot }) {
   return path.join(resourcesPath, 'runtime');
 }
 
+function resolveFfmpegPath({ isPackaged, resourcesPath, projectRoot }) {
+  if (isPackaged) {
+    const candidates = [
+      path.join(resourcesPath, 'bin', 'ffmpeg.exe'),
+      path.join(resourcesPath, 'ffmpeg', 'ffmpeg.exe'),
+      path.join(resourcesPath, 'ffmpeg', 'bin', 'ffmpeg.exe'),
+      path.join(resourcesPath, '..', 'ffmpeg.exe'),
+      path.join(resourcesPath, '..', 'bin', 'ffmpeg.exe'),
+    ];
+    for (const cand of candidates) {
+      if (fs.statSync(cand, { throwIfNoEntry: false })?.isFile()) {
+        return cand;
+      }
+    }
+    return path.join(resourcesPath, 'bin', 'ffmpeg.exe');
+  }
+
+  const devCandidates = [
+    path.join(projectRoot, 'release', 'bin', 'ffmpeg.exe'),
+    path.join(projectRoot, 'bin', 'ffmpeg.exe'),
+  ];
+  for (const cand of devCandidates) {
+    if (fs.statSync(cand, { throwIfNoEntry: false })?.isFile()) {
+      return cand;
+    }
+  }
+
+  return path.join(projectRoot, 'release', 'bin', 'ffmpeg.exe');
+}
+
 function resolveRuntimeLayout({ isPackaged, resourcesPath, projectRoot }) {
   const root = resolveRuntimeRoot({ isPackaged, resourcesPath, projectRoot });
   const main = path.join(root, 'runtime-main');
   const chatterbox = path.join(root, 'runtime-chatterbox', 'python.exe');
+  const ffmpeg = resolveFfmpegPath({ isPackaged, resourcesPath, projectRoot });
   
   // Backend can be in resources/backend (Core App) or runtime-main/app (bundled package)
   let backend = path.join(main, 'app');
@@ -67,6 +98,7 @@ function resolveRuntimeLayout({ isPackaged, resourcesPath, projectRoot }) {
     backend,
     chatterbox,
     modelStore: path.join(root, 'models', 'huggingface'),
+    ffmpeg,
     development: !isPackaged,
   };
 
@@ -82,5 +114,5 @@ function resolveRuntimeLayout({ isPackaged, resourcesPath, projectRoot }) {
   return layout;
 }
 
-module.exports = { resolveRuntimeLayout, resolveRuntimeRoot };
+module.exports = { resolveFfmpegPath, resolveRuntimeLayout, resolveRuntimeRoot };
 

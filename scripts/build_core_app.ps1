@@ -15,6 +15,11 @@ try {
 }
 
 Write-Host "=== 2. Preparing Isolated Staging Environment ===" -ForegroundColor Cyan
+$ffmpegSource = Join-Path $root 'release\bin\ffmpeg.exe'
+if (-not (Test-Path -LiteralPath $ffmpegSource)) {
+    throw "Missing required FFmpeg binary at: $ffmpegSource"
+}
+
 New-Item -ItemType Directory -Force -Path $outputBase | Out-Null
 $unpacked = Join-Path $outputBase 'win-unpacked'
 if (Test-Path -LiteralPath $unpacked) {
@@ -52,7 +57,26 @@ if (Test-Path -LiteralPath $candidateDir) {
 }
 Rename-Item -LiteralPath $unpacked -NewName $candidateName
 
-Write-Host "=== 4. Adding AI Package Config and Desktop Shortcut Helper ===" -ForegroundColor Cyan
+Write-Host "=== 4. Adding AI Package Config, Tools and Helpers ===" -ForegroundColor Cyan
+$bundledFfmpeg = Join-Path $candidateDir 'resources\bin\ffmpeg.exe'
+if (-not (Test-Path -LiteralPath $bundledFfmpeg)) {
+    Write-Host "[WARN] resources\bin\ffmpeg.exe was not created by electron-builder, copying directly..." -ForegroundColor Yellow
+    New-Item -ItemType Directory -Force -Path (Join-Path $candidateDir 'resources\bin') | Out-Null
+    Copy-Item -LiteralPath $ffmpegSource -Destination $bundledFfmpeg -Force
+}
+if ((Get-Item -LiteralPath $bundledFfmpeg).Length -eq 0) {
+    throw "Bundled FFmpeg binary is empty: $bundledFfmpeg"
+}
+Write-Host "  -> Bundled FFmpeg verified: $bundledFfmpeg ($([math]::Round((Get-Item $bundledFfmpeg).Length/1MB, 2)) MB)" -ForegroundColor Green
+
+# Ensure 7-Zip tools (7z.exe + 7z.dll v26.03) are present in candidate
+$sevenZipDir = Join-Path $root 'release\tools\7zip'
+if (Test-Path -LiteralPath (Join-Path $sevenZipDir '7z.exe')) {
+    Copy-Item -LiteralPath (Join-Path $sevenZipDir '7z.exe') -Destination (Join-Path $candidateDir '7z.exe') -Force
+    Copy-Item -LiteralPath (Join-Path $sevenZipDir '7z.dll') -Destination (Join-Path $candidateDir '7z.dll') -Force
+    Write-Host "  -> Bundled 7-Zip 26.03 verified in Core candidate" -ForegroundColor Green
+}
+
 $defaultConfig = @{
     ai_packages_dir = "./ai-packages"
     description = "Duong dan den thu muc AI Packages. Mac dinh: ./ai-packages (nam canh Voca Basic.exe)"

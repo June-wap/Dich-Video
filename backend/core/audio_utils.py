@@ -118,6 +118,7 @@ def write_wav(path: str | Path, samples: np.ndarray, sample_rate: int) -> Path:
     return path
 
 
+
 def wav_duration(path: str | Path) -> float:
     """Return duration of a WAV file in seconds."""
     with wave.open(str(path), "rb") as wf:
@@ -131,27 +132,53 @@ def wav_sample_rate(path: str | Path) -> int:
 
 
 def export_mp3(wav_path: str | Path, mp3_path: str | Path = None) -> Path | None:
-    """Convert WAV to MP3 using pydub + ffmpeg. Returns path or None on failure."""
+    """Convert WAV to MP3 using pydub + resolved FFmpeg. Returns path or None on failure."""
+    from backend.core.ffmpeg_resolver import resolve_ffmpeg_path
+
     wav_path = Path(wav_path)
+    if not wav_path.is_file() or wav_path.stat().st_size == 0:
+        logger.error("MP3 export failed: input WAV missing or empty: %s", wav_path)
+        return None
+
     if mp3_path is None:
         mp3_path = wav_path.with_suffix(".mp3")
     else:
         mp3_path = Path(mp3_path)
+
+    # 1. Authoritative FFmpeg resolution (fail-closed before opening any output file)
+    ffmpeg_bin = resolve_ffmpeg_path()
+    if ffmpeg_bin is None or not ffmpeg_bin.is_file():
+        logger.error("MP3 export failed for %s: FFmpeg binary not available", wav_path.name)
+        return None
+
     mp3_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         from pydub import AudioSegment
+        AudioSegment.converter = str(ffmpeg_bin)
+        AudioSegment.ffmpeg = str(ffmpeg_bin)
+
         audio = AudioSegment.from_wav(str(wav_path))
         audio.export(str(mp3_path), format="mp3", bitrate="192k")
-        logger.info("MP3 exported: %s", mp3_path.name)
+
+        if not mp3_path.is_file() or mp3_path.stat().st_size == 0:
+            logger.error("MP3 export produced zero-byte file for %s", wav_path.name)
+            if mp3_path.is_file():
+                mp3_path.unlink(missing_ok=True)
+            return None
+
+        logger.info("MP3 exported successfully: %s (%d bytes)", mp3_path.name, mp3_path.stat().st_size)
         return mp3_path
     except Exception as e:
         logger.error("MP3 export failed for %s: %s", wav_path.name, e)
+        if mp3_path.is_file() and mp3_path.stat().st_size == 0:
+            try:
+                mp3_path.unlink(missing_ok=True)
+            except OSError:
+                pass
         return None
 
 
 def merge_segments(
-    wav_paths: list[str | Path],
-    output_path: str | Path,
     pause_ms: int = 500,
     target_sr: int = None,
     pauses_ms: list[float] | None = None,

@@ -83,3 +83,36 @@ test('packaged layout discovers external packages via ai-package-config.json', (
   assert.equal(layout.python, path.join(externalDir, 'runtime-main', 'python.exe'));
 });
 
+test('packaged layout discovers bundled ffmpeg in resources/bin', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'voca-app-'));
+  const resourcesPath = path.join(root, 'resources');
+  const packages = path.join(root, 'ai-packages');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.mkdirSync(resourcesPath, { recursive: true });
+  fs.mkdirSync(path.join(resourcesPath, 'bin'), { recursive: true });
+  const bundledFfmpeg = path.join(resourcesPath, 'bin', 'ffmpeg.exe');
+  fs.closeSync(fs.openSync(bundledFfmpeg, 'w'));
+  createRuntimeLayout(packages);
+
+  const layout = resolveRuntimeLayout({ isPackaged: true, resourcesPath, projectRoot: 'ignored' });
+  assert.equal(layout.ffmpeg, bundledFfmpeg);
+});
+
+test('development layout discovers ffmpeg in release/bin', (t) => {
+  const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'voca-project-'));
+  t.after(() => fs.rmSync(projectRoot, { recursive: true, force: true }));
+  const stagedRuntime = path.join(projectRoot, 'release', 'staged-runtime');
+  createRuntimeLayout(stagedRuntime);
+  const releaseBin = path.join(projectRoot, 'release', 'bin');
+  fs.mkdirSync(releaseBin, { recursive: true });
+  const devFfmpeg = path.join(releaseBin, 'ffmpeg.exe');
+  fs.closeSync(fs.openSync(devFfmpeg, 'w'));
+
+  const layout = resolveRuntimeLayout({
+    isPackaged: false,
+    resourcesPath: 'ignored',
+    projectRoot,
+  });
+  assert.equal(layout.ffmpeg, devFfmpeg);
+});
+

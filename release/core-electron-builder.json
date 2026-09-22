@@ -27,6 +27,10 @@
     {
       "from": "release/THIRD_PARTY_NOTICES.md",
       "to": "THIRD_PARTY_NOTICES.md"
+    },
+    {
+      "from": "release/bin/ffmpeg.exe",
+      "to": "bin/ffmpeg.exe"
     }
   ],
   "win": {
